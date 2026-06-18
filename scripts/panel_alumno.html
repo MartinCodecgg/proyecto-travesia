@@ -1,0 +1,905 @@
+<p>
+  <script>
+    // Quitar margen del <p> que Moodle crea alrededor del script
+    if (document.currentScript?.parentElement?.tagName === "P") {
+      document.currentScript.parentElement.style.margin = "0";
+    }
+
+    // Ocultar el título de la página de Moodle lo más rápido posible
+    (function () {
+      var style = document.createElement("style");
+      style.textContent = `
+         h2:first-of-type, .page-header-headings, .activity-header {
+           display: none !important;
+         }
+      `;
+      document.head.appendChild(style);
+    })();
+  </script>
+</p>
+
+<!-- Pantalla Falsa (Seguridad por Oscuridad) -->
+<div id="pantalla-falsa">
+  <p style="font-size: 15px; color: #444; line-height: 1.8;"><strong>Página de prueba Moodle</strong></p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est, et nunc <span id="btn-oculto" style="cursor: text;">accumsan</span> vehicula nisi. Mauris placerat eleifend leo, quisque sit amet est et sapien ullamcorper pharetra.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis molestie dictum semper, quam quam congue erat, vitae sodales nisi metus a nunc. Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod sodales, sollicitudin vel, wisi.</p>
+</div>
+
+<!-- Panel del Alumno -->
+<div id="tablero" style="display: none;">
+  <div id="student-panel-container">
+    
+    <!-- Cabecera Premium -->
+    <div class="panel-header">
+      <h3 style="color: hsl(168, 60%, 35%) !important; margin-top: 0 !important; margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: hsl(168, 60%, 35%);">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/>
+        </svg>
+        Portal de Seguimiento Estudiantil
+      </h3>
+    </div>
+
+    <!-- Indicador de Carga -->
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="spinner"></div>
+      <div id="loading-text" class="loading-text">Cargando tus datos...</div>
+    </div>
+
+    <!-- Contenido del Panel -->
+    <div id="panel-content" style="display: none;">
+      
+      <!-- Información del Estudiante -->
+      <div class="welcome-card">
+        <div class="user-avatar" id="student-avatar"></div>
+        <div class="user-details">
+          <h4 id="student-name" style="margin: 0; font-size: 16px; font-weight: 700; color: #333;">Cargando estudiante...</h4>
+          <p id="student-email" style="margin: 4px 0 0 0; font-size: 12px; color: #666; font-weight: 500;">correo@facultad.edu.ar</p>
+        </div>
+      </div>
+
+      <!-- Estado de la Solicitud -->
+      <div class="status-section" style="margin-bottom: 24px;">
+        <div class="card-status" id="status-card">
+          <div class="status-icon" id="status-icon">🔍</div>
+          <div class="status-info">
+            <h5 id="status-title" style="margin: 0; font-size: 14px; font-weight: 700; color: #333;">Estado de tu Solicitud</h5>
+            <p id="status-desc" style="margin: 6px 0 0 0; font-size: 13px; color: #555; line-height: 1.5;">Verificando estado actual en el sistema...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de Acción Dinámica (Formulario / Cancelar) -->
+      <div id="action-section"></div>
+      
+      <!-- Mensaje de Status Transitorio -->
+      <div id="status-message" class="status-text" style="display: none;"></div>
+
+    </div>
+  </div>
+</div>
+
+<p>
+  <script>
+    (function () {
+      // Inyección dinámica de CSS para evitar la sanitización de etiquetas <style> de Moodle
+      (function () {
+        const style = document.createElement("style");
+        style.textContent = `
+          #student-panel-container {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #333;
+            background-color: #fcfcfc;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px auto;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05);
+            position: relative;
+            max-width: 580px;
+            box-sizing: border-box;
+          }
+          
+          .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid hsl(168, 60%, 90%);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+          }
+          
+          .welcome-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: white;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+          }
+          
+          .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #eaeaea;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+          }
+          
+          .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+          
+          .userinitials {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background-color: hsl(168, 60%, 35%);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 15px;
+          }
+          
+          .card-status {
+            display: flex;
+            gap: 16px;
+            background: white;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 18px;
+            align-items: flex-start;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+            transition: border-color 0.2s ease;
+          }
+          
+          .card-status-pending {
+            border-left: 4px solid #f39c12;
+            background: linear-gradient(145deg, #ffffff 70%, #fffbf2 100%);
+          }
+          
+          .card-status-approved {
+            border-left: 4px solid #2ecc71;
+            background: linear-gradient(145deg, #ffffff 70%, #f4fbf6 100%);
+          }
+          
+          .card-status-empty {
+            border-left: 4px solid #3498db;
+            background: linear-gradient(145deg, #ffffff 70%, #f5fafd 100%);
+          }
+          
+          .status-icon {
+            font-size: 24px;
+            line-height: 1;
+            flex-shrink: 0;
+            user-select: none;
+          }
+          
+          .status-info {
+            flex: 1;
+          }
+          
+          .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+          }
+          
+          .form-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #555;
+          }
+          
+          .form-textarea {
+            width: 100%;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 13px;
+            padding: 12px;
+            border: 1px solid #d1d3e2;
+            border-radius: 6px;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.15s ease;
+          }
+          
+          .form-textarea:focus {
+            outline: none;
+            border-color: hsl(168, 60%, 35%);
+          }
+          
+          .btn-action {
+            background: hsl(168, 60%, 35%);
+            color: white !important;
+            border: none;
+            padding: 10px 18px;
+            font-size: 13.5px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.15s ease;
+            width: 100%;
+            height: 40px;
+          }
+          
+          .btn-action:hover:not(:disabled) {
+            background: hsl(168, 60%, 28%);
+          }
+          
+          .btn-action:disabled {
+            background: #a5c7be;
+            cursor: not-allowed;
+            opacity: 0.7;
+          }
+          
+          .btn-danger {
+            background: #e74c3c;
+          }
+          
+          .btn-danger:hover:not(:disabled) {
+            background: #c0392b;
+          }
+          
+          .status-text {
+            font-size: 13px;
+            margin-top: 12px;
+            text-align: center;
+            font-weight: 600;
+          }
+          
+          .text-success { color: #27ae60; }
+          .text-danger { color: #c0392b; }
+          .text-warning { color: #d35400; }
+          
+          .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-radius: 8px;
+            gap: 12px;
+            min-height: 200px;
+          }
+          
+          .spinner {
+            width: 36px;
+            height: 36px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid hsl(168, 60%, 35%);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+          
+          .loading-text {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: hsl(168, 60%, 25%);
+          }
+          
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `;
+        document.head.appendChild(style);
+      })();
+
+      // Revelado del tablero con click en accumsan
+      document.getElementById("btn-oculto").addEventListener("click", function () {
+        document.getElementById("pantalla-falsa").style.display = "none";
+        document.getElementById("tablero").style.display = "block";
+        initPanel(); // Inicializar el panel al revelar
+      });
+
+      // ==========================================================
+      // ★ CONSTANTES Y CONFIGURACIÓN (HARDCODEADO POR COMPATIBILIDAD) ★
+      // ==========================================================
+      const SOLICITUDES_DB_CMID = 54783;  // CMID de la base de datos "Db Solicitudes de ayuda"
+      const SOLICITUDES_DB_ID = 15;      // DATAID de la base de datos "Db Solicitudes de ayuda"
+      const HISTORIAL_DB_CMID = 54864;    // CMID de la base de datos "Historial de asistencias"
+      const HISTORIAL_DB_ID = 22;        // DATAID de la base de datos "Historial de asistencias"
+      const CURSO_ID = 1732;             // ID del curso en Moodle
+
+      const sesskey = window.M?.cfg?.sesskey || document.querySelector('input[name="sesskey"]')?.value || "";
+
+      // Variables de estado local
+      let currentUserId = window.M?.cfg?.userid || "";
+      let currentUserFullName = window.M?.cfg?.userfullname || "Estudiante";
+      let currentUserEmail = "";
+      let currentUserAvatarHtml = "";
+      
+      let solicitudActiva = null; // { rid, descripcion, fecha, estado: 'pendiente'|'atendida' }
+
+      // Mostrar/Ocultar loading
+      function showLoading(text) {
+        const overlay = document.getElementById("loading-overlay");
+        const loadingText = document.getElementById("loading-text");
+        loadingText.textContent = text;
+        overlay.style.display = "flex";
+      }
+
+      function hideLoading() {
+        document.getElementById("loading-overlay").style.display = "none";
+      }
+
+      // Mostrar mensaje transitorio de status
+      function showStatus(text, type = "success") {
+        const msgEl = document.getElementById("status-message");
+        msgEl.className = "status-text";
+        if (type === "success") msgEl.classList.add("text-success");
+        else if (type === "danger") msgEl.classList.add("text-danger");
+        else if (type === "warning") msgEl.classList.add("text-warning");
+        
+        msgEl.textContent = text;
+        msgEl.style.display = "block";
+        
+        // Auto-ocultar después de 6 segundos
+        setTimeout(() => {
+          msgEl.style.display = "none";
+        }, 6000);
+      }
+
+      // Parsea de manera tolerante y robusta las fechas de Moodle
+      function parseMoodleDate(str) {
+        if (!str) return new Date(0);
+        try {
+          const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+          const clean = str.replace(/de/g, "").replace(/,/g, "").replace(/\s+/g, " ").trim();
+          const parts = clean.split(" ");
+          
+          // Si el primer elemento no es numérico, es el nombre del día, lo quitamos
+          if (isNaN(parseInt(parts[0], 10))) {
+            parts.shift();
+          }
+          
+          const dia = parseInt(parts[0], 10);
+          const mesIndex = meses.indexOf(parts[1].toLowerCase());
+          const anio = parseInt(parts[2], 10);
+          const h = parts[3].split(":");
+          
+          return new Date(anio, mesIndex, dia, parseInt(h[0], 10), parseInt(h[1], 10));
+        } catch (e) {
+          console.error("Error al parsear fecha Moodle:", str, e);
+          return new Date(str);
+        }
+      }
+
+      // Función auxiliar para normalizar texto de labels
+      const normLabel = (str) => str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      // Obtener los datos del estudiante logueado (avatar y correo) desde el DOM o el perfil
+      async function fetchCurrentUserProfile() {
+        // Intentar parsear el menú de usuario de Moodle para obtener el avatar y nombre
+        const userMenuBtn = document.querySelector(".userbutton");
+        if (userMenuBtn) {
+          const nameEl = userMenuBtn.querySelector(".userfullname");
+          if (nameEl) currentUserFullName = nameEl.textContent.trim();
+          const imgEl = userMenuBtn.querySelector("img.userpicture");
+          if (imgEl) currentUserAvatarHtml = `<div class="user-pic-wrapper">${imgEl.outerHTML}</div>`;
+        }
+
+        // Si no se encuentra el avatar, usar iniciales del nombre
+        if (!currentUserAvatarHtml) {
+          currentUserAvatarHtml = `<div class="userinitials">${currentUserFullName.substring(0, 2).toUpperCase()}</div>`;
+        }
+
+        // Si no tenemos la ID del usuario, intentar extraerla desde algún enlace en la cabecera
+        if (!currentUserId) {
+          const myProfileLink = document.querySelector("a[href*='/user/profile.php'], a[href*='/user/view.php']");
+          if (myProfileLink) {
+            const m = myProfileLink.getAttribute("href").match(/id=(\d+)/);
+            if (m) currentUserId = m[1];
+          }
+        }
+
+        // Intentar obtener el correo haciendo fetch a la propia página de perfil
+        if (currentUserId) {
+          try {
+            const res = await fetch(`${window.location.origin}/user/profile.php?id=${currentUserId}`);
+            if (res.ok) {
+              const html = await res.text();
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(html, "text/html");
+              // Moodle muestra el correo en las listas de detalles del perfil
+              const emailLink = doc.querySelector("a[href^='mailto:']");
+              if (emailLink) {
+                currentUserEmail = emailLink.textContent.trim();
+              }
+            }
+          } catch (e) {
+            console.warn("No se pudo descargar el perfil completo para extraer el correo:", e);
+          }
+        }
+
+        // Actualizar UI de cabecera de usuario
+        document.getElementById("student-avatar").innerHTML = currentUserAvatarHtml;
+        document.getElementById("student-name").textContent = currentUserFullName;
+        document.getElementById("student-email").textContent = currentUserEmail || "Estudiante Moodle";
+      }
+
+      // Leer el estado de las solicitudes del alumno
+      async function loadStudentRequestStatus() {
+        showLoading("Comprobando el estado de tus solicitudes...");
+        solicitudActiva = null;
+
+        try {
+          // Fetch paralelo a la base de datos de solicitudes (d=15) y a la base de datos de historial de asistencias (d=22)
+          const [resSoli, resHistorial] = await Promise.all([
+            fetch(`${window.location.origin}/mod/data/view.php?d=${SOLICITUDES_DB_ID}`).then(r => r.text()),
+            fetch(`${window.location.origin}/mod/data/view.php?d=${HISTORIAL_DB_ID}`).then(r => r.text())
+          ]);
+
+          // A. Procesar solicitudes en d=15 (cola de pendientes)
+          const parserSoli = new DOMParser();
+          const docSoli = parserSoli.parseFromString(resSoli, "text/html");
+          let entriesSoli = Array.from(docSoli.querySelectorAll(".defaulttemplate-listentry, #defaulttemplate-single, .defaulttemplate-single"));
+          if (entriesSoli.length === 0) {
+            entriesSoli = Array.from(docSoli.querySelectorAll("#data-listview-content .card, #data-singleview-content .card, .defaulttemplate-single-body"));
+          }
+          // Filtrar entradas de d=15 reales
+          entriesSoli = entriesSoli.filter(entry => {
+            const hasAction = entry.querySelector("a[href*='delete='], a[href*='rid='], a[href*='edit.php']");
+            return !!hasAction;
+          });
+
+          let solicitudPendiente = null;
+          if (entriesSoli.length > 0) {
+            const entry = entriesSoli[0];
+            let rid = null;
+            const deleteLink = entry.querySelector("a[href*='delete=']");
+            if (deleteLink) {
+              const m = deleteLink.getAttribute("href").match(/delete=(\d+)/);
+              if (m) rid = m[1];
+            }
+            if (!rid) {
+              const editLink = entry.querySelector("a[href*='rid=']");
+              if (editLink) {
+                const m = editLink.getAttribute("href").match(/rid=(\d+)/);
+                if (m) rid = m[1];
+              }
+            }
+
+            const descEl = entry.querySelector(".data-field-html");
+            const descripcionText = descEl ? descEl.textContent.trim() : "";
+
+            const timeEl = entry.querySelector(".data-timeinfo span[title]");
+            const fechaText = timeEl ? timeEl.getAttribute("title") : (entry.querySelector(".data-timeinfo")?.textContent?.trim() || "Recientemente");
+            solicitudPendiente = {
+              rid: rid,
+              descripcion: descripcionText || "Sin descripción",
+              fecha: fechaText,
+              estado: "pendiente"
+            };
+          }
+
+          // B. Procesar historial en d=22 (solicitudes enviadas por el alumno que sirven de historial)
+          const parserHistorial = new DOMParser();
+          const docHistorial = parserHistorial.parseFromString(resHistorial, "text/html");
+          let entriesHistorial = Array.from(docHistorial.querySelectorAll(".defaulttemplate-listentry, #defaulttemplate-single, .defaulttemplate-single"));
+          if (entriesHistorial.length === 0) {
+            entriesHistorial = Array.from(docHistorial.querySelectorAll("#data-listview-content .card, #data-singleview-content .card, .defaulttemplate-single-body"));
+          }
+          
+          // Filtrar entradas de d=22 reales (deben tener labels que coincidan con la estructura)
+          entriesHistorial = entriesHistorial.filter(entry => {
+            const labels = entry.querySelectorAll(".font-weight-bold, span");
+            for (let label of labels) {
+              const text = label.textContent.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              if (text.includes("solicitud original") || text.includes("solicitud_original") || text.includes("nombre alumno") || text.includes("nombre_alumno")) {
+                return true;
+              }
+            }
+            return false;
+          });
+
+          let solicitudAtendida = null;
+          if (entriesHistorial.length > 0) {
+            // Quedarse con la más reciente
+            let masRecienteEntry = null;
+            let maxFecha = null;
+
+            entriesHistorial.forEach(entry => {
+              const timeEl = entry.querySelector(".data-timeinfo span[title]");
+              const fechaText = timeEl ? timeEl.getAttribute("title") : (entry.querySelector(".data-timeinfo")?.textContent?.trim() || "");
+              if (fechaText) {
+                const d = parseMoodleDate(fechaText);
+                if (!maxFecha || d > maxFecha) {
+                  maxFecha = d;
+                  masRecienteEntry = entry;
+                }
+              }
+            });
+
+            if (masRecienteEntry) {
+              // Parsear los campos del historial de d=22
+              const desc22El = masRecienteEntry.querySelector(".data-field-html");
+              const solicitudOriginal = desc22El ? desc22El.textContent.trim() : "Consulta de ayuda";
+
+              const timeEl = masRecienteEntry.querySelector(".data-timeinfo span[title]");
+              const fechaText = timeEl ? timeEl.getAttribute("title") : (masRecienteEntry.querySelector(".data-timeinfo")?.textContent?.trim() || "Recientemente");
+
+              solicitudAtendida = {
+                solicitudOriginal: solicitudOriginal || "Consulta de ayuda",
+                fecha: fechaText,
+                estado: "atendida"
+              };
+            }
+          }
+
+          // C. Resolver estado definitivo
+          if (solicitudPendiente) {
+            solicitudActiva = solicitudPendiente;
+          } else if (solicitudAtendida) {
+            solicitudActiva = solicitudAtendida;
+          } else {
+            solicitudActiva = null;
+          }
+
+          console.log("[DEBUG] Estado resuelto de la solicitud:", solicitudActiva);
+          
+          renderUI();
+          hideLoading();
+        } catch (e) {
+          console.error("Error al cargar solicitudes:", e);
+          showStatus("❌ Error al obtener tus datos. Por favor recarga la página.", "danger");
+          hideLoading();
+        }
+      }
+
+      // Renderizar la UI según el estado actual
+      function renderUI() {
+        const card = document.getElementById("status-card");
+        const icon = document.getElementById("status-icon");
+        const title = document.getElementById("status-title");
+        const desc = document.getElementById("status-desc");
+        const actionSec = document.getElementById("action-section");
+
+        // Limpiar clases
+        card.className = "card-status";
+
+        if (!solicitudActiva) {
+          // Caso A: Sin solicitudes activas
+          card.classList.add("card-status-empty");
+          icon.textContent = "ℹ️";
+          title.textContent = "Sin Solicitudes Activas";
+          desc.textContent = "No tienes solicitudes de asistencia pendientes en este cuatrimestre. Si estás teniendo dificultades académicas, puedes enviarle una consulta a los tutores completando el formulario a continuación.";
+
+          actionSec.innerHTML = `
+            <form id="form-solicitud" style="display: flex; flex-direction: column; gap: 14px;">
+              <div class="form-group">
+                <label for="input-descripcion" class="form-label">Describe brevemente tu situación o motivo de consulta</label>
+                <textarea id="input-descripcion" class="form-textarea" required placeholder="Ej: Necesito apoyo con la materia Análisis Matemático 1..."></textarea>
+              </div>
+              <button type="submit" id="btn-enviar" class="btn-action">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+                Enviar Solicitud de Ayuda
+              </button>
+            </form>
+          `;
+
+          // Registrar evento del formulario
+          document.getElementById("form-solicitud").addEventListener("submit", handleCreateRequest);
+
+        } else if (solicitudActiva.estado === "pendiente") {
+          // Caso B: Solicitud pendiente (Activa)
+          card.classList.add("card-status-pending");
+          icon.textContent = "⏳";
+          title.textContent = "Solicitud Pendiente de Atención";
+          desc.innerHTML = `
+            Tu solicitud fue enviada el <strong>${solicitudActiva.fecha}</strong>.<br><br>
+            <span style="font-style: italic; color: #555;">"Motivo: ${solicitudActiva.descripcion}"</span><br><br>
+            Un tutor revisará tu caso y te contactará a través de la mensajería interna de Moodle.
+          `;
+
+          actionSec.innerHTML = `
+            <button type="button" id="btn-cancelar" class="btn-action btn-danger">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              Dar de Baja Solicitud
+            </button>
+          `;
+
+          // Registrar evento de cancelación
+          document.getElementById("btn-cancelar").addEventListener("click", handleDeleteRequest);
+
+        } else if (solicitudActiva.estado === "atendida") {
+          // Caso C: Solicitud aprobada (Atendida)
+          card.classList.add("card-status-approved");
+          icon.textContent = "✅";
+          title.textContent = "Solicitud Atendida";
+          desc.innerHTML = `
+            Tu solicitud de ayuda anterior (enviada el <strong>${solicitudActiva.fecha}</strong>) ya ha sido procesada y <strong>atendida</strong> por el equipo de tutores.<br><br>
+            <strong>Tu consulta original:</strong><br>
+            <span style="font-style: italic; color: #555;">"${solicitudActiva.solicitudOriginal}"</span><br><br>
+            Un tutor te habrá contactado por medio de la mensajería interna de Moodle.<br><br>
+            Si requieres una nueva asistencia académica, puedes crear una nueva solicitud a continuación.
+          `;
+
+          actionSec.innerHTML = `
+            <form id="form-solicitud" style="display: flex; flex-direction: column; gap: 14px;">
+              <div class="form-group">
+                <label for="input-descripcion" class="form-label">Nueva consulta o situación a describir</label>
+                <textarea id="input-descripcion" class="form-textarea" required placeholder="Describe aquí la nueva ayuda que necesitas..."></textarea>
+              </div>
+              <button type="submit" id="btn-enviar" class="btn-action">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+                Enviar Nueva Solicitud
+              </button>
+            </form>
+          `;
+
+          // Registrar evento del formulario
+          document.getElementById("form-solicitud").addEventListener("submit", handleCreateRequest);
+        }
+      }
+
+      // Crear nueva solicitud de asistencia
+      async function handleCreateRequest(e) {
+        e.preventDefault();
+        
+        const descText = document.getElementById("input-descripcion").value.trim();
+        if (!descText) return;
+
+        if (!sesskey) {
+          showStatus("❌ No se pudo validar la firma de sesión Moodle (sesskey). Por favor recarga la página.", "danger");
+          return;
+        }
+
+        showLoading("Enviando tu solicitud...");
+
+        try {
+          const parser = new DOMParser();
+
+          // 1. Obtener la página del formulario de alta general de solicitudes (d=15) para mapear los campos dinámicamente
+          const formRes = await fetch(`${window.location.origin}/mod/data/edit.php?d=${SOLICITUDES_DB_ID}`);
+          if (!formRes.ok) throw new Error("No se pudo obtener el formulario de solicitudes (d=15).");
+
+          const formHtml = await formRes.text();
+          const docForm = parser.parseFromString(formHtml, "text/html");
+
+          // Buscar el textarea de descripción en d=15
+          let fieldName = "field_41"; // Fallback por defecto
+          const fontWeights = docForm.querySelectorAll(".font-weight-bold, label, legend");
+          for (let label of fontWeights) {
+            const text = normLabel(label.textContent);
+            if (text.includes("descripcion")) {
+              const parent = label.closest("div") || label.parentElement;
+              const inputEl = parent.querySelector("textarea, input[type='text']");
+              if (inputEl) {
+                fieldName = inputEl.getAttribute("name");
+                break;
+              }
+            }
+          }
+
+          // 1.5. Obtener la página del formulario de alta de historial (d=22) para mapear los campos dinámicamente
+          const form22Res = await fetch(`${window.location.origin}/mod/data/edit.php?d=${HISTORIAL_DB_ID}`);
+          if (!form22Res.ok) throw new Error("No se pudo obtener el formulario de historial (d=22).");
+          
+          const form22Html = await form22Res.text();
+          const docForm22 = parser.parseFromString(form22Html, "text/html");
+
+          const fields22Mapeo = {};
+          const label22Elements = docForm22.querySelectorAll("label[for]");
+          
+          label22Elements.forEach(label => {
+            const text = normLabel(label.textContent);
+            const inputId = label.getAttribute("for");
+            const inputEl = docForm22.getElementById(inputId) || docForm22.querySelector('[name="' + inputId + '"]');
+            if (inputEl) {
+              const fieldName = inputEl.getAttribute("name");
+              if (fieldName) {
+                if (text.includes("id_alumno") || text.includes("id alumno")) {
+                  fields22Mapeo.id_alumno = fieldName;
+                } else if (text.includes("nombre_alumno") || text.includes("nombre alumno")) {
+                  fields22Mapeo.nombre_alumno = fieldName;
+                } else if (text.includes("solicitud_original") || text.includes("solicitud original") || text.includes("solicitud")) {
+                  fields22Mapeo.solicitud_original = fieldName;
+                }
+              }
+            }
+          });
+
+          // Fallback de mapeo para d=22
+          if (!fields22Mapeo.nombre_alumno) {
+            const wrapperRows = docForm22.querySelectorAll("#defaulttemplate-addentry > div, .form-group, .fitem");
+            wrapperRows.forEach(row => {
+              const label = row.querySelector(".font-weight-bold, label, .col-form-label");
+              if (label) {
+                const labelText = normLabel(label.textContent);
+                const input = row.querySelector("input[name], textarea[name], select[name]");
+                if (input) {
+                  const fieldName = input.getAttribute("name");
+                  if (fieldName) {
+                    if (labelText.includes("id_alumno") || labelText.includes("id alumno")) {
+                      fields22Mapeo.id_alumno = fieldName;
+                    } else if (labelText.includes("nombre_alumno") || labelText.includes("nombre alumno")) {
+                      fields22Mapeo.nombre_alumno = fieldName;
+                    } else if (labelText.includes("solicitud_original") || labelText.includes("solicitud original") || labelText.includes("solicitud")) {
+                      fields22Mapeo.solicitud_original = fieldName;
+                    }
+                  }
+                }
+              }
+            });
+          }
+
+          // 2. Construir FormData con todos los inputs requeridos por Moodle para d=15
+          const formEl = docForm.querySelector("form[action*='edit.php']") || docForm.querySelector("form");
+          if (!formEl) throw new Error("No se encontró el formulario contenedor de solicitudes (d=15).");
+
+          const formData = new FormData();
+          const inputs = formEl.querySelectorAll("input, textarea, select");
+          inputs.forEach(input => {
+            const name = input.getAttribute("name");
+            if (!name) return;
+            if (input.type === "submit" || input.type === "button") return;
+            if ((input.type === "checkbox" || input.type === "radio") && !input.checked) return;
+            formData.set(name, input.value || "");
+          });
+
+          // Sobrescribir campos específicos de la solicitud en d=15
+          formData.set("d", SOLICITUDES_DB_ID.toString());
+          formData.set("rid", "0");
+          formData.set("sesskey", sesskey);
+          formData.set(fieldName, descText);
+          formData.set("saveandview", "Guardar");
+
+          // 2.5. Construir FormData con todos los inputs requeridos por Moodle para d=22
+          const form22El = docForm22.querySelector("form[action*='edit.php']") || docForm22.querySelector("form");
+          if (!form22El) throw new Error("No se encontró el formulario contenedor de historial (d=22).");
+
+          const formData22 = new FormData();
+          const inputs22 = form22El.querySelectorAll("input, textarea, select");
+          inputs22.forEach(input => {
+            const name = input.getAttribute("name");
+            if (!name) return;
+            if (input.type === "submit" || input.type === "button") return;
+            if ((input.type === "checkbox" || input.type === "radio") && !input.checked) return;
+            formData22.set(name, input.value || "");
+          });
+
+          // Sobrescribir campos específicos en d=22
+          formData22.set("d", HISTORIAL_DB_ID.toString());
+          formData22.set("rid", "0");
+          formData22.set("sesskey", sesskey);
+          if (fields22Mapeo.id_alumno) {
+            formData22.set(fields22Mapeo.id_alumno, currentUserEmail || currentUserId || "");
+          }
+          if (fields22Mapeo.nombre_alumno) {
+            formData22.set(fields22Mapeo.nombre_alumno, currentUserFullName || "");
+          }
+          if (fields22Mapeo.solicitud_original) {
+            formData22.set(fields22Mapeo.solicitud_original, descText);
+          }
+          formData22.set("saveandview", "Guardar");
+
+          // 3. POST a Moodle solicitudes (d=15)
+          const postRes = await fetch(`${window.location.origin}/mod/data/edit.php?d=${SOLICITUDES_DB_ID}`, {
+            method: "POST",
+            body: formData,
+            credentials: "include"
+          });
+
+          // Validar guardado exitoso en d=15
+          const responseText = await postRes.text();
+          const docPost = parser.parseFromString(responseText, "text/html");
+          const hasForm = docPost.querySelector('form#mform1, form[action*="edit.php"]') !== null;
+          const errorEl = docPost.querySelector('.errormsg, .error, .alert-danger');
+
+          if (hasForm) {
+            let errorMsg = "Fallo de validación en Moodle para solicitudes (d=15).";
+            if (errorEl) errorMsg += ` Detalle: ${errorEl.textContent.trim()}`;
+            throw new Error(errorMsg);
+          }
+
+          // 4. POST a Moodle historial (d=22)
+          const post22Res = await fetch(`${window.location.origin}/mod/data/edit.php?d=${HISTORIAL_DB_ID}`, {
+            method: "POST",
+            body: formData22,
+            credentials: "include"
+          });
+
+          // Validar guardado exitoso en d=22
+          const response22Text = await post22Res.text();
+          const doc22Post = parser.parseFromString(response22Text, "text/html");
+          const has22Form = doc22Post.querySelector('form#mform1, form[action*="edit.php"]') !== null;
+          const error22El = doc22Post.querySelector('.errormsg, .error, .alert-danger');
+
+          if (has22Form) {
+            let errorMsg = "Fallo de validación en Moodle para historial (d=22).";
+            if (error22El) errorMsg += ` Detalle: ${error22El.textContent.trim()}`;
+            throw new Error(errorMsg);
+          }
+
+          // Éxito, recargar estado
+          showStatus("✅ Solicitud de asistencia enviada con éxito.", "success");
+          await loadStudentRequestStatus();
+
+        } catch (e) {
+          console.error("Error al enviar solicitud:", e);
+          showStatus(`❌ No se pudo guardar la solicitud. ${e.message || "Verifica tu sesión Moodle."}`, "danger");
+          hideLoading();
+        }
+      }
+
+      // Eliminar (Dar de baja) solicitud activa
+      async function handleDeleteRequest() {
+        if (!solicitudActiva || !solicitudActiva.rid) return;
+
+        if (!confirm("¿Estás seguro de que deseas dar de baja tu solicitud de asistencia activa?")) {
+          return;
+        }
+
+        showLoading("Cancelando tu solicitud...");
+
+        try {
+          const deleteForm = new FormData();
+          deleteForm.append("d", SOLICITUDES_DB_ID.toString());
+          deleteForm.append("delete", solicitudActiva.rid);
+          deleteForm.append("confirm", "1");
+          deleteForm.append("sesskey", sesskey);
+
+          // Petición POST de confirmación de borrado
+          const deleteRes = await fetch(`${window.location.origin}/mod/data/view.php`, {
+            method: "POST",
+            body: deleteForm,
+            credentials: "include"
+          });
+
+          if (!deleteRes.ok) throw new Error("Fallo de red al enviar la solicitud de borrado.");
+
+          showStatus("✅ Solicitud de asistencia dada de baja correctamente.", "success");
+          await loadStudentRequestStatus();
+
+        } catch (e) {
+          console.error("Error al borrar solicitud:", e);
+          showStatus("❌ No se pudo cancelar la solicitud. Intenta nuevamente.", "danger");
+          hideLoading();
+        }
+      }
+
+      // Inicialización general
+      async function initPanel() {
+        // Ejecutar obtención del perfil y carga de solicitudes en paralelo
+        await Promise.all([
+          fetchCurrentUserProfile(),
+          loadStudentRequestStatus()
+        ]);
+        document.getElementById("panel-content").style.display = "block";
+      }
+
+    })();
+  </script>
+</p>

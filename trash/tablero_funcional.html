@@ -1,0 +1,3216 @@
+<p>
+  <script>
+    // Quitar margen del <p> que Moodle crea alrededor del script
+    if (document.currentScript?.parentElement?.tagName === "P") {
+      document.currentScript.parentElement.style.margin = "0";
+    }
+
+    // Ocultar el título de la página de Moodle lo más rápido posible
+    (function() {
+      var style = document.createElement("style");
+      style.textContent = `
+         h2:first-of-type, .page-header-headings, .activity-header {
+           display: none !important;
+         }
+      `;
+      document.head.appendChild(style);
+    })();
+  </script>
+</p>
+<!-- Pantalla Falsa (Seguridad por Oscuridad) -->
+<div id="pantalla-falsa">
+  <p style="font-size: 15px; color: #444; line-height: 1.8;"><strong>Página de
+      pruebaa Moodle</strong></p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Lorem ipsum dolor
+    sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+    exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
+    aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+    fugiat nulla pariatur.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Pellentesque
+    habitant morbi tristique senectus et netus et malesuada fames ac turpis
+    egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit
+    amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies
+    mi vitae est, et nunc <span id="btn-oculto"
+      style="cursor: text;">accumsan</span> vehicula nisi. Mauris placerat
+    eleifend leo, quisque sit amet est et sapien ullamcorper pharetra.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Curabitur pretium
+    tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis molestie
+    dictum semper, quam quam congue erat, vitae sodales nisi metus a nunc.
+    Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod sodales,
+    sollicitudin vel, wisi.</p>
+</div>
+<!-- Tablero de Control Principal -->
+<div id="tablero" style="display: none;">
+  <div id="dashboard-container"><!-- Cabecera Premium -->
+    <div class="dashboard-header">
+      <div>
+        <h3
+          style="color: hsl(168, 60%, 35%) !important; margin-top: 0 !important; margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important;">
+          📊 Sistema de Seguimiento Estudiantil - Tablero de Control General
+        </h3>
+      </div>
+      <div class="header-actions"
+        style="display: flex; gap: 8px; align-items: center;"><span
+          id="txt-last-update"
+          style="font-size: 13px; color: #666; margin-right: 4px;">Última
+          actualización: —</span> <button id="btn-refresh" class="btn-action"
+          type="button"> Actualizar datos </button> <button
+          id="btn-save-historical" class="btn-action" type="button"> 💾 Guardar
+          Histórico </button></div>
+    </div>
+    <!-- Indicador de Carga General -->
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="spinner"> </div>
+      <div id="loading-text" class="loading-text">Cargando configuración...
+      </div>
+    </div>
+    <!-- Resumen Estadístico Rápido (KPIs) -->
+    <div class="grid-kpis">
+      <div class="card-kpi bg-light-red"><span id="kpi-alto-riesgo"
+          class="kpi-value color-red">0</span> <span class="kpi-label">Alumnos
+          en riesgo alto (IRD ≥ 80)</span></div>
+      <div class="card-kpi bg-light-yellow"><span id="kpi-medio-riesgo"
+          class="kpi-value color-yellow">0</span> <span
+          class="kpi-label">Alumnos en riesgo medio (40-79)</span></div>
+      <div class="card-kpi bg-light-green"><span id="kpi-bajo-riesgo"
+          class="kpi-value color-green">0</span> <span class="kpi-label">Alumnos
+          sin riesgo (&lt; 40)</span></div>
+      <div class="card-kpi bg-light-blue"><span id="kpi-solicitudes-pendientes"
+          class="kpi-value color-blue">0</span> <span
+          class="kpi-label">Solicitudes pendientes de ayuda</span></div>
+    </div>
+    <!-- Pestañas de Navegación -->
+    <div class="tabs-navigation"><button class="tab-btn active" type="button"
+        data-tab="tab-listado-alumnos">📊 Riesgo Estudiantil (IRD)</button>
+      <button class="tab-btn" type="button" data-tab="tab-solicitudes">🆘
+        Solicitudes de Ayuda</button> <button class="tab-btn" type="button"
+        data-tab="tab-cohortes">🎓 Indicadores por Cohorte</button> <button
+        class="tab-btn" type="button" data-tab="tab-peso-preguntas">📈 Peso de
+        Preguntas</button></div>
+    <!-- Tab 1: Listado de Alumnos -->
+    <div id="tab-listado-alumnos" class="tab-content active">
+      <div class="section-card"><!-- Sección de Filtros -->
+        <div id="filters-toggle-btn" class="filters-header"
+          style="cursor: pointer;"><span
+            style="font-weight: 500; color: hsl(168, 60%, 25%);">🔍 Filtros de
+            Búsqueda</span> <span id="filters-arrow-icon">▼</span></div>
+        <div id="filters-container" class="filters-row" style="display: none;">
+          <div class="filter-item"><label for="filter-search">Buscar
+              Alumno</label> <input id="filter-search" class="filter-input"
+              type="text" placeholder="Nombre, apellido o email..."></div>
+          <div class="filter-item" style="max-width: 120px;"><label
+              for="filter-ird-min">IRD Mínimo</label> <input id="filter-ird-min"
+              class="filter-input" max="100" min="0" type="number"></div>
+          <div class="filter-item" style="max-width: 120px;"><label
+              for="filter-ird-max">IRD Máximo</label> <input id="filter-ird-max"
+              class="filter-input" max="100" min="0" type="number"></div>
+          <div class="filter-item"><label for="filter-asistencia">Estado de
+              Asistencia</label><select id="filter-asistencia"
+              class="filter-input">
+              <option value="todos">Todos</option>
+              <option value="asistidos">Asistidos</option>
+              <option value="sin_asistir">Sin asistir</option>
+            </select></div>
+          <div class="filter-item"><label
+              for="filter-riesgo-perceb">Autopercepción de Riesgo</label><select
+              id="filter-riesgo-perceb" class="filter-input">
+              <option value="todos">Todos</option>
+              <option value="si">Se percibe en riesgo</option>
+              <option value="no">No se percibe</option>
+            </select></div>
+          <div class="filter-item"
+            style="align-self: flex-end; display: flex; gap: 8px;"><button
+              id="btn-clear-filters" class="btn-action"
+              type="button">Limpiar</button></div>
+        </div>
+        <!-- Tabla de Alumnos -->
+        <div class="table-responsive">
+          <table id="table-students" class="table-dashboard">
+            <thead>
+              <tr>
+                <th style="width: 50px;">Foto</th>
+                <th>Nombre</th>
+                <th class="sortable" data-sort="ird">IRD ↕</th>
+                <th class="sortable" data-sort="ralentizacion">Ralentización ↕
+                </th>
+                <th class="sortable" data-sort="sePercibeRiesgo">¿Se percibe en
+                  riesgo? ↕</th>
+                <th class="sortable" data-sort="asistencia">Últ. Asistencia ↕
+                </th>
+                <th class="sortable" data-sort="solicitud">Últ. Solicitud ↕</th>
+                <th style="width: 100px; text-align: center;">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody">
+              <tr>
+                <td style="text-align: center; padding: 32px; color: #666;"
+                  colspan="8">No hay datos cargados. Presiona "Actualizar datos"
+                  para comenzar.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Paginación -->
+        <div class="pagination-row">
+          <div id="pagination-info" style="font-size: 13px; color: #666;">
+            Mostrando 0-0 de 0 alumnos</div>
+          <div id="pagination-nav" class="pagination-buttons"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Tab 2: Solicitudes de Ayuda -->
+    <div id="tab-solicitudes" class="tab-content">
+      <div class="section-card">
+        <h3
+          style="margin-top: 0; margin-bottom: 16px; color: hsl(168, 60%, 25%); display: flex; align-items: center; gap: 8px;">
+          🆘 Solicitudes de Ayuda Pendientes de Atención</h3>
+        <div class="table-responsive">
+          <table id="table-requests" class="table-dashboard">
+            <thead>
+              <tr>
+                <th style="width: 50px;">Foto</th>
+                <th>Alumno</th>
+                <th>Fecha de Solicitud</th>
+                <th>Detalle / Mensaje del Alumno</th>
+                <th style="width: 180px; text-align: center;">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="requests-tbody">
+              <tr>
+                <td style="text-align: center; padding: 32px; color: #666;"
+                  colspan="5">No hay solicitudes pendientes en este momento.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- Tab 3: Indicadores por Cohorte -->
+    <div id="tab-cohortes" class="tab-content">
+      <div class="section-card">
+        <h3
+          style="margin-top: 0; margin-bottom: 16px; color: hsl(168, 60%, 25%);">
+          🎓 Indicadores de Deserción y Eficiencia por Cohorte (Año de Ingreso)
+        </h3>
+        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Calculado
+          sobre el estado actual de los alumnos del curso. Los alumnos
+          ingresados hace más de 2 cuatrimestres (360 días) sin responder
+          encuestas cuatrimestrales se computan como desertores.</p>
+        <div class="table-responsive">
+          <table id="table-cohortes-data" class="table-dashboard">
+            <thead>
+              <tr>
+                <th>Cohorte</th>
+                <th>Ingresantes</th>
+                <th>Alumnos Activos (%)</th>
+                <th>Egresados (%)</th>
+                <th>Desertados (%)</th>
+              </tr>
+            </thead>
+            <tbody id="cohortes-tbody">
+              <tr>
+                <td style="text-align: center; padding: 32px; color: #666;"
+                  colspan="5">No hay datos estadísticos de cohorte disponibles.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- Tab 4: Peso de Preguntas -->
+    <div id="tab-peso-preguntas" class="tab-content">
+      <div class="section-card">
+        <h3
+          style="margin-top: 0; margin-bottom: 16px; color: hsl(168, 60%, 25%);">
+          📈 Impacto de Indicadores en el Riesgo Global del Grupo</h3>
+        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Muestra la
+          suma acumulada de la contribución (β × x) de cada pregunta para todos
+          los estudiantes evaluados. Permite identificar los factores de riesgo
+          con mayor prevalencia en este grupo.</p>
+        <div class="table-responsive">
+          <table id="table-questions-weight" class="table-dashboard">
+            <thead>
+              <tr>
+                <th style="width: 50px; text-align: center;">N°</th>
+                <th>Pregunta / Indicador</th>
+                <th>Origen</th>
+                <th style="text-align: right; width: 180px;">Peso Acumulado (%)
+                  ↓</th>
+              </tr>
+            </thead>
+            <tbody id="questions-tbody">
+              <tr>
+                <td style="text-align: center; padding: 32px; color: #666;"
+                  colspan="4">No hay datos de peso por pregunta calculados.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal Flotante de Registro de Asistencia -->
+<div id="modal-asistencia" class="modal-wrapper" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-title">Registrar Asistencia Académica</h3>
+      <button id="btn-modal-close" class="modal-close-btn"
+        type="button">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-student-info"
+        style="margin-bottom: 16px; padding: 12px; background: #f8f9fa; border-radius: 6px; font-weight: 600; font-size: 14px; color: #333;">
+        Alumno: —</div>
+      <form id="form-asistencia"
+        style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group"><label
+            style="font-weight: 600; margin-bottom: 6px; display: block; font-size: 13px; color: #555;"
+            for="asistencia-origen">Origen de la Asistencia</label><select
+            id="asistencia-origen" class="filter-input"
+            style="width: 100%; box-sizing: border-box;" required="">
+            <option value="Proactivo">Proactivo (Detección del Tutor por IRD)
+            </option>
+            <option value="Solicitud">Solicitud (Respuesta a pedido de ayuda del
+              Alumno)</option>
+          </select></div>
+        <div class="form-group"><label
+            style="font-weight: 600; margin-bottom: 6px; display: block; font-size: 13px; color: #555;"
+            for="asistencia-mensaje"> Mensaje de asistencia / Orientación
+            brindada </label> <textarea id="asistencia-mensaje"
+            style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: 13px; padding: 10px; border: 1px solid #d1d3e2; border-radius: 6px; resize: vertical;"
+            rows="6"
+            placeholder="Escribe aquí el mensaje u orientación que le enviarás al alumno por chat interno de Moodle y guardarás en los logs..."></textarea>
+        </div>
+        <div id="modal-error" class="status-text text-danger"
+          style="margin-top: 4px; display: none;"></div>
+        <div class="modal-footer"><button id="btn-modal-cancel"
+            class="btn-action btn-secondary-action"
+            type="button">Cancelar</button> <button id="btn-modal-save"
+            class="btn-action" type="submit">Guardar y Enviar</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+<p>
+  <script>
+    (function() {
+      // Inyección dinámica de CSS para evitar la sanitización de etiquetas <style> de Moodle
+      (function() {
+        const style = document.createElement("style");
+        style.textContent = `
+          #dashboard-container {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #333;
+            background-color: #fcfcfc;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05);
+            position: relative;
+          }
+          
+          .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid hsl(168, 60%, 90%);
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+          }
+          
+          #dashboard-container h2 {
+            color: hsl(168, 60%, 25%);
+            font-weight: 600;
+            margin: 0;
+            font-size: 22px;
+          }
+          
+          .subtitle {
+            margin: 4px 0 0 0;
+            font-size: 14px;
+            color: #666;
+            font-weight: normal;
+          }
+          
+          .header-actions {
+            display: flex;
+            align-items: center;
+          }
+          
+          /* KPIs Grid */
+          .grid-kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+          }
+          
+          @media (max-width: 992px) {
+            .grid-kpis {
+              grid-template-columns: repeat(2, 1fr);
+            }
+          }
+          
+          @media (max-width: 576px) {
+            .grid-kpis {
+              grid-template-columns: 1fr;
+            }
+          }
+          
+          .card-kpi {
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: white;
+            box-shadow: 0 4px 6px rgba(58, 59, 69, 0.02);
+            transition: all 0.2s ease-in-out;
+            position: relative;
+            overflow: hidden;
+          }
+          
+          .card-kpi:hover {
+            box-shadow: 0 10px 20px rgba(58, 59, 69, 0.08);
+          }
+          
+          .kpi-value {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 6px;
+          }
+          
+          .kpi-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #5d6d7e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .bg-light-red {
+            border-left: 4px solid #e74c3c;
+            background: linear-gradient(145deg, #ffffff 60%, #fdf2f2 100%);
+          }
+          .color-red { color: #c0392b; }
+          
+          .bg-light-yellow {
+            border-left: 4px solid #f39c12;
+            background: linear-gradient(145deg, #ffffff 60%, #fef9eb 100%);
+          }
+          .color-yellow { color: #d35400; }
+          
+          .bg-light-green {
+            border-left: 4px solid #2ecc71;
+            background: linear-gradient(145deg, #ffffff 60%, #f4fbf7 100%);
+          }
+          .color-green { color: #16a085; }
+          
+          .bg-light-blue {
+            border-left: 4px solid #3498db;
+            background: linear-gradient(145deg, #ffffff 60%, #f4f9fd 100%);
+          }
+          .color-blue { color: #2980b9; }
+          
+          /* Pestañas */
+          .tabs-navigation {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            gap: 4px;
+            overflow-x: auto;
+          }
+          
+          .tab-btn {
+            background: #f8f9fa;
+            border: 1px solid #d1d3e2;
+            color: #495057 !important;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+          }
+          
+          .tab-btn:hover {
+            background: #e9ecef;
+            color: #333 !important;
+          }
+          
+          .tab-btn.active {
+            background: hsl(168, 60%, 35%) !important;
+            color: white !important;
+            border-color: hsl(168, 60%, 35%) !important;
+            border-bottom: 1px solid hsl(168, 60%, 35%) !important;
+            margin-bottom: 0;
+            z-index: 2;
+          }
+          
+          .tab-content {
+            display: none;
+          }
+          
+          .tab-content.active {
+            display: block;
+          }
+          
+          /* Section Card */
+          .section-card {
+            background: white;
+            border: 1px solid #e3e6f0;
+            border-radius: 6px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+          }
+          
+          /* Filtros */
+          .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid hsl(168, 60%, 90%);
+            background: hsl(168, 60%, 98%);
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            user-select: none;
+          }
+          
+          .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: #fdfdfd;
+            border: 1px solid #e3e6f0;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 20px;
+          }
+          
+          .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1 1 180px;
+          }
+          
+          .filter-item label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+          }
+          
+          .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d3e2;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+            background-color: white;
+            height: 38px;
+            transition: border-color 0.15s ease;
+          }
+          
+          .filter-input:focus {
+            outline: none;
+            border-color: hsl(168, 60%, 35%);
+          }
+          
+          /* Botones */
+          .btn-action {
+            background: hsl(168, 60%, 35%);
+            color: white !important;
+            border: none;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 38px;
+            transition: background 0.15s ease;
+          }
+          
+          .btn-action:hover:not(:disabled) {
+            background: hsl(168, 60%, 28%);
+          }
+          
+          .btn-action:disabled {
+            background: #a5c7be;
+            cursor: not-allowed;
+            opacity: 0.7;
+          }
+          
+          .btn-secondary-action {
+            background: #f8f9fa;
+            color: #495057 !important;
+            border: 1px solid #d1d3e2;
+          }
+          
+          .btn-secondary-action:hover:not(:disabled) {
+            background: #e9ecef;
+          }
+          
+          .btn-table {
+            height: 28px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+          }
+
+          .user-link {
+            font-weight: 500;
+            color: #333;
+            text-decoration: none;
+            transition: color 0.15s ease;
+          }
+          
+          .user-link:hover {
+            color: hsl(168, 60%, 35%);
+            text-decoration: underline;
+          }
+          
+          /* Paginación */
+          .pagination-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+          }
+          
+          .pagination-buttons {
+            display: flex;
+            gap: 6px;
+          }
+          
+          .page-btn {
+            padding: 6px 12px;
+            background: #f8f9fa;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #333 !important;
+            transition: all 0.15s ease;
+          }
+          
+          .page-btn.active {
+            background: hsl(168, 60%, 35%) !important;
+            color: white !important;
+            border-color: hsl(168, 60%, 35%) !important;
+          }
+          
+          .page-btn:hover:not(.active):not(:disabled) {
+            background: #e9ecef;
+            color: #333 !important;
+          }
+          
+          .page-btn:disabled {
+            background: #f8f9fa !important;
+            color: #aaa !important;
+            border-color: #ddd !important;
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+          
+          /* Tabla */
+          .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 16px;
+          }
+          
+          .table-dashboard {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+          }
+          
+          .table-dashboard th, .table-dashboard td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e3e6f0;
+            text-align: left;
+            vertical-align: middle;
+          }
+          
+          .table-dashboard th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            user-select: none;
+          }
+          
+          .table-dashboard th.sortable {
+            cursor: pointer;
+          }
+          
+          .table-dashboard th.sortable:hover {
+            background-color: #e9ecef;
+          }
+          
+          .table-dashboard tr:hover {
+            background-color: #fcfcfc;
+          }
+          
+          /* Fila en riesgo (percepción) */
+          .row-perceived-risk {
+            border-left: 4px solid #c0392b !important;
+            background-color: #fff9f9;
+          }
+          
+          /* Semáforo Ralentización */
+          .badge-ralent {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 12px;
+            text-align: center;
+          }
+          
+          .badge-ralent-red {
+            background-color: #fadbd8;
+            color: #78281f;
+          }
+          
+          .badge-ralent-yellow {
+            background-color: #fdebd0;
+            color: #7e5109;
+          }
+          
+          .badge-ralent-green {
+            background-color: #d4efdf;
+            color: #145a32;
+          }
+
+          /* Semáforo IRD */
+          .badge-ird {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 12px;
+            text-align: center;
+          }
+          
+          .badge-ird-red {
+            background-color: #fadbd8;
+            color: #78281f;
+          }
+          
+          .badge-ird-yellow {
+            background-color: #fdebd0;
+            color: #7e5109;
+          }
+          
+          .badge-ird-green {
+            background-color: #d4efdf;
+            color: #145a32;
+          }
+          
+          .user-pic-wrapper {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+          }
+          
+          .user-pic-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+          
+          .userinitials {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background-color: hsl(168, 60%, 45%);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 12px;
+          }
+          
+          /* Paginación */
+          .pagination-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+          }
+          
+          .pagination-buttons {
+            display: flex;
+            gap: 4px;
+          }
+          
+          .page-btn {
+            padding: 6px 12px;
+            background: #f8f9fa;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #333 !important;
+            transition: all 0.15s ease;
+          }
+          
+          .page-btn.active {
+            background: hsl(168, 60%, 35%) !important;
+            color: white !important;
+            border-color: hsl(168, 60%, 35%) !important;
+          }
+          
+          .page-btn:hover:not(.active):not(:disabled) {
+            background: #e9ecef;
+          }
+          
+          .page-btn:disabled {
+            background: #f8f9fa !important;
+            color: #aaa !important;
+            border-color: #ddd !important;
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+          
+          /* Carga / Loading */
+          .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-radius: 8px;
+            gap: 12px;
+          }
+          
+          .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid hsl(168, 60%, 35%);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+          
+          .loading-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: hsl(168, 60%, 25%);
+          }
+          
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          
+          /* Modal */
+          .modal-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+          }
+          
+          .modal-box {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 550px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+          }
+          
+          .modal-header {
+            background: hsl(168, 60%, 35%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          
+          .modal-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+          }
+          
+          .modal-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            opacity: 0.8;
+          }
+          
+          .modal-close-btn:hover {
+            opacity: 1;
+          }
+          
+          .modal-body {
+            padding: 20px;
+          }
+          
+          .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 16px;
+            border-top: 1px solid #eee;
+            padding-top: 16px;
+          }
+          
+          .text-danger { color: #c0392b; }
+        `;
+        document.head.appendChild(style);
+      })();
+
+      // Revelado del tablero con click en accumsan
+      document.getElementById("btn-oculto").addEventListener("click",
+        function() {
+          document.getElementById("pantalla-falsa").style.display = "none";
+          document.getElementById("tablero").style.display = "block";
+          initDashboard(); // Inicializar el dashboard al revelar
+        });
+
+      // ==========================================================
+      // ★ CONSTANTES DE CONFIGURACIÓN MOODLE (FALLBACK POR DEFECTO) ★
+      // ==========================================================
+      const CONFIG_DB_CMID = 54785; // CMID de la base de datos "Db Config"
+      const CONFIG_DB_ID = 17; // DATAID de la base de datos "Db Config"
+      const CURSO_ID = 1732; // ID del aula / curso de Moodle
+
+      // Configuración en memoria con valores por defecto del archivo config_2.md
+      let systemConfig = {
+        urls: {
+          base: window.location.origin,
+          curso_id: CURSO_ID,
+          cmids: {
+            encuesta_inicial: 54062,
+            encuesta_cuatrimestral: 54284,
+            db_solicitudes: 54783,
+            db_logs: 54784,
+            db_historico: 54788
+          },
+          dataids: {
+            db_solicitudes: 15,
+            db_logs: 16,
+            db_historico: 18
+          }
+        },
+        umbrales: {
+          threshold_ird: 40,
+          cooldown_actualizar_seg: 30,
+          quarterly_warning_days: 90,
+          cuatrimestres_desercion: 2,
+          page_size_paneles: 30
+        },
+        encuesta_inicial: {
+          preguntas: []
+        },
+        encuesta_cuatrimestral: {
+          preguntas: []
+        },
+        preguntas_especiales: {
+          id_percepcion_riesgo: "(ABANDONAR_CARRERA) ¿Crees que estás en riesgo de abandonar la carrera?",
+          id_anio_ingreso: "¿En qué año ingresaste a la carrera? (Primer cuatrimestre cursado)",
+          id_egreso: "(EGRESO) ¿Ha egresado?"
+        }
+      };
+
+      // Plan de estudios hardcodeado
+      const PLAN_DE_ESTUDIOS = {
+        anio1: 7,
+        anio2: 18,
+        anio3: 30,
+        anio4: 41,
+        anio5: 51
+      };
+
+      // Estado en memoria
+      let alumnosCalculados = [];
+      let solicitudesPendientes = [];
+      let pesosPreguntasGlobal = [];
+      let cohortesStats = [];
+      let lastUpdateDate = null;
+      let refreshCooldownActive = false;
+
+      // Variables de Paginación y Filtros
+      let currentPage = 1;
+      let filters = {
+        search: "",
+        irdMin: null,
+        irdMax: null,
+        asistencia: "todos",
+        riesgoPerceb: "todos"
+      };
+      let activeSort = {
+        column: "ird",
+        direction: "desc"
+      };
+
+      // Clave de sesión de Moodle
+      const sesskey = window.M?.cfg?.sesskey || document.querySelector(
+        'input[name="sesskey"]')?.value || "";
+
+      // Limpia JSON inyectado de Moodle y Unicode spaces
+      function parseCleanJSON(rawText) {
+        if (!rawText) return null;
+        let clean = rawText.replace(/<[^>]*>/g, "");
+        clean = clean.replace(/&nbsp;/g, " ").replace(/&quot;/g, '"');
+        clean = clean.replace(/\u00a0/g, " "); // Limpieza Unicode obligatoria
+        clean = clean.replace(/\s+/g, " ").trim();
+        try {
+          return JSON.parse(clean);
+        } catch (e) {
+          console.error("Error al parsear JSON:", rawText, e);
+          return null;
+        }
+      }
+
+      // Parsea las entradas HTML de bases de datos
+      function parseEntriesHTML(htmlText) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlText, "text/html");
+        return Array.from(doc.querySelectorAll(
+          ".defaulttemplate-listentry, .defaulttemplate-single"));
+      }
+
+      // Parser de CSV robusto (RFC 4180 completo) — soporta comillas, saltos de línea y escapes "" dentro de celdas
+      function parseCSV(text) {
+        // Si el texto parece HTML, Moodle devolvió una página en lugar del CSV — retornar vacío
+        const trimmedText = text.trimStart();
+        if (trimmedText.startsWith("<!DOCTYPE") || trimmedText.startsWith(
+            "<html") || trimmedText.startsWith("<HTML")) {
+          console.error(
+            "parseCSV: La respuesta es HTML, no CSV. Moodle puede haber redirigido al login o devuelto un error.",
+            trimmedText.substring(0, 300));
+          return [];
+        }
+
+        const rows = [];
+        let col = "";
+        let row = [];
+        let inQuotes = false;
+        let i = 0;
+        const len = text.length;
+
+        while (i < len) {
+          const ch = text[i];
+
+          if (inQuotes) {
+            if (ch === '"') {
+              // Comilla de cierre o escape ""
+              if (i + 1 < len && text[i + 1] === '"') {
+                // Escape "" → agregar una comilla literal
+                col += '"';
+                i += 2;
+              } else {
+                // Cierre de campo entre comillas
+                inQuotes = false;
+                i++;
+              }
+            } else {
+              // Cualquier char dentro de comillas (incluyendo \n, \r) es parte del valor
+              col += ch;
+              i++;
+            }
+          } else {
+            if (ch === '"') {
+              // Apertura de campo entre comillas
+              inQuotes = true;
+              i++;
+            } else if (ch === ',') {
+              // Separador de columna
+              row.push(col);
+              col = "";
+              i++;
+            } else if (ch === '\r') {
+              // Fin de línea (CRLF o CR sólo)
+              row.push(col);
+              col = "";
+              rows.push(row);
+              row = [];
+              if (i + 1 < len && text[i + 1] === '\n') i++;
+              i++;
+            } else if (ch === '\n') {
+              // Fin de línea (LF)
+              row.push(col);
+              col = "";
+              rows.push(row);
+              row = [];
+              i++;
+            } else {
+              col += ch;
+              i++;
+            }
+          }
+        }
+
+        // Agregar la última columna/fila si quedó contenido
+        if (col !== "" || row.length > 0) {
+          row.push(col);
+          // Solo agregar si la fila no está completamente vacía
+          if (row.some(c => c.trim() !== "")) {
+            rows.push(row);
+          }
+        }
+
+        if (rows.length === 0) return [];
+
+        // La primera fila es el encabezado
+        const headers = rows[0].map(h => h.trim());
+
+        // Convertir filas en objetos {columna: valor}
+        return rows.slice(1)
+          .filter(r => r.some(c => c.trim() !== ""))
+          .map(r => Object.fromEntries(
+            headers.map((h, idx) => [h, (r[idx] ?? "").trim()])
+          ));
+      }
+
+      // Muestra/Oculta overlay de carga
+      function showLoading(text) {
+        const overlay = document.getElementById("loading-overlay");
+        const loadingText = document.getElementById("loading-text");
+        loadingText.textContent = text;
+        overlay.style.display = "flex";
+      }
+
+      function hideLoading() {
+        document.getElementById("loading-overlay").style.display = "none";
+      }
+
+      // Carga la configuración inicial desde la base de datos "Db Config" de Moodle
+      async function loadDbConfig() {
+        showLoading("Cargando configuración del sistema...");
+        try {
+          const response = await fetch(
+            `${window.location.origin}/mod/data/view.php?d=${CONFIG_DB_ID}`
+            );
+          if (response.ok) {
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const entries = doc.querySelectorAll(
+              ".defaulttemplate-listentry, .defaulttemplate-single, .card, .generaltable td"
+              );
+            let foundJson = null;
+
+            for (let entry of entries) {
+              const text = entry.textContent;
+              const cleanText = text.replace(/\u00a0/g, " ").replace(
+                /&nbsp;/g, " ").trim();
+              const match = cleanText.match(/\{[\s\S]*\}/);
+              if (match) {
+                const parsed = parseCleanJSON(match[0]);
+                if (parsed && (parsed.urls || parsed.umbrales || parsed
+                    .encuesta_inicial)) {
+                  foundJson = parsed;
+                  break;
+                }
+              }
+            }
+
+            if (!foundJson) {
+              // Buscar en todo el body
+              const bodyText = doc.body ? doc.body.textContent : html;
+              const cleanBody = bodyText.replace(/\u00a0/g, " ").replace(
+                /&nbsp;/g, " ").trim();
+              const match = cleanBody.match(/\{[\s\S]*\}/);
+              if (match) {
+                const parsed = parseCleanJSON(match[0]);
+                if (parsed && (parsed.urls || parsed.umbrales || parsed
+                    .encuesta_inicial)) {
+                  foundJson = parsed;
+                }
+              }
+            }
+
+            if (foundJson) {
+              systemConfig = foundJson;
+              console.log("Configuración cargada de la DB Moodle:",
+                systemConfig);
+            } else {
+              console.warn(
+                "No se encontró entrada de configuración válida en la DB. Usando fallback."
+                );
+              alert(
+                "Aviso: No se encontró una entrada de configuración válida en la base de datos de Moodle. Se intentará cargar el respaldo local."
+                );
+              await loadFallbackConfig();
+            }
+          } else {
+            console.error(
+              "Error al obtener la configuración de la DB. Usando fallback."
+              );
+            alert(
+              "Error: No se pudo obtener la configuración desde la base de datos de Moodle (código de respuesta no exitoso). Se intentará cargar el respaldo local."
+              );
+            await loadFallbackConfig();
+          }
+        } catch (e) {
+          console.error("Excepción al cargar config:", e);
+          alert(
+            "Error de red o sesión al intentar cargar la configuración de Moodle. Se cargará el respaldo local."
+            );
+          await loadFallbackConfig();
+        }
+      }
+
+      // Carga configuración fallback leyéndola desde config_2.md local (si no cargó de Moodle)
+      async function loadFallbackConfig() {
+        try {
+          const response = await fetch(
+            `${window.location.origin}/scripts/config_2.md`);
+          if (response.ok) {
+            let text = await response.text();
+            // Limpiar Markdown blocks si vienen incluidos
+            text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+            const parsed = parseCleanJSON(text);
+            if (parsed) {
+              systemConfig = parsed;
+              console.log(
+                "Configuración cargada de config_2.md fallback local:",
+                systemConfig);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error(
+            "No se pudo obtener fallback de config_2.md local, usando hardcodeado:",
+            e);
+        }
+
+        alert(
+          "Error crítico: No se pudo leer el archivo de configuración local config_2.md. Se usará la configuración mínima predeterminada."
+          );
+
+        // Configuración mínima hardcodeada por si fallan todos los fetches de config
+        systemConfig = {
+          urls: {
+            base: window.location.origin,
+            curso_id: CURSO_ID,
+            cmids: {
+              encuesta_inicial: 54062,
+              encuesta_cuatrimestral: 54284,
+              db_solicitudes: 54783,
+              db_logs: 54784,
+              db_historico: 54788
+            },
+            dataids: {
+              db_solicitudes: 15,
+              db_logs: 16,
+              db_historico: 18
+            }
+          },
+          umbrales: {
+            threshold_ird: 40,
+            cooldown_actualizar_seg: 30,
+            quarterly_warning_days: 90,
+            cuatrimestres_desercion: 2,
+            page_size_paneles: 30
+          },
+          encuesta_inicial: {
+            preguntas: [{
+                id: "Orientación de tu colegio secundario",
+                tipo: "seleccion_unica",
+                beta: 0.5,
+                max_value: 0.2,
+                respuestas: {
+                  "Técnico": 0,
+                  "Bachiller": 0.2
+                }
+              },
+              {
+                id: "¿Cual es el máximo nivel académico alcanzado por alguno de tus Padres/Tutores?",
+                tipo: "seleccion_unica",
+                beta: 1,
+                max_value: 0.8,
+                respuestas: {
+                  "No posee": 0.8,
+                  "Primario completo": 0.6,
+                  "Secundario completo": 0.3,
+                  "Terciario - Universitario completo": 0.1
+                }
+              },
+              {
+                id: "(CARRERA) ¿Es tu primera carrera universitaria dentro de la facultad?",
+                tipo: "si_no",
+                beta: 0.5,
+                max_value: 0.3,
+                respuestas: {
+                  "Si": 0.3,
+                  "No": 0
+                }
+              },
+              {
+                id: "¿Cuántas personas tenes a cargo?",
+                tipo: "seleccion_unica",
+                beta: 2,
+                max_value: 1,
+                respuestas: {
+                  "Ninguna": 0,
+                  "1": 0.25,
+                  "2": 0.5,
+                  "3": 0.75,
+                  "4 o mas": 1
+                }
+              },
+              {
+                id: "(TRABAJO) ¿Trabaja actualmente?",
+                tipo: "si_no",
+                beta: 1.5,
+                max_value: 0.45,
+                respuestas: {
+                  "No": 0,
+                  "Sí": "calculado"
+                },
+                subpreguntas: [{
+                  id: "¿Cuántas horas semanales trabajas?",
+                  tipo: "seleccion_unica",
+                  respuestas: {
+                    "Menos de 5hs": 0,
+                    "Entre 6hs y 20hs": 0.1,
+                    "Entre 21hs y 40hs": 0.25,
+                    "Más de 40hs": 0.45
+                  }
+                }]
+              },
+              {
+                id: "Situación económica",
+                tipo: "seleccion_unica",
+                beta: 2,
+                max_value: 1,
+                respuestas: {
+                  "1 - Muy mala": 1,
+                  "2 - Mala": 0.5,
+                  "3 - Regular": 0.2,
+                  "4 - Buena": -0.2,
+                  "5 - Muy buena": -0.5
+                }
+              },
+              {
+                id: "¿Con cuánta disponibilidad de tiempo posees para estudiar?",
+                tipo: "seleccion_unica",
+                beta: 2.5,
+                max_value: 0.9,
+                respuestas: {
+                  "1 - Muy poco tiempo": 0.9,
+                  "2 - Poco tiempo": 0.7,
+                  "3 - Tiempo regular": 0,
+                  "4 - Tiempo suficiente": -0.2,
+                  "5 - Mucho tiempo": -0.5
+                }
+              },
+              {
+                id: "¿Cuánto tiempo tardas en llegar a la facultad? ",
+                tipo: "seleccion_unica",
+                beta: 1,
+                max_value: 0.25,
+                respuestas: {
+                  "Menos de 20 minutos": 0,
+                  "Entre 20 y 40 minutos": 0.08,
+                  "Entre 41 y 60 minutos": 0.156,
+                  "Más de 60 minutos": 0.25
+                }
+              },
+              {
+                id: "¿Cómo financiás económicamente tus estudios?",
+                tipo: "seleccion_unica",
+                beta: 1.8,
+                max_value: 1,
+                respuestas: {
+                  "Beca Estudiantil": -1,
+                  "Financiamiento Familiar": 0,
+                  "Financiamiento Propio": 0.5,
+                  "Otros": 0
+                }
+              },
+              {
+                id: "¿Por qué eligió la carrera?",
+                tipo: "seleccion_unica",
+                beta: 0.5,
+                max_value: 0.6,
+                respuestas: {
+                  "Vocación": 0.2,
+                  "Salida Laboral": 0.6,
+                  "Recomendación": 0.4,
+                  "Otro": 0
+                }
+              }
+            ]
+          },
+          encuesta_cuatrimestral: {
+            preguntas: [{
+                id: "(ABANDONAR_MATERIAS) En este cuatrimestre ¿Abandonó alguna materia?",
+                tipo: "si_no",
+                beta: 2,
+                max_value: 1,
+                respuestas: {
+                  "No": 0,
+                  "Si": "calculado"
+                },
+                subpreguntas: [{
+                  id: "¿Cuantas materias dejó este cuatrimestre?",
+                  tipo: "numerico",
+                  max_value: 1,
+                  respuestas: null
+                }]
+              },
+              {
+                id: "Satisfacción con respecto al cuatrimestre cursado",
+                tipo: "seleccion_unica",
+                beta: 1,
+                max_value: 1,
+                respuestas: {
+                  "1 - No satisfactorio": 1,
+                  "2 - Poco satisfactorio": 0.5,
+                  "3 - Regular": 0,
+                  "4 - Satisfactorio": -0.5,
+                  "5 - Muy satisfactorio": -1
+                }
+              },
+              {
+                id: "Nivel de estrés que sufrió durante el cuatrimestre",
+                tipo: "seleccion_unica",
+                beta: 1.5,
+                max_value: 0.7,
+                respuestas: {
+                  "1 - Sin estrés": 0,
+                  "2 - Estrés bajo": 0.2,
+                  "3 - Estrés moderado": 0.35,
+                  "4 - Estrés medio": 0.5,
+                  "5 - Estrés elevado": 0.7
+                }
+              },
+              {
+                id: "¿Qué tan motivado está a continuar la carrera?",
+                tipo: "seleccion_unica",
+                beta: 2.5,
+                max_value: 1,
+                respuestas: {
+                  "1 - No estoy motivado": 1,
+                  "2 - Motivación baja": 0.5,
+                  "3 - Motivación moderada": 0,
+                  "4 - Motivación alta": -0.5,
+                  "5 - Muy motivado": -1
+                }
+              },
+              {
+                id: "¿Qué tan al día estás con el plan de estudios?",
+                tipo: "seleccion_unica",
+                beta: 1.5,
+                max_value: 0.8,
+                respuestas: {
+                  "1 - Adelantado": -1,
+                  "2 - Al día": 0,
+                  "3 - Atrasado un cuatrimestre": 0.25,
+                  "4 - Atrasado un año": 0.5,
+                  "5 - Atrasado más de un año": 0.8
+                }
+              },
+              {
+                id: "¿Tenés grupo de estudio/compañeros con los que estudiar?",
+                tipo: "si_no",
+                beta: 1,
+                max_value: 0.4,
+                respuestas: {
+                  "Sí": -0.1,
+                  "No": 0.4
+                }
+              }
+            ]
+          },
+          preguntas_especiales: {
+            id_percepcion_riesgo: "(ABANDONAR_CARRERA) ¿Crees que estás en riesgo de abandonar la carrera?",
+            id_anio_ingreso: "¿En qué año ingresaste a la carrera? (Primer cuatrimestre cursado)",
+            id_egreso: "(EGRESO) ¿Ha egresado?"
+          }
+        };
+      }
+
+      // Scraping paginado de participantes en Moodle (de 50 en 50)
+      async function fetchParticipantes() {
+        let page = 0;
+        const estudiantesMap = new Map();
+        const idToEstudiante = new Map();
+        const idsVistos = new Set();
+
+        while (true) {
+          const url =
+            `${window.location.origin}/user/index.php?id=${CURSO_ID}&page=${page}&perpage=5000&group=0`;
+          console.log(
+            `[DEBUG] Descargando página ${page} de participantes... URL: ${url}`
+            );
+          const response = await fetch(url);
+          if (!response.ok) {
+            console.warn(
+              `[DEBUG] Error de respuesta HTTP al obtener participantes en página ${page}`
+              );
+            break;
+          }
+
+          const htmlText = await response.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlText, "text/html");
+
+          const table = doc.getElementById("participants");
+          if (!table) {
+            console.log(
+              `[DEBUG] No se encontró la tabla de participantes en la página ${page}. Fin de la paginación.`
+              );
+            break;
+          }
+
+          const rows = table.querySelectorAll("tbody tr");
+          if (rows.length === 0) {
+            console.log(
+              `[DEBUG] La tabla de participantes está vacía en la página ${page}. Fin de la paginación.`
+              );
+            break;
+          }
+
+          let nuevosEnPagina = 0;
+
+          for (let row of rows) {
+            if (row.classList.contains("emptyrow")) continue;
+
+            const rolesText = row.querySelector(".c3")?.textContent || "";
+            if (!rolesText.includes("Estudiante")) continue;
+
+            const emailCell = row.querySelector(".c2");
+            const email = emailCell?.textContent?.trim();
+            if (!email) continue;
+
+            const nameLink = row.querySelector(".c1 a");
+            let nombreCompleto = "";
+            if (nameLink) {
+              const clone = nameLink.cloneNode(true);
+              clone.querySelectorAll(".userinitials, img, .sr-only")
+                .forEach(el => el.remove());
+              nombreCompleto = clone.textContent.trim();
+            }
+
+            const profileHref = nameLink?.getAttribute("href") || "";
+            const matchId = profileHref.match(/id=(\d+)/);
+            const idAlumno = matchId ? matchId[1] : null;
+
+            if (!idAlumno) continue;
+
+            // Si el alumno ya fue procesado en una página anterior, lo omitimos
+            if (idsVistos.has(idAlumno)) {
+              continue;
+            }
+
+            idsVistos.add(idAlumno);
+            nuevosEnPagina++;
+
+            // Extraer foto de perfil buscando en toda la fila (evita fallos por columna incorrecta c0/c1)
+            const imgEl = row.querySelector("img.userpicture");
+            const avatarHtml = imgEl ?
+              `<div class="user-pic-wrapper">${imgEl.outerHTML}</div>` :
+              `<div class="userinitials">${nombreCompleto.substring(0, 2).toUpperCase()}</div>`;
+
+            const groupsText = row.querySelector(".c4")?.textContent
+            ?.trim() || "";
+
+            estudiantesMap.set(email, {
+              id: idAlumno,
+              nombre: nombreCompleto,
+              email: email,
+              avatarHtml: avatarHtml,
+              grupo: groupsText
+            });
+
+            idToEstudiante.set(idAlumno, estudiantesMap.get(email));
+          }
+
+          console.log(
+            `[DEBUG] Página ${page}: Procesados ${rows.length} registros, se encontraron ${nuevosEnPagina} estudiantes nuevos.`
+            );
+
+          // Si no se detectó ningún estudiante nuevo en esta página, es porque llegamos al final de la lista
+          // o Moodle está devolviendo la misma página (redirección)
+          if (nuevosEnPagina === 0) {
+            console.log(
+              `[DEBUG] No se encontraron nuevos estudiantes en la página ${page}. Deteniendo bucle de paginación.`
+              );
+            break;
+          }
+
+          page++;
+        }
+
+        return {
+          estudiantesMap,
+          idToEstudiante
+        };
+      }
+
+      // Parsea solicitudes de ayuda desde la DB
+      function parseSolicitudes(htmlText, idToEstudiante) {
+        const entries = parseEntriesHTML(htmlText);
+        const list = [];
+
+        entries.forEach(entry => {
+          const userLink = entry.querySelector(
+          "a[href*='user/view.php']");
+          if (!userLink) return;
+          const href = userLink.getAttribute("href");
+          const matchUser = href.match(/id=(\d+)/);
+          if (!matchUser) return;
+          const idAlumno = matchUser[1];
+
+          let rid = null;
+          const actionLinks = entry.querySelectorAll("a[href*='rid=']");
+          for (let link of actionLinks) {
+            const linkHref = link.getAttribute("href");
+            const matchRid = linkHref.match(/rid=(\d+)/);
+            if (matchRid) {
+              rid = matchRid[1];
+              break;
+            }
+          }
+          if (!rid) {
+            const deleteLinks = entry.querySelectorAll(
+              "a[href*='delete='], a[href*='approve='], a[href*='disapprove=']"
+              );
+            for (let link of deleteLinks) {
+              const linkHref = link.getAttribute("href");
+              const match = linkHref.match(
+                /(?:delete|approve|disapprove)=(\d+)/);
+              if (match) {
+                rid = match[1];
+                break;
+              }
+            }
+          }
+
+          const approveLink = entry.querySelector("a[href*='approve=']");
+          const isApproved = entry.querySelector(".approved") !== null ||
+            entry.querySelector("a[href*='disapprove=']") !== null;
+          const isPending = approveLink !== null || (!isApproved);
+
+          const descEl = entry.querySelector(".data-field-html");
+          const descripcion = descEl ? descEl.textContent.trim() : "";
+
+          const timeEl = entry.querySelector(
+          ".data-timeinfo span[title]");
+          const fechaText = timeEl ? timeEl.getAttribute("title") : (entry
+            .querySelector(".data-timeinfo")?.textContent?.trim() || "");
+
+          const estudianteInfo = idToEstudiante.get(idAlumno);
+
+          if (isPending) {
+            list.push({
+              rid: rid,
+              idAlumno: idAlumno,
+              nombre: estudianteInfo ? estudianteInfo.nombre :
+                "Alumno Desconocido",
+              avatarHtml: estudianteInfo ? estudianteInfo.avatarHtml :
+                '<div class="userinitials">A</div>',
+              descripcion: descripcion,
+              fechaText: fechaText
+            });
+          }
+        });
+
+        return list;
+      }
+
+      // Parsea el log de asistencias
+      function parseLogs(htmlText) {
+        const entries = parseEntriesHTML(htmlText);
+        const logsMap = new Map();
+
+        entries.forEach(entry => {
+          const userLink = entry.querySelector(
+          "a[href*='user/view.php']");
+          if (!userLink) return;
+          const href = userLink.getAttribute("href");
+          const matchUser = href.match(/id=(\d+)/);
+          if (!matchUser) return;
+          const idAlumno = matchUser[1];
+
+          let tutor = "";
+          let origen = "";
+
+          const rows = entry.querySelectorAll(".row, div");
+          rows.forEach(row => {
+            const labelEl = row.querySelector(
+              ".font-weight-bold, span");
+            if (labelEl) {
+              const text = labelEl.textContent.trim().toLowerCase();
+              let val = "";
+              const valEl = row.querySelector(
+                ".col-8, .col-lg-9, p.mt-2, .data-field-html");
+              if (valEl) {
+                val = valEl.textContent.trim();
+              } else if (labelEl.nextElementSibling) {
+                val = labelEl.nextElementSibling.textContent.trim();
+              }
+
+              if (text.includes("tutor")) {
+                tutor = val;
+              } else if (text.includes("origen")) {
+                origen = val;
+              }
+            }
+          });
+
+          const timeEl = entry.querySelector(
+          ".data-timeinfo span[title]");
+          const fechaText = timeEl ? timeEl.getAttribute("title") : (entry
+            .querySelector(".data-timeinfo")?.textContent?.trim() || "");
+
+          const parseMoodleDate = (str) => {
+            if (!str) return new Date(0);
+            try {
+              const clean = str.replace(/de/g, "").replace(/,/g, "")
+                .replace(/\s+/g, " ");
+              const parts = clean.split(" ");
+              const dia = parseInt(parts[1]);
+              const mesText = parts[2].toLowerCase();
+              const anio = parseInt(parts[3]);
+              const horaParts = parts[4].split(":");
+              const horas = parseInt(horaParts[0]);
+              const minutos = parseInt(horaParts[1]);
+
+              const meses = ["enero", "febrero", "marzo", "abril",
+                "mayo", "junio", "julio", "agosto", "septiembre",
+                "octubre", "noviembre", "diciembre"
+              ];
+              const mesIndex = meses.indexOf(mesText);
+              return new Date(anio, mesIndex, dia, horas, minutos);
+            } catch (e) {
+              return new Date(str);
+            }
+          };
+
+          const logDate = parseMoodleDate(fechaText);
+          const existingLog = logsMap.get(idAlumno);
+          if (!existingLog || logDate > existingLog.date) {
+            logsMap.set(idAlumno, {
+              date: logDate,
+              fechaText: fechaText,
+              tutor: tutor || "Tutor",
+              origen: origen || "Proactivo"
+            });
+          }
+        });
+
+        return logsMap;
+      }
+
+      // Procesa y realiza todos los cálculos de alumnos en paralelo
+      async function updateDashboardData() {
+        console.log(
+          "=== INICIO DE ACTUALIZACIÓN DE DATOS DEL DASHBOARD ===");
+        console.time("Tiempo Total Actualización Dashboard");
+        showLoading("Descargando datos del aula Moodle...");
+        try {
+          // 1. Obtener participantes en paginación
+          console.log(
+            "Descargando listado de participantes del aula Moodle...");
+          console.time("Obtención de Participantes Moodle");
+          const {
+            estudiantesMap,
+            idToEstudiante
+          } = await fetchParticipantes();
+          console.timeEnd("Obtención de Participantes Moodle");
+          console.log(
+            `Participantes obtenidos: ${estudiantesMap.size} estudiantes.`
+            );
+
+          // 2. Realizar llamadas en paralelo
+          console.log(
+            "Descargando encuestas de feedback y bases de datos Moodle en paralelo..."
+            );
+          console.time("Descargas de Encuestas y DBs en Paralelo");
+          // URL correcta para descargar respuestas CSV de Moodle Feedback (verificada via Network tab)
+          const urlInicial =
+            `${window.location.origin}/mod/feedback/show_entries.php?sesskey=${sesskey}&download=csv&id=${systemConfig.urls.cmids.encuesta_inicial}`;
+          const urlCuat =
+            `${window.location.origin}/mod/feedback/show_entries.php?sesskey=${sesskey}&download=csv&id=${systemConfig.urls.cmids.encuesta_cuatrimestral}`;
+          const urlSolicitudes =
+            `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_solicitudes}&perpage=1000`;
+          const urlLogs =
+            `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_logs}&perpage=1000`;
+
+          console.log("[DEBUG] URL encuesta inicial:", urlInicial);
+          console.log("[DEBUG] URL encuesta cuatrimestral:", urlCuat);
+
+          const [resInic, resCuat, resSoli, resLogs] = await Promise.all([
+            fetch(urlInicial).then(r => r.text()),
+            fetch(urlCuat).then(r => r.text()),
+            fetch(urlSolicitudes).then(r => r.text()),
+            fetch(urlLogs).then(r => r.text())
+          ]);
+          console.timeEnd("Descargas de Encuestas y DBs en Paralelo");
+
+          // 3. Parsear
+          console.log(
+            "Parseando archivos CSV de encuestas y registros HTML...");
+          console.time("Parseo e Indexación de Datos");
+          // Diagnóstico: mostrar los primeros 300 chars del raw para detectar si Moodle devolvió HTML
+          console.log("[RAW] Inicio respuesta CSV Inicial:", resInic
+            .substring(0, 300));
+          console.log("[RAW] Inicio respuesta CSV Cuatrimestral:", resCuat
+            .substring(0, 300));
+          const csvInicial = parseCSV(resInic);
+          const csvCuat = parseCSV(resCuat);
+          const logsAsistencias = parseLogs(resLogs);
+          solicitudesPendientes = parseSolicitudes(resSoli, idToEstudiante);
+          console.timeEnd("Parseo e Indexación de Datos");
+          console.log(
+            `CSV Inicial: ${csvInicial.length} respuestas. CSV Cuatrimestral: ${csvCuat.length} respuestas. Logs asistencia: ${logsAsistencias.size} registros. Solicitudes de ayuda: ${solicitudesPendientes.length} pendientes.`
+            );
+
+          // Función auxiliar para extraer el email de una fila de encuesta de forma robusta
+          function getEmailFromRow(row) {
+            if (!row) return "";
+            const keys = Object.keys(row);
+            // Intentar coincidencia directa primero por eficiencia
+            if (row["Dirección de correo"]) return row[
+              "Dirección de correo"];
+            if (row["email"]) return row["email"];
+            if (row["Dirección de correo electrónico"]) return row[
+              "Dirección de correo electrónico"];
+
+            // Si no, buscar dinámicamente cualquier columna que tenga relación con correo/email
+            for (let key of keys) {
+              const normKey = key.toLowerCase().normalize("NFD").replace(
+                /[\u0300-\u036f]/g, "");
+              if (normKey.includes("email") || normKey.includes("correo") ||
+                normKey.includes("mail")) {
+                return row[key];
+              }
+            }
+            return "";
+          }
+
+          // console.log("Cabeceras de las columnas del CSV Inicial:", csvInicial.length > 0 ? Object.keys(csvInicial[0]) : "Vacío");
+          // console.log("Cabeceras de las columnas del CSV Cuatrimestral:", csvCuat.length > 0 ? Object.keys(csvCuat[0]) : "Vacío");
+          console.log(
+            "Correos de los alumnos obtenidos del scraping de participantes de Moodle:",
+            Array.from(estudiantesMap.keys()));
+
+          // Mapear encuestas por email
+          const mapInicialByEmail = new Map();
+          csvInicial.forEach(row => {
+            const email = getEmailFromRow(row);
+            if (email) mapInicialByEmail.set(email.trim().toLowerCase(),
+              row);
+          });
+
+          const mapCuatByEmail = new Map();
+          csvCuat.forEach(row => {
+            const email = getEmailFromRow(row);
+            if (email) mapCuatByEmail.set(email.trim().toLowerCase(),
+              row);
+          });
+
+          console.log(
+            `Mapeado de encuesta inicial: ${mapInicialByEmail.size} correos. Algunos ejemplos indexados:`,
+            Array.from(mapInicialByEmail.keys()).slice(0, 5));
+          console.log(
+            `Mapeado de encuesta cuatrimestral: ${mapCuatByEmail.size} correos. Algunos ejemplos indexados:`,
+            Array.from(mapCuatByEmail.keys()).slice(0, 5));
+
+          // 4. Calcular Zmax dinámicamente
+          let Z_max = 0;
+          [...systemConfig.encuesta_inicial.preguntas, ...systemConfig
+            .encuesta_cuatrimestral.preguntas
+          ].forEach(p => {
+            Z_max += (p.beta || 0) * (p.max_value || 0);
+          });
+
+          const pesosPreguntas = {};
+          const
+          cohortes = {}; // cohorte -> { ingresantes, activos, egresados, desertados }
+
+          const computedAlumnos = [];
+
+          // Iterar por todos los estudiantes encontrados en el campus
+          console.log(
+            "Iniciando procesamiento y cálculo del IRD para cada estudiante..."
+            );
+          console.time("Procesamiento de Estudiantes (IRD/Ralentización)");
+          for (let [email, est] of estudiantesMap.entries()) {
+            const emailKey = email.trim().toLowerCase();
+
+            // Filtro temporal: permitir únicamente a Renzo y a Martin Girau para simulación
+            const esRenzo = emailKey === "renzogijon1234@gmail.com" || est
+              .nombre.toLowerCase().includes("gijon") || est.nombre
+              .toLowerCase().includes("renzo");
+            const esMartin = emailKey === "giraumartin@gmail.com" || est
+              .nombre.toLowerCase().includes("girau") || est.nombre
+              .toLowerCase().includes("martin");
+
+            if (!esRenzo && !esMartin) {
+              console.log(
+                `[TEMPORAL] Omitiendo a ${est.nombre} por filtro de prueba.`
+                );
+              continue;
+            }
+
+            const rowInic = mapInicialByEmail.get(emailKey);
+            const rowCuat = mapCuatByEmail.get(emailKey);
+
+            console.log(
+              `Evaluando estudiante: ${est.nombre} (${emailKey}). Encuesta inicial completada: ${rowInic !== undefined}. Encuesta cuatrimestral completada: ${rowCuat !== undefined}`
+              );
+
+            // Punto 8: Si el estudiante no completó la encuesta inicial ni la cuatrimestral, se omite
+            if (!rowInic && !rowCuat) {
+              console.log(
+                `Omitiendo estudiante ${est.nombre} por no haber completado ninguna encuesta.`
+                );
+              continue;
+            }
+
+            const solicitudObj = solicitudesPendientes.find(s => s
+              .idAlumno === est.id);
+            const logObj = logsAsistencias.get(est.id);
+
+            // Determinar año de ingreso
+            let anioIngreso = null;
+            if (rowInic) {
+              const keyAnio = systemConfig.preguntas_especiales
+                .id_anio_ingreso;
+              anioIngreso = parseInt(rowInic[keyAnio]) || null;
+            }
+
+            // Determinar si se percibe en riesgo
+            let sePercibeRiesgo = false;
+            if (rowCuat) {
+              const keyRiesgo = systemConfig.preguntas_especiales
+                .id_percepcion_riesgo;
+              const valRiesgo = rowCuat[keyRiesgo] || "";
+              if (valRiesgo.toLowerCase().includes("sí") || valRiesgo
+                .toLowerCase().includes("si")) {
+                sePercibeRiesgo = true;
+              }
+            }
+
+            // Determinar si egresó
+            let esEgresado = false;
+            if (rowCuat) {
+              const keyEgreso = systemConfig.preguntas_especiales.id_egreso;
+              const valEgreso = rowCuat[keyEgreso] || "";
+              if (valEgreso.toLowerCase().includes("sí") || valEgreso
+                .toLowerCase().includes("si")) {
+                esEgresado = true;
+              }
+            }
+
+            // Determinar si es desertor
+            let esDesertor = false;
+            let fechaCuat = null;
+            if (rowCuat) {
+              // El campo de fecha en el CSV exportado de Moodle es "Período de envío" o "Completado"
+              // Se prueba ambos nombres posibles
+              const fechaRawCuat = rowCuat["Período de envío"] || rowCuat[
+                "Completado"] || rowCuat["Fecha"] || "";
+              if (fechaRawCuat) {
+                try {
+                  // Formato de fecha de Moodle en exportación: "sábado, 13 de junio de 2026, 13:47"
+                  const clean = fechaRawCuat.replace(/de/g, "").replace(
+                    /,/g, "").replace(/\s+/g, " ").trim();
+                  const parts = clean.split(" ");
+                  // Si hay día de semana al frente, partes[0] es texto, partes[1] es número
+                  const diaIdx = isNaN(parseInt(parts[0])) ? 1 : 0;
+                  const dia = parseInt(parts[diaIdx]);
+                  const mesText = parts[diaIdx + 1].toLowerCase();
+                  const anio = parseInt(parts[diaIdx + 2]);
+
+                  const meses = ["enero", "febrero", "marzo", "abril",
+                    "mayo", "junio", "julio", "agosto", "septiembre",
+                    "octubre", "noviembre", "diciembre"
+                  ];
+                  const mesIndex = meses.indexOf(mesText);
+                  if (mesIndex === -1 || isNaN(dia) || isNaN(anio))
+                  throw new Error("Formato de fecha inválido");
+                  fechaCuat = new Date(anio, mesIndex, dia);
+
+                  const diffTime = Math.abs(new Date() - fechaCuat);
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 *
+                    24));
+                  const diasDesercion = (systemConfig.umbrales
+                    .cuatrimestres_desercion || 2) * 180;
+
+                  if (diffDays >= diasDesercion) {
+                    esDesertor = true;
+                  }
+                } catch (e) {
+                  console.error(
+                    "Error al parsear fecha de encuesta cuatrimestral:",
+                    fechaRawCuat, e);
+                }
+              }
+            }
+
+            let IRD = null;
+
+            // Solo si completó ambas encuestas se calcula el IRD
+            if (rowInic && rowCuat) {
+              let Z = 0;
+
+              // Evaluar preguntas iniciales
+              systemConfig.encuesta_inicial.preguntas.forEach(p => {
+                let X = 0;
+                let valText = rowInic[p.id];
+
+                if (valText !== undefined && valText !== null) {
+                  valText = valText.trim();
+                  if (valText.toLowerCase() === "otros" || valText
+                    .toLowerCase() === "otro") {
+                    X = 0;
+                  } else if (p.tipo === "numerico") {
+                    const n = parseInt(valText) || 0;
+                    if (n === 0) X = p.respuestas["0"] !== undefined ? p
+                      .respuestas["0"] : (p.respuestas["Ninguna"] || 0);
+                    else if (n === 1) X = p.respuestas["1"] || 0;
+                    else if (n === 2) X = p.respuestas["2"] || 0;
+                    else if (n === 3) X = p.respuestas["3"] || 0;
+                    else if (n >= 4) X = p.respuestas["4 o mas"] !==
+                      undefined ? p.respuestas["4 o mas"] : (p
+                        .respuestas["4 o más"] || 1);
+                  } else if (p.tipo === "si_no") {
+                    if (valText.toLowerCase() === "si" || valText
+                      .toLowerCase() === "sí") {
+                      if (p.subpreguntas && p.subpreguntas.length > 0) {
+                        const sub = p.subpreguntas[0];
+                        const subValText = rowInic[sub.id] || "";
+                        X = sub.respuestas[subValText.trim()] || 0;
+                      } else {
+                        X = p.respuestas["Si"] !== undefined ? p
+                          .respuestas["Si"] : (p.respuestas["Sí"] ||
+                            0.3);
+                      }
+                    } else {
+                      X = p.respuestas["No"] || 0;
+                    }
+                  } else {
+                    X = p.respuestas[valText] !== undefined ? p
+                      .respuestas[valText] : 0;
+                  }
+                }
+                const aporte = (p.beta || 0) * X;
+                Z += aporte;
+                pesosPreguntas[p.id] = (pesosPreguntas[p.id] || 0) +
+                  aporte;
+              });
+
+              // Evaluar preguntas cuatrimestrales
+              systemConfig.encuesta_cuatrimestral.preguntas.forEach(p => {
+                let X = 0;
+                let valText = rowCuat[p.id];
+
+                if (valText !== undefined && valText !== null) {
+                  valText = valText.trim();
+                  if (valText.toLowerCase() === "otros" || valText
+                    .toLowerCase() === "otro") {
+                    X = 0;
+                  } else if (p.tipo === "si_no") {
+                    if (valText.toLowerCase() === "si" || valText
+                      .toLowerCase() === "sí") {
+                      if (p.subpreguntas && p.subpreguntas.length > 0) {
+                        const sub = p.subpreguntas[0];
+                        const subValText = rowCuat[sub.id] || "";
+                        const nSub = parseInt(subValText) || 0;
+                        if (sub.respuestas) {
+                          if (nSub === 0) X = sub.respuestas["0"] !==
+                            undefined ? sub.respuestas["0"] : 0;
+                          else if (nSub === 1) X = sub.respuestas[
+                            "1"] !== undefined ? sub.respuestas["1"] :
+                            0;
+                          else if (nSub === 2) X = sub.respuestas[
+                            "2"] !== undefined ? sub.respuestas["2"] :
+                            0;
+                          else if (nSub === 3) X = sub.respuestas[
+                            "3"] !== undefined ? sub.respuestas["3"] :
+                            0;
+                          else if (nSub >= 4) X = sub.respuestas[
+                            "4 o mas"] !== undefined ? sub.respuestas[
+                            "4 o mas"] : (sub.respuestas["4 o más"] ||
+                            1);
+                        } else {
+                          // Mapeo directo para valor numérico puro
+                          if (nSub === 0) X = 0;
+                          else if (nSub === 1) X = 0.1;
+                          else if (nSub === 2) X = 0.6;
+                          else if (nSub === 3) X = 0.9;
+                          else if (nSub >= 4) X = 1.0;
+                        }
+                      } else {
+                        X = p.respuestas["Si"] !== undefined ? p
+                          .respuestas["Si"] : (p.respuestas["Sí"] || 1);
+                      }
+                    } else {
+                      X = p.respuestas["No"] || 0;
+                    }
+                  } else {
+                    X = p.respuestas[valText] !== undefined ? p
+                      .respuestas[valText] : 0;
+                  }
+                }
+                const aporte = (p.beta || 0) * X;
+                Z += aporte;
+                pesosPreguntas[p.id] = (pesosPreguntas[p.id] || 0) +
+                  aporte;
+              });
+
+              Z = Math.max(Z, 0); // Truncar a cero
+              IRD = Z_max > 0 ? parseFloat(((Z / Z_max) * 100).toFixed(1)) :
+                0;
+            }
+
+            // Calcular ralentización
+            let ralentizacion = null;
+            let materiasAprobadas = 0;
+            if (rowCuat && anioIngreso) {
+              const anioActual = new Date().getFullYear();
+              const anioEnCarrera = Math.min(Math.max(anioActual -
+                anioIngreso + 1, 1), 5);
+
+              if (anioEnCarrera >= 2) {
+                // Contar materias con nota >= 5
+                Object.keys(rowCuat).forEach(key => {
+                  if (key.endsWith(": Nota")) {
+                    const notaVal = parseInt(rowCuat[key]);
+                    if (!isNaN(notaVal) && notaVal >= 5) {
+                      materiasAprobadas++;
+                    }
+                  }
+                });
+
+                const esperadas = PLAN_DE_ESTUDIOS["anio" +
+                  anioEnCarrera] || 51;
+                ralentizacion = parseFloat(((1 - (materiasAprobadas /
+                  esperadas)) * 100).toFixed(1));
+                if (ralentizacion < 0) ralentizacion = 0;
+              }
+            }
+
+            // Acumular estadísticas de cohorte
+            if (anioIngreso) {
+              if (!cohortes[anioIngreso]) {
+                cohortes[anioIngreso] = {
+                  ingresantes: 0,
+                  activos: 0,
+                  egresados: 0,
+                  desertados: 0
+                };
+              }
+              cohortes[anioIngreso].ingresantes++;
+              if (esEgresado) {
+                cohortes[anioIngreso].egresados++;
+              } else if (esDesertor) {
+                cohortes[anioIngreso].desertados++;
+              } else {
+                cohortes[anioIngreso].activos++;
+              }
+            }
+
+            computedAlumnos.push({
+              id: est.id,
+              nombre: est.nombre,
+              email: est.email,
+              avatarHtml: est.avatarHtml,
+              grupo: est.grupo,
+              IRD: IRD,
+              sePercibeRiesgo: sePercibeRiesgo,
+              ralentizacion: ralentizacion,
+              anioIngreso: anioIngreso,
+              hasSolicitud: solicitudObj !== undefined,
+              solicitudRid: solicitudObj ? solicitudObj.rid : null,
+              solicitudText: solicitudObj ? solicitudObj.descripcion :
+                "",
+              solicitudFecha: solicitudObj ? solicitudObj.fechaText :
+                null,
+              ultimaAsistencia: logObj ? logObj.fechaText : null,
+              ultimoTutor: logObj ? logObj.tutor : null,
+              asistido: logObj !== undefined
+            });
+          }
+
+          // Guardar estado global
+          alumnosCalculados = computedAlumnos;
+
+          // Formatear pesos de preguntas
+          pesosPreguntasGlobal = Object.keys(pesosPreguntas).map(key => {
+            const isInicial = systemConfig.encuesta_inicial.preguntas
+              .find(p => p.id === key) !== undefined;
+            return {
+              pregunta: key,
+              origen: isInicial ? "Encuesta Inicial" :
+                "Encuesta Cuatrimestral",
+              peso: parseFloat(pesosPreguntas[key].toFixed(2))
+            };
+          }).sort((a, b) => b.peso - a.peso);
+
+          // Formatear estadísticas de cohorte
+          cohortesStats = Object.keys(cohortes).map(anio => {
+            const data = cohortes[anio];
+            return {
+              cohorte: anio,
+              ingresantes: data.ingresantes,
+              activos: data.activos,
+              activosPorc: data.ingresantes > 0 ? ((data.activos / data
+                .ingresantes) * 100).toFixed(1) + "%" : "0%",
+              egresados: data.egresados,
+              egresadosPorc: data.ingresantes > 0 ? ((data.egresados /
+                data.ingresantes) * 100).toFixed(1) + "%" : "0%",
+              desertados: data.desertados,
+              desertadosPorc: data.ingresantes > 0 ? ((data.desertados /
+                data.ingresantes) * 100).toFixed(1) + "%" : "0%"
+            };
+          }).sort((a, b) => parseInt(b.cohorte) - parseInt(a.cohorte));
+
+          // Actualizar hora de actualización
+          lastUpdateDate = new Date();
+          const formatDigits = (n) => n < 10 ? "0" + n : n;
+          document.getElementById("txt-last-update").textContent =
+            `Última actualización: ${formatDigits(lastUpdateDate.getDate())}/${formatDigits(lastUpdateDate.getMonth()+1)}/${lastUpdateDate.getFullYear()} ${formatDigits(lastUpdateDate.getHours())}:${formatDigits(lastUpdateDate.getMinutes())}`;
+
+          // Renderizar vistas
+          console.time("Renderizado de Tablero");
+          renderDashboard();
+          console.timeEnd("Renderizado de Tablero");
+
+          console.timeEnd(
+            "Procesamiento de Estudiantes (IRD/Ralentización)");
+          console.timeEnd("Tiempo Total Actualización Dashboard");
+          console.log("=== ACTUALIZACIÓN FINALIZADA CON ÉXITO ===");
+          hideLoading();
+        } catch (e) {
+          console.error("Error al actualizar los datos:", e);
+          try {
+            console.timeEnd(
+              "Procesamiento de Estudiantes (IRD/Ralentización)");
+          } catch (err) {}
+          try {
+            console.timeEnd("Tiempo Total Actualización Dashboard");
+          } catch (err) {}
+          alert(
+            "Error al cargar los datos de Moodle. Por favor, verifica tu sesión o la base de datos."
+            );
+          hideLoading();
+        }
+      }
+
+      // Ordenar y renderizar el listado
+      function renderDashboard() {
+        // Actualizar KPIs de la cabecera
+        let alto = 0,
+          medio = 0,
+          bajo = 0;
+        alumnosCalculados.forEach(a => {
+          if (a.IRD === null) return;
+          if (a.IRD >= 80) alto++;
+          else if (a.IRD >= 40) medio++;
+          else bajo++;
+        });
+        document.getElementById("kpi-alto-riesgo").textContent = alto;
+        document.getElementById("kpi-medio-riesgo").textContent = medio;
+        document.getElementById("kpi-bajo-riesgo").textContent = bajo;
+        document.getElementById("kpi-solicitudes-pendientes").textContent =
+          solicitudesPendientes.length;
+
+        // Renderizar Panel 2: Solicitudes
+        const reqTbody = document.getElementById("requests-tbody");
+        reqTbody.innerHTML = "";
+        if (solicitudesPendientes.length === 0) {
+          reqTbody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 24px; color: #145a32; background: #e8f8f5; font-weight: 600;">
+                ✅ Sin solicitudes pendientes de atención en este momento
+              </td>
+            </tr>
+          `;
+        } else {
+          solicitudesPendientes.forEach(req => {
+            reqTbody.innerHTML += `
+              <tr>
+                <td>${req.avatarHtml}</td>
+                <td><a href="${window.location.origin}/user/view.php?id=${req.idAlumno}&course=${CURSO_ID}" target="_blank" class="user-link">${req.nombre}</a></td>
+                <td>${req.fechaText}</td>
+                <td style="font-style: italic;">"${req.descripcion || 'Sin mensaje adicional'}"</td>
+                <td style="text-align: center;">
+                  <button type="button" class="btn-action btn-table" onclick="abrirModalAsistencia('${req.idAlumno}', '${req.nombre}', 'Solicitud')">
+                    Asistir
+                  </button>
+                </td>
+              </tr>
+            `;
+          });
+        }
+
+        // Renderizar Panel 3: Cohortes
+        const cohTbody = document.getElementById("cohortes-tbody");
+        cohTbody.innerHTML = "";
+        if (cohortesStats.length === 0) {
+          cohTbody.innerHTML =
+            `<tr><td colspan="5" style="text-align: center; padding: 24px;">No hay información disponible.</td></tr>`;
+        } else {
+          cohortesStats.forEach(stat => {
+            cohTbody.innerHTML += `
+              <tr>
+                <td><strong>${stat.cohorte}</strong></td>
+                <td>${stat.ingresantes}</td>
+                <td>${stat.activos} (${stat.activosPorc})</td>
+                <td>${stat.egresados} (${stat.egresadosPorc})</td>
+                <td>${stat.desertados} (${stat.desertadosPorc})</td>
+              </tr>
+            `;
+          });
+        }
+
+        // Renderizar Panel 4: Peso de Preguntas
+        const qTbody = document.getElementById("questions-tbody");
+        qTbody.innerHTML = "";
+        if (pesosPreguntasGlobal.length === 0) {
+          qTbody.innerHTML =
+            `<tr><td colspan="4" style="text-align: center; padding: 24px;">No hay información de impacto calculada.</td></tr>`;
+        } else {
+          const sumaPesosTotal = pesosPreguntasGlobal.reduce((sum, p) => sum +
+            p.peso, 0);
+          pesosPreguntasGlobal.forEach((p, idx) => {
+            const porc = sumaPesosTotal > 0 ? ((p.peso / sumaPesosTotal) *
+              100).toFixed(1) + "%" : "0%";
+            qTbody.innerHTML += `
+              <tr>
+                <td style="text-align: center; font-weight: 700; color: #666;">${idx + 1}</td>
+                <td><strong>${p.pregunta}</strong></td>
+                <td><span style="font-size: 11px; background: #eee; padding: 2px 6px; border-radius: 4px; color: #555;">${p.origen}</span></td>
+                <td style="text-align: right; font-weight: 700; color: hsl(168, 60%, 25%);">
+                  ${p.peso} <span style="font-size: 11px; font-weight: normal; color: #666; margin-left: 4px;">(${porc})</span>
+                </td>
+              </tr>
+            `;
+          });
+        }
+
+        // Aplicar filtrado y ordenamiento al listado del Panel 1
+        let list = [...alumnosCalculados];
+
+        // 1. Filtrado
+        if (filters.search) {
+          const query = filters.search.toLowerCase().normalize("NFD").replace(
+            /[\u0300-\u036f]/g, "");
+          list = list.filter(a => {
+            const nom = a.nombre.toLowerCase().normalize("NFD").replace(
+              /[\u0300-\u036f]/g, "");
+            return nom.includes(query) || a.email.toLowerCase().includes(
+              query) || (a.grupo && a.grupo.toLowerCase().includes(
+              query));
+          });
+        }
+
+        if (filters.irdMin !== null) {
+          list = list.filter(a => a.IRD !== null && a.IRD >= filters.irdMin);
+        }
+        if (filters.irdMax !== null) {
+          list = list.filter(a => a.IRD !== null && a.IRD <= filters.irdMax);
+        }
+
+        if (filters.asistencia === "asistidos") {
+          list = list.filter(a => a.asistido);
+        } else if (filters.asistencia === "sin_asistir") {
+          list = list.filter(a => !a.asistido);
+        }
+
+        if (filters.riesgoPerceb === "si") {
+          list = list.filter(a => a.sePercibeRiesgo);
+        } else if (filters.riesgoPerceb === "no") {
+          list = list.filter(a => !a.sePercibeRiesgo);
+        }
+
+        // 2. Ordenamiento Predeterminado e Interactivo
+        list.sort((a, b) => {
+          // Si la columna activa no es la autopercepción de riesgo, los de riesgo van arriba por defecto
+          if (activeSort.column !== "sePercibeRiesgo") {
+            if (a.sePercibeRiesgo && !b.sePercibeRiesgo) return -1;
+            if (!a.sePercibeRiesgo && b.sePercibeRiesgo) return 1;
+          }
+
+          // Si pertenecen al mismo grupo (o la columna activa es sePercibeRiesgo), ordenar por la columna activa
+          let valA = a[activeSort.column];
+          let valB = b[activeSort.column];
+
+          // Manejo de nulos al final
+          if (valA === null || valA === undefined) return 1;
+          if (valB === null || valB === undefined) return -1;
+
+          if (typeof valA === "boolean") {
+            valA = valA ? 1 : 0;
+            valB = valB ? 1 : 0;
+          } else if (typeof valA === "string") {
+            valA = valA.toLowerCase();
+            valB = valB.toLowerCase();
+          }
+
+          if (valA < valB) return activeSort.direction === "asc" ? -1 : 1;
+          if (valA > valB) return activeSort.direction === "asc" ? 1 : -1;
+          return 0;
+        });
+
+        // 3. Paginación (default 30 por página)
+        const pageSize = systemConfig.umbrales.page_size_paneles || 30;
+        const totalAlumnos = list.length;
+        const totalPages = Math.ceil(totalAlumnos / pageSize);
+        if (currentPage > totalPages && totalPages > 0) currentPage =
+          totalPages;
+
+        const startIdx = (currentPage - 1) * pageSize;
+        const endIdx = Math.min(startIdx + pageSize, totalAlumnos);
+        const paginatedList = list.slice(startIdx, endIdx);
+
+        // Renderizar tabla
+        const tbody = document.getElementById("students-tbody");
+        tbody.innerHTML = "";
+
+        if (paginatedList.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 24px; color: #666;">
+                Ningún alumno coincide con los filtros aplicados.
+              </td>
+            </tr>
+          `;
+        } else {
+          paginatedList.forEach(alumno => {
+            const hasData = alumno.IRD !== null;
+            let irdBadge = "—";
+            let rowClass = alumno.sePercibeRiesgo ? "row-perceived-risk" :
+              "";
+
+            if (hasData) {
+              let colorClass = "badge-ird-green";
+              if (alumno.IRD >= 80) colorClass = "badge-ird-red";
+              else if (alumno.IRD >= systemConfig.umbrales.threshold_ird)
+                colorClass = "badge-ird-yellow";
+
+              irdBadge =
+                `<span class="badge-ird ${colorClass}">${alumno.IRD}</span>`;
+            }
+            const percibeRiesgoText = alumno.sePercibeRiesgo ? "Sí" :
+            "No";
+            let ralentText = "—";
+            if (alumno.ralentizacion !== null) {
+              let colorClass = "badge-ralent-green";
+              if (alumno.ralentizacion >= 80) colorClass =
+                "badge-ralent-red";
+              else if (alumno.ralentizacion >= 40) colorClass =
+                "badge-ralent-yellow";
+
+              ralentText =
+                `<span class="badge-ralent ${colorClass}">${alumno.ralentizacion}%</span>`;
+            }
+            const asistText = alumno.ultimaAsistencia ?
+              `<span title="Por ${alumno.ultimoTutor}">${alumno.ultimaAsistencia.substring(0, 16)}</span>` :
+              "—";
+            const reqText = alumno.solicitudFecha ?
+              `<span title="${alumno.solicitudText}">${alumno.solicitudFecha.substring(0, 16)}</span>` :
+              "—";
+
+            // Mostrar botón asistir si: tiene IRD y supera umbral, y no ha sido asistido tras su última solicitud
+            let btnAsistir = "";
+            const superaUmbral = hasData && alumno.IRD >= systemConfig
+              .umbrales.threshold_ird;
+            let mostrarBoton = false;
+
+            if (superaUmbral) {
+              if (!alumno.ultimaAsistencia) {
+                mostrarBoton = true;
+              } else if (alumno.solicitudFecha) {
+                // Comparar fechas de última solicitud y última asistencia
+                const parseDate = (str) => {
+                  if (!str) return 0;
+                  const clean = str.replace(/de/g, "").replace(/,/g, "")
+                    .replace(/\s+/g, " ");
+                  const parts = clean.split(" ");
+                  const dia = parseInt(parts[1]);
+                  const meses = ["enero", "febrero", "marzo", "abril",
+                    "mayo", "junio", "julio", "agosto", "septiembre",
+                    "octubre", "noviembre", "diciembre"
+                  ];
+                  const mesIndex = meses.indexOf(parts[2]
+                .toLowerCase());
+                  const anio = parseInt(parts[3]);
+                  const h = parts[4].split(":");
+                  return new Date(anio, mesIndex, dia, parseInt(h[0]),
+                    parseInt(h[1])).getTime();
+                };
+                if (parseDate(alumno.solicitudFecha) > parseDate(alumno
+                    .ultimaAsistencia)) {
+                  mostrarBoton = true;
+                }
+              }
+            }
+
+            if (mostrarBoton) {
+              btnAsistir = `
+                <button type="button" class="btn-action btn-table" onclick="abrirModalAsistencia('${alumno.id}', '${alumno.nombre}', 'Proactivo')">
+                  Asistir
+                </button>
+              `;
+            } else if (alumno.asistido) {
+              btnAsistir =
+                `<span style="font-size: 11px; font-weight: 700; color: #16a085;">✅ Asistido</span>`;
+            }
+
+            tbody.innerHTML += `
+              <tr class="${rowClass}">
+                <td>${alumno.avatarHtml}</td>
+                <td><a href="${window.location.origin}/user/view.php?id=${alumno.id}&course=${CURSO_ID}" target="_blank" class="user-link">${alumno.nombre}</a></td>
+                <td>${irdBadge}</td>
+                <td>${ralentText}</td>
+                <td style="text-align: center;">${percibeRiesgoText}</td>
+                <td>${asistText}</td>
+                <td>${reqText}</td>
+                <td style="text-align: center;">${btnAsistir}</td>
+              </tr>
+            `;
+          });
+        }
+
+        // Renderizar Info de Paginación
+        const infoDesde = totalAlumnos === 0 ? 0 : startIdx + 1;
+        document.getElementById("pagination-info").textContent =
+          `Mostrando ${infoDesde}-${endIdx} de ${totalAlumnos} alumnos`;
+
+        let navHtml = "";
+        navHtml +=
+          `<button type="button" class="page-btn" ${currentPage === 1 ? "disabled" : ""} onclick="changePage(${currentPage - 1})">◀ Prev</button>`;
+        for (let i = 1; i <= totalPages; i++) {
+          if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <=
+              currentPage + 2)) {
+            navHtml +=
+              `<button type="button" class="page-btn ${currentPage === i ? "active" : ""}" onclick="changePage(${i})">${i}</button>`;
+          } else if (i === currentPage - 3 || i === currentPage + 3) {
+            navHtml +=
+              `<span style="padding: 0 4px; align-self: flex-end; color: #666;">...</span>`;
+          }
+        }
+        navHtml +=
+          `<button type="button" class="page-btn" ${currentPage === totalPages || totalPages === 0 ? "disabled" : ""} onclick="changePage(${currentPage + 1})">Sig ▶</button>`;
+
+        const navContainer = document.getElementById("pagination-nav");
+        if (navContainer) {
+          navContainer.innerHTML = navHtml;
+        }
+      }
+
+      // Cambiar de página
+      window.changePage = function(page) {
+        currentPage = page;
+        renderDashboard();
+      };
+
+      // Manejar el ordenamiento al hacer click en las cabeceras de tabla
+      document.querySelectorAll("#table-students th.sortable").forEach(th => {
+        th.addEventListener("click", () => {
+          const col = th.getAttribute("data-sort");
+          if (activeSort.column === col) {
+            activeSort.direction = activeSort.direction === "asc" ?
+              "desc" : "asc";
+          } else {
+            activeSort.column = col;
+            activeSort.direction = "desc"; // Por defecto descendente
+          }
+          renderDashboard();
+        });
+      });
+
+      // Inicialización general del Dashboard
+      async function initDashboard() {
+        await loadDbConfig();
+        await updateDashboardData();
+      }
+
+      // Eventos de Pestañas
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach(b => b
+            .classList.remove("active"));
+          document.querySelectorAll(".tab-content").forEach(c => c
+            .classList.remove("active"));
+
+          btn.classList.add("active");
+          const tabId = btn.getAttribute("data-tab");
+          document.getElementById(tabId).classList.add("active");
+        });
+      });
+
+      // Evento expandir/colapsar filtros
+      const filterToggle = document.getElementById("filters-toggle-btn");
+      const filtersRow = document.getElementById("filters-container");
+      const arrowIcon = document.getElementById("filters-arrow-icon");
+      filterToggle.addEventListener("click", () => {
+        const isCollapsed = filtersRow.style.display === "none";
+        filtersRow.style.display = isCollapsed ? "flex" : "none";
+        arrowIcon.textContent = isCollapsed ? "▲" : "▼";
+      });
+
+      // Función para aplicar filtros en tiempo real
+      function applyFilters() {
+        filters.search = document.getElementById("filter-search").value;
+
+        const minVal = document.getElementById("filter-ird-min").value;
+        filters.irdMin = minVal !== "" ? parseInt(minVal) : null;
+
+        const maxVal = document.getElementById("filter-ird-max").value;
+        filters.irdMax = maxVal !== "" ? parseInt(maxVal) : null;
+
+        filters.asistencia = document.getElementById("filter-asistencia")
+          .value;
+        filters.riesgoPerceb = document.getElementById("filter-riesgo-perceb")
+          .value;
+
+        currentPage = 1;
+        renderDashboard();
+      }
+
+      // Escuchar cambios en los inputs para filtrar en tiempo real
+      document.getElementById("filter-search").addEventListener("input",
+        applyFilters);
+      document.getElementById("filter-ird-min").addEventListener("input",
+        applyFilters);
+      document.getElementById("filter-ird-max").addEventListener("input",
+        applyFilters);
+      document.getElementById("filter-asistencia").addEventListener("change",
+        applyFilters);
+      document.getElementById("filter-riesgo-perceb").addEventListener(
+        "change", applyFilters);
+
+      // Evento limpiar filtros
+      document.getElementById("btn-clear-filters").addEventListener("click",
+      () => {
+        document.getElementById("filter-search").value = "";
+        document.getElementById("filter-ird-min").value = "";
+        document.getElementById("filter-ird-max").value = "";
+        document.getElementById("filter-asistencia").value = "todos";
+        document.getElementById("filter-riesgo-perceb").value = "todos";
+
+        filters = {
+          search: "",
+          irdMin: null,
+          irdMax: null,
+          asistencia: "todos",
+          riesgoPerceb: "todos"
+        };
+        currentPage = 1;
+        renderDashboard();
+      });
+
+      // Evento de refresco de datos
+      document.getElementById("btn-refresh").addEventListener("click",
+    async () => {
+        if (refreshCooldownActive) return;
+
+        // Activar Cooldown
+        refreshCooldownActive = true;
+        const btn = document.getElementById("btn-refresh");
+        btn.disabled = true;
+
+        await updateDashboardData();
+
+        let cd = systemConfig.umbrales.cooldown_actualizar_seg || 30;
+        const timer = setInterval(() => {
+          cd--;
+          if (cd <= 0) {
+            clearInterval(timer);
+            btn.disabled = false;
+            refreshCooldownActive = false;
+            btn.innerHTML = `
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              Actualizar datos
+            `;
+          } else {
+            btn.textContent = `Esperar ${cd}s`;
+          }
+        }, 1000);
+      });
+
+      // ==========================================================
+      // ★ HISTÓRICO DE CUATRIMESTRES ★
+      // ==========================================================
+      async function guardarHistorico() {
+        console.log("=== INICIANDO GUARDADO DE HISTÓRICO ===");
+        showLoading("Sincronizando base de datos histórica...");
+        try {
+          // 1. Obtener todas las entradas actuales de la base de datos histórica (db_historico)
+          const urlHist =
+            `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_historico}&perpage=1000`;
+          const resHist = await fetch(urlHist);
+          if (!resHist.ok) throw new Error(
+            "No se pudo conectar con la base de datos histórica de Moodle"
+            );
+          const htmlHist = await resHist.text();
+
+          // Parsear las entradas existentes en la base de datos histórica
+          const parser = new DOMParser();
+          const docHist = parser.parseFromString(htmlHist, "text/html");
+          const entriesList = docHist.querySelectorAll(
+            ".defaulttemplate-listentry, .defaulttemplate-single, .card, .generaltable tr"
+            );
+
+          const histEntradasMap =
+        new Map(); // email -> { rid, nombre, historialText }
+
+          entriesList.forEach(entry => {
+            // Extraer rid de los links de acciones o innerHTML
+            let rid = null;
+            const actionLinks = entry.querySelectorAll(
+              "a[href*='rid=']");
+            for (let link of actionLinks) {
+              const match = link.getAttribute("href").match(
+              /rid=(\d+)/);
+              if (match) {
+                rid = match[1];
+                break;
+              }
+            }
+            if (!rid) {
+              const match = entry.innerHTML.match(/[?&]rid=(\d+)/);
+              if (match) rid = match[1];
+            }
+            if (!rid) return;
+
+            // Extraer campos de la entrada
+            let emailVal = "";
+            let nombreVal = "";
+            let historialVal = "";
+
+            const rows = entry.querySelectorAll(".row, div, td");
+            rows.forEach(row => {
+              const labelEl = row.querySelector(
+                ".font-weight-bold, span, th, label");
+              let labelText = labelEl ? labelEl.textContent.trim()
+                .toLowerCase() : "";
+              let valText = "";
+              const valEl = row.querySelector(
+                ".col-8, .col-lg-9, p, td:nth-child(2), .data-field-html"
+                );
+              if (valEl) {
+                valText = valEl.textContent.trim();
+              } else if (labelEl && labelEl.nextElementSibling) {
+                valText = labelEl.nextElementSibling.textContent
+                  .trim();
+              }
+
+              if (labelText.includes("email") || labelText.includes(
+                  "correo")) {
+                emailVal = valText;
+              } else if (labelText.includes("alumno") || labelText
+                .includes("nombre")) {
+                nombreVal = valText;
+              } else if (labelText.includes("historial") ||
+                labelText.includes("trayectoria") || labelText
+                .includes("datos")) {
+                historialVal = valText;
+              }
+            });
+
+            // Fallback por regex si no se encontró el email mediante etiquetas
+            if (!emailVal) {
+              const emailMatch = entry.textContent.match(
+                /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+              if (emailMatch) emailVal = emailMatch[0];
+            }
+
+            if (emailVal) {
+              histEntradasMap.set(emailVal.trim().toLowerCase(), {
+                rid: rid,
+                nombre: nombreVal,
+                historialText: historialVal
+              });
+            }
+          });
+
+          console.log(
+            `Entradas históricas preexistentes cargadas: ${histEntradasMap.size}`
+            );
+
+          // 2. Obtener el formulario de edición/creación de db_historico para mapear los nombres de campos
+          const getFormRes = await fetch(
+            `${window.location.origin}/mod/data/edit.php?d=${systemConfig.urls.dataids.db_historico}`
+            );
+          if (!getFormRes.ok) throw new Error(
+            "No se pudo obtener el formulario de creación histórica");
+          const formHtml = await getFormRes.text();
+          const docForm = parser.parseFromString(formHtml, "text/html");
+
+          const fieldsMapeo = {};
+          const labelElements = docForm.querySelectorAll("label[for]");
+          const normLabel = (str) => str.trim().toLowerCase().normalize(
+            "NFD").replace(/[\u0300-\u036f]/g, "");
+
+          labelElements.forEach(label => {
+            const text = normLabel(label.textContent);
+            const inputId = label.getAttribute("for");
+            const inputEl = docForm.getElementById(inputId) || docForm
+              .querySelector(`[name="${inputId}"]`);
+            if (inputEl) {
+              const fieldName = inputEl.getAttribute("name");
+              if (!fieldName) return;
+              if (text.includes("email") || text.includes("correo"))
+                fieldsMapeo.email = fieldName;
+              else if (text.includes("alumno") || text.includes(
+                  "nombre")) fieldsMapeo.nombre = fieldName;
+              else if (text.includes("historial") || text.includes(
+                  "trayectoria") || text.includes("datos")) fieldsMapeo
+                .historial = fieldName;
+            }
+          });
+
+          // Fallback por si no están en label for
+          if (!fieldsMapeo.email) {
+            const inputs = docForm.querySelectorAll(
+              "input[name], textarea[name]");
+            inputs.forEach(input => {
+              const name = input.getAttribute("name");
+              if (name && name.startsWith("field_")) {
+                if (input.tagName === "TEXTAREA" && !fieldsMapeo
+                  .historial) {
+                  fieldsMapeo.historial = name;
+                }
+              }
+            });
+            const wrapperRows = docForm.querySelectorAll(
+              "#defaulttemplate-addentry > div, .form-group, .fitem");
+            wrapperRows.forEach(row => {
+              const label = row.querySelector(
+                ".font-weight-bold, label, .col-form-label");
+              if (label) {
+                const labelText = normLabel(label.textContent);
+                const input = row.querySelector(
+                  "input[name], textarea[name]");
+                if (input) {
+                  const fieldName = input.getAttribute("name");
+                  if (!fieldName) return;
+                  if (labelText.includes("email") || labelText.includes(
+                      "correo")) fieldsMapeo.email = fieldName;
+                  else if (labelText.includes("alumno") || labelText
+                    .includes("nombre")) fieldsMapeo.nombre = fieldName;
+                  else if (labelText.includes("historial") || labelText
+                    .includes("trayectoria") || labelText.includes(
+                      "datos")) fieldsMapeo.historial = fieldName;
+                }
+              }
+            });
+          }
+
+          if (!fieldsMapeo.email || !fieldsMapeo.historial) {
+            console.error("Campos mapeados detectados:", fieldsMapeo);
+            throw new Error(
+              "No se pudo detectar dinámicamente el campo de Email o Historial en la base de datos de Moodle"
+              );
+          }
+
+          // Determinamos el cuatrimestre/periodo actual de forma dinámica
+          const hoy = new Date();
+          const anioActual = hoy.getFullYear();
+          const cuatActual = hoy.getMonth() <= 6 ? 1 : 2;
+          const periodoActual = `${anioActual}-${cuatActual}`;
+
+          let guardadosCount = 0;
+          let creadosCount = 0;
+          let editadosCount = 0;
+
+          console.log(
+            `Iniciando guardado de datos históricos para el periodo ${periodoActual}...`
+            );
+
+          // 3. Iterar por cada alumno calculado en el dashboard para guardarlo/actualizarlo
+          for (let alumno of alumnosCalculados) {
+            if (alumno.IRD === null)
+          continue; // Si no tiene datos de IRD, no se guarda histórico
+
+            const emailKey = alumno.email.trim().toLowerCase();
+            const entradaExistente = histEntradasMap.get(emailKey);
+
+            // Parsear o inicializar el historial del cuatrimestre
+            let historial = [];
+            if (entradaExistente && entradaExistente.historialText) {
+              try {
+                const parsed = parseCleanJSON(entradaExistente
+                  .historialText);
+                if (Array.isArray(parsed)) {
+                  historial = parsed;
+                }
+              } catch (e) {
+                console.warn(
+                  "No se pudo parsear el historial previo del alumno:",
+                  emailKey, entradaExistente.historialText);
+              }
+            }
+
+            // Crear el registro de datos para este periodo
+            const registroPeriodo = {
+              periodo: periodoActual,
+              ird: alumno.IRD,
+              ralentizacion: alumno.ralentizacion,
+              asistido: alumno.asistido,
+              percepcion_riesgo: alumno.sePercibeRiesgo,
+              fecha: hoy.toISOString().substring(0, 10)
+            };
+
+            // Actualizar o añadir el registro del periodo en el historial
+            const idxPeriodo = historial.findIndex(h => h.periodo ===
+              periodoActual);
+            if (idxPeriodo !== -1) {
+              historial[idxPeriodo] = registroPeriodo;
+            } else {
+              historial.push(registroPeriodo);
+            }
+
+            const historialJsonText = JSON.stringify(historial);
+
+            // Crear FormData para enviar a Moodle
+            const formData = new FormData();
+            formData.append("d", systemConfig.urls.dataids.db_historico);
+            formData.append("sesskey", sesskey);
+            formData.append("saveandview", "Guardar");
+
+            // Mapear campos obligatorios
+            formData.append(fieldsMapeo.email, alumno.email);
+            if (fieldsMapeo.nombre) formData.append(fieldsMapeo.nombre,
+              alumno.nombre);
+            formData.append(fieldsMapeo.historial, historialJsonText);
+
+            if (entradaExistente && entradaExistente.rid) {
+              // Actualizar entrada existente
+              formData.append("rid", entradaExistente.rid);
+              const postUrl =
+                `${window.location.origin}/mod/data/edit.php?d=${systemConfig.urls.dataids.db_historico}&rid=${entradaExistente.rid}`;
+              const postRes = await fetch(postUrl, {
+                method: "POST",
+                body: formData
+              });
+              if (!postRes.ok) throw new Error(
+                `Fallo al actualizar el histórico de ${alumno.nombre}`);
+              editadosCount++;
+            } else {
+              // Crear nueva entrada
+              formData.append("rid", "0");
+              const postUrl =
+                `${window.location.origin}/mod/data/edit.php?d=${systemConfig.urls.dataids.db_historico}`;
+              const postRes = await fetch(postUrl, {
+                method: "POST",
+                body: formData
+              });
+              if (!postRes.ok) throw new Error(
+                `Fallo al crear el histórico de ${alumno.nombre}`);
+              creadosCount++;
+            }
+
+            guardadosCount++;
+
+            // Breve delay para evitar sobrecargar a Moodle
+            await new Promise(r => setTimeout(r, systemConfig.umbrales
+              .historico_delay_ms || 300));
+          }
+
+          alert(
+            `Histórico guardado correctamente.\nTotal procesados: ${guardadosCount} alumnos (Nuevos: ${creadosCount}, Actualizados: ${editadosCount}) para el periodo ${periodoActual}.`
+            );
+          console.log(
+            `Sincronización histórica finalizada. Guardados: ${guardadosCount}.`
+            );
+        } catch (error) {
+          console.error("Error al guardar el histórico en Moodle:", error);
+          alert(`Error al guardar histórico: ${error.message}`);
+        } finally {
+          hideLoading();
+        }
+      }
+
+      // Evento de guardado histórico
+      document.getElementById("btn-save-historical").addEventListener("click",
+        async () => {
+          if (!alumnosCalculados || alumnosCalculados.length === 0) {
+            alert(
+              "No hay datos de alumnos cargados para guardar. Por favor, actualiza los datos primero."
+              );
+            return;
+          }
+          const confirmar = confirm(
+            "¿Deseas guardar/actualizar los resultados actuales del cuatrimestre en el registro histórico?"
+            );
+          if (confirmar) {
+            await guardarHistorico();
+          }
+        });
+
+      // ==========================================================
+      // ★ MODAL Y REGISTRO DE ASISTENCIA ★
+      // ==========================================================
+      let activeStudentId = null;
+      let activeStudentName = "";
+
+      window.abrirModalAsistencia = function(id, name, defaultOrigen) {
+        activeStudentId = id;
+        activeStudentName = name;
+
+        document.getElementById("modal-student-info").textContent =
+          `Alumno: ${name}`;
+        document.getElementById("asistencia-origen").value = defaultOrigen;
+        document.getElementById("asistencia-mensaje").value = "";
+        document.getElementById("modal-error").style.display = "none";
+
+        document.getElementById("modal-asistencia").style.display = "flex";
+      };
+
+      // Cerrar modal
+      const closeModal = () => {
+        document.getElementById("modal-asistencia").style.display = "none";
+      };
+
+      document.getElementById("btn-modal-close").addEventListener("click",
+        closeModal);
+      document.getElementById("btn-modal-cancel").addEventListener("click",
+        closeModal);
+
+      // Guardar Asistencia (Submit de Formulario)
+      document.getElementById("form-asistencia").addEventListener("submit",
+        async (e) => {
+          e.preventDefault();
+
+          const origen = document.getElementById("asistencia-origen")
+            .value;
+          const mensajeText = document.getElementById(
+            "asistencia-mensaje").value.trim();
+          const btnSave = document.getElementById("btn-modal-save");
+          const btnCancel = document.getElementById("btn-modal-cancel");
+          const errDiv = document.getElementById("modal-error");
+
+          errDiv.style.display = "none";
+          btnSave.disabled = true;
+          btnCancel.disabled = true;
+
+          try {
+            // 1. POST a DB Logs (d=16) resolviendo dinámicamente los campos
+            showLoading("Registrando log de asistencia...");
+            const getFormRes = await fetch(
+              `${window.location.origin}/mod/data/edit.php?d=${systemConfig.urls.dataids.db_logs}`
+              );
+            if (!getFormRes.ok) throw new Error(
+              "No se pudo obtener el formulario de creación de logs");
+
+            const formHtml = await getFormRes.text();
+            const parser = new DOMParser();
+            const docForm = parser.parseFromString(formHtml, "text/html");
+
+            const fieldsMapeo = {};
+            const labelElements = docForm.querySelectorAll("label[for]");
+
+            // Función auxiliar para normalizar texto de labels (sin diacríticos, en minúsculas)
+            const normLabel = (str) => str.trim().toLowerCase().normalize(
+              "NFD").replace(/[\u0300-\u036f]/g, "");
+
+            labelElements.forEach(label => {
+              const text = normLabel(label.textContent);
+              const inputId = label.getAttribute("for");
+              const inputEl = docForm.getElementById(inputId) ||
+                docForm.querySelector(`[name="${inputId}"]`);
+              if (inputEl) {
+                const fieldName = inputEl.getAttribute("name");
+                if (!fieldName) return;
+                if (text.includes("nombre_alumno") || text.includes(
+                    "alumno")) fieldsMapeo.nombre_alumno = fieldName;
+                else if (text.includes("id_alumno") || text.includes(
+                    "id alumno")) fieldsMapeo.id_alumno = fieldName;
+                else if (text.includes("nombre_tutor") || text
+                  .includes("tutor")) fieldsMapeo.nombre_tutor =
+                  fieldName;
+                else if (text.includes("origen")) fieldsMapeo.origen =
+                  fieldName;
+                else if (text.includes("mensaje") || text.includes(
+                    "orientacion") || text.includes("orientación"))
+                  fieldsMapeo.mensaje = fieldName;
+              }
+            });
+
+            // Si no encuentra por label for, buscar por clases de mod-data-input o labels genéricos
+            if (!fieldsMapeo.nombre_alumno) {
+              const wrapperRows = docForm.querySelectorAll(
+                "#defaulttemplate-addentry > div, .form-group, .fitem");
+              wrapperRows.forEach(row => {
+                const label = row.querySelector(
+                  ".font-weight-bold, label, .col-form-label");
+                if (label) {
+                  const labelText = normLabel(label.textContent);
+                  const input = row.querySelector(
+                    "input[name], textarea[name], select[name]");
+                  if (input) {
+                    const fieldName = input.getAttribute("name");
+                    if (!fieldName) return;
+                    if (labelText.includes("nombre_alumno") ||
+                      labelText.includes("alumno")) fieldsMapeo
+                      .nombre_alumno = fieldName;
+                    else if (labelText.includes("id_alumno") ||
+                      labelText.includes("id alumno")) fieldsMapeo
+                      .id_alumno = fieldName;
+                    else if (labelText.includes("nombre_tutor") ||
+                      labelText.includes("tutor")) fieldsMapeo
+                      .nombre_tutor = fieldName;
+                    else if (labelText.includes("origen")) fieldsMapeo
+                      .origen = fieldName;
+                    else if (labelText.includes("mensaje") ||
+                      labelText.includes("orientacion")) fieldsMapeo
+                      .mensaje = fieldName;
+                  }
+                }
+              });
+            }
+
+            // Resolver el nombre del tutor logueado
+            const tutorNombre = window.M?.cfg?.userfullname ||
+              document.querySelector('.userbutton .usertext')?.textContent
+              ?.trim() ||
+              document.querySelector('.usermenu .usertext')?.textContent
+              ?.trim() ||
+              document.querySelector('.usertext')?.textContent?.trim() ||
+              "Tutor";
+
+            const formData = new FormData();
+            formData.append("d", systemConfig.urls.dataids.db_logs);
+            formData.append("rid", "0");
+            formData.append("sesskey", sesskey);
+            formData.append("saveandview", "Guardar");
+
+            if (fieldsMapeo.nombre_alumno) formData.append(fieldsMapeo
+              .nombre_alumno, activeStudentName);
+            if (fieldsMapeo.id_alumno) formData.append(fieldsMapeo
+              .id_alumno, activeStudentId);
+            if (fieldsMapeo.nombre_tutor) formData.append(fieldsMapeo
+              .nombre_tutor, tutorNombre);
+            if (fieldsMapeo.origen) formData.append(fieldsMapeo.origen,
+              origen);
+            if (fieldsMapeo.mensaje) formData.append(fieldsMapeo.mensaje,
+              mensajeText);
+
+            const postLogRes = await fetch(
+              `${window.location.origin}/mod/data/edit.php`, {
+                method: "POST",
+                body: formData
+              });
+            if (!postLogRes.ok) throw new Error(
+              "No se pudo registrar la asistencia en la base de datos"
+              );
+
+            // 2. Si el origen es "Solicitud", RECHAZAR en DB Solicitudes (d=15)
+            // Nota: Las solicitudes nunca se aprueban, solo se rechazan (disapprove) para archivarlas.
+            // En el frontend del alumno esto se traduce visualmente como "atendida".
+            const studentObj = alumnosCalculados.find(a => a.id ===
+              activeStudentId);
+            if (origen === "Solicitud" && studentObj && studentObj
+              .solicitudRid) {
+              showLoading("Archivando solicitud del alumno...");
+              const disapproveUrl =
+                `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_solicitudes}&disapprove=${studentObj.solicitudRid}&sesskey=${sesskey}`;
+              const disapproveRes = await fetch(disapproveUrl);
+              if (!disapproveRes.ok) console.warn(
+                "El rechazo/archivado de la solicitud de Moodle retornó un error."
+                );
+            }
+
+            // 3. Enviar mensaje por mensajería instantánea AJAX si se escribió un mensaje
+            if (mensajeText) {
+              showLoading("Enviando mensaje interno en Moodle...");
+              const payload = [{
+                index: 0,
+                methodname: "core_message_send_instant_messages",
+                args: {
+                  messages: [{
+                    // touserid debe ser entero, no string
+                    touserid: parseInt(activeStudentId, 10),
+                    text: mensajeText
+                  }]
+                }
+              }];
+              const msgUrl =
+                `${window.location.origin}/lib/ajax/service.php?sesskey=${sesskey}&info=core_message_send_instant_messages`;
+              const msgRes = await fetch(msgUrl, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+              });
+              if (msgRes.ok) {
+                const resJson = await msgRes.json();
+                if (resJson[0]?.error) {
+                  console.warn("Moodle reportó error al enviar mensaje:",
+                    resJson[0].exception);
+                }
+              } else {
+                console.warn(
+                  "Fallo de red al enviar el mensaje por chat.");
+              }
+            }
+
+            // Éxito total
+            closeModal();
+            await updateDashboardData();
+          } catch (error) {
+            console.error("Error al registrar la asistencia:", error);
+            errDiv.textContent = `Error: ${error.message}`;
+            errDiv.style.display = "block";
+          } finally {
+            btnSave.disabled = false;
+            btnCancel.disabled = false;
+            hideLoading();
+          }
+        });
+
+    })();
+  </script>
+</p>

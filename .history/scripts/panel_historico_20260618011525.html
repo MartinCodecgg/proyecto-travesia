@@ -1,0 +1,1823 @@
+<p>
+  <script>
+    // Quitar margen del <p> que Moodle crea alrededor del script
+    if (document.currentScript?.parentElement?.tagName === "P") {
+      document.currentScript.parentElement.style.margin = "0";
+    }
+    
+    // Ocultar el título de la página de Moodle lo más rápido posible
+    (function () {
+      var style = document.createElement("style");
+      style.textContent = `
+         h2:first-of-type, .page-header-headings, .activity-header {
+           display: none !important;
+         }
+      `;
+      document.head.appendChild(style);
+    })();
+  </script>
+</p>
+
+<!-- Pantalla Falsa (Seguridad por Oscuridad) -->
+<div id="pantalla-falsa">
+  <p style="font-size: 15px; color: #444; line-height: 1.8;"><strong>Página de pruebaa Moodle</strong></p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est, et nunc <span id="btn-oculto" style="cursor: text;">accumsan</span> vehicula nisi. Mauris placerat eleifend leo, quisque sit amet est et sapien ullamcorper pharetra.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis molestie dictum semper, quam quam congue erat, vitae sodales nisi metus a nunc. Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod sodales, sollicitudin vel, wisi.</p>
+</div>
+
+<!-- Tablero Real -->
+<div id="tablero" style="display: none;">
+  <div id="panel-historico-container">
+    
+    <!-- Encabezado de la página -->
+    <div class="panel-header-wrapper">
+      <div class="header-title-box">
+        <h3 class="panel-title">📂 Panel Histórico General - Seguimiento y Evolución</h3>
+      </div>
+      <div class="header-actions">
+        <span id="txt-last-update" class="last-update-text">Última actualización: —</span>
+        <button type="button" id="btn-refresh" class="btn-action">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          Actualizar datos
+        </button>
+      </div>
+    </div>
+
+    <!-- Indicador de Carga -->
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="spinner"></div>
+      <div id="loading-text" class="loading-text">Cargando base de datos...</div>
+    </div>
+
+    <!-- Pestañas Principales -->
+    <div class="tabs-navigation">
+      <button type="button" class="tab-btn active" data-tab="tab-alumnos">👥 Historial por Alumnos</button>
+      <button type="button" class="tab-btn" data-tab="tab-cuatrimestres">📅 Historial por Cuatrimestres</button>
+    </div>
+
+    <!-- PESTAÑA 1: HISTORIAL POR ALUMNOS -->
+    <div id="tab-alumnos" class="tab-content active">
+      <div class="section-card">
+        
+        <!-- Sección de Filtros de Alumnos -->
+        <div class="filters-header" id="filters-toggle-btn-al">
+          <span style="font-weight: 500; color: hsl(168, 60%, 25%);">🔍 Filtros de Búsqueda</span>
+          <span id="filters-arrow-icon-al">▼</span>
+        </div>
+        
+        <!-- Fila de Filtros de Alumnos -->
+        <div class="filters-row" id="filters-container-al" style="display: none;">
+          <div class="filter-item" style="flex: 2; min-width: 200px;">
+            <label for="search-alumno">Buscar por Alumno o Email</label>
+            <input type="text" id="search-alumno" class="filter-input" placeholder="Nombre o email..." />
+          </div>
+          
+          <div class="filter-item" style="min-width: 130px;">
+            <label for="filter-al-cuat">Cuatrimestre</label>
+            <select id="filter-al-cuat" class="filter-input">
+              <option value="">Todos</option>
+            </select>
+          </div>
+
+          <div class="filter-item">
+            <label for="filter-al-desde">Desde (Fecha Snapshot)</label>
+            <input type="date" id="filter-al-desde" class="filter-input" />
+          </div>
+
+          <div class="filter-item">
+            <label for="filter-al-hasta">Hasta (Fecha Snapshot)</label>
+            <input type="date" id="filter-al-hasta" class="filter-input" />
+          </div>
+
+          <div class="filter-item">
+            <label for="filter-al-ird-min">IRD Mín (%)</label>
+            <input type="number" id="filter-al-ird-min" class="filter-input" style="width: 80px;" min="0" max="100" />
+          </div>
+
+          <div class="filter-item">
+            <label for="filter-al-ird-max">IRD Máx (%)</label>
+            <input type="number" id="filter-al-ird-max" class="filter-input" style="width: 80px;" min="0" max="100" />
+          </div>
+
+          <div class="filter-item">
+            <label for="filter-al-ralent-min">Ralent. Mín (%)</label>
+            <input type="number" id="filter-al-ralent-min" class="filter-input" style="width: 80px;" min="0" max="100" />
+          </div>
+
+          <div class="filter-item">
+            <label for="filter-al-ralent-max">Ralent. Máx (%)</label>
+            <input type="number" id="filter-al-ralent-max" class="filter-input" style="width: 80px;" min="0" max="100" />
+          </div>
+
+          <div class="filter-item" style="min-width: 110px;">
+            <label for="filter-al-riesgo">Percibe Riesgo</label>
+            <select id="filter-al-riesgo" class="filter-input">
+              <option value="">Todos</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <div class="filter-item" style="min-width: 110px;">
+            <label for="filter-al-asistido">Asistido</label>
+            <select id="filter-al-asistido" class="filter-input">
+              <option value="">Todos</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <div class="filter-item" style="align-self: flex-end;">
+            <button type="button" id="btn-clear-filters-al" class="btn-action" style="height: 38px;">Limpiar</button>
+          </div>
+        </div>
+
+        <!-- Acciones de Exportación -->
+        <div class="actions-row">
+          <button type="button" id="btn-export-al-all" class="btn-action btn-secondary-action">
+            📥 Exportar Todo (CSV)
+          </button>
+          <button type="button" id="btn-export-al-filtered" class="btn-action">
+            📥 Exportar Filtrado (CSV)
+          </button>
+        </div>
+
+        <!-- Tabla de Alumnos -->
+        <div class="table-responsive">
+          <table class="table-historical" id="table-alumnos-list">
+            <thead>
+              <tr>
+                <th style="width: 40px;"></th>
+                <th>Alumno</th>
+                <th>Email</th>
+                <th style="text-align: center;">Cuatrimestres</th>
+                <th style="text-align: center;">Último IRD</th>
+                <th style="text-align: center;">Última Ralentización</th>
+                <th style="text-align: center;">Última Percepción</th>
+              </tr>
+            </thead>
+            <tbody id="alumnos-tbody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: #666; padding: 32px;">⏳ Cargando datos históricos de alumnos...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación Alumnos -->
+        <div class="pagination-row">
+          <div class="pagination-info" id="pagination-info-al">Mostrando 0 de 0 alumnos</div>
+          <div class="pagination-buttons" id="pagination-nav-al"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PESTAÑA 2: HISTORIAL POR CUATRIMESTRES -->
+    <div id="tab-cuatrimestres" class="tab-content">
+      <div class="section-card">
+        
+        <!-- Sección de Filtros de Cuatrimestres -->
+        <div class="filters-header" id="filters-toggle-btn-cuat">
+          <span style="font-weight: 500; color: hsl(168, 60%, 25%);">🔍 Filtros de Búsqueda</span>
+          <span id="filters-arrow-icon-cuat">▼</span>
+        </div>
+        
+        <!-- Fila de Filtros de Cuatrimestres -->
+        <div class="filters-row" id="filters-container-cuat" style="display: none;">
+          <div class="filter-item" style="flex: 1; min-width: 150px;">
+            <label for="search-cuatrimestre">Filtrar por Cuatrimestre</label>
+            <input type="text" id="search-cuatrimestre" class="filter-input" placeholder="Ej: 2026-1..." />
+          </div>
+
+          <div class="filter-item">
+            <label for="filter-cuat-desde">Desde (Fecha Registro)</label>
+            <input type="date" id="filter-cuat-desde" class="filter-input" />
+          </div>
+
+          <div class="filter-item">
+            <label for="filter-cuat-hasta">Hasta (Fecha Registro)</label>
+            <input type="date" id="filter-cuat-hasta" class="filter-input" />
+          </div>
+
+          <div class="filter-item" style="align-self: flex-end;">
+            <button type="button" id="btn-clear-filters-cuat" class="btn-action" style="height: 38px;">Limpiar</button>
+          </div>
+        </div>
+
+        <!-- Acciones de Exportación -->
+        <div class="actions-row">
+          <button type="button" id="btn-export-cuat-all" class="btn-action btn-secondary-action">
+            📥 Exportar Todo (CSV)
+          </button>
+          <button type="button" id="btn-export-cuat-filtered" class="btn-action">
+            📥 Exportar Filtrado (CSV)
+          </button>
+        </div>
+
+        <!-- Tabla de Cuatrimestres -->
+        <div class="table-responsive">
+          <table class="table-historical" id="table-cuatrimestres-list">
+            <thead>
+              <tr>
+                <th style="width: 40px;"></th>
+                <th>Cuatrimestre</th>
+                <th>Fecha de Registro</th>
+                <th style="text-align: center;">Alto Riesgo</th>
+                <th style="text-align: center;">Medio Riesgo</th>
+                <th style="text-align: center;">Bajo Riesgo</th>
+                <th style="text-align: center;">Solicitudes Pendientes</th>
+              </tr>
+            </thead>
+            <tbody id="cuatrimestres-tbody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: #666; padding: 32px;">⏳ Cargando datos históricos por cuatrimestre...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación Cuatrimestres -->
+        <div class="pagination-row">
+          <div class="pagination-info" id="pagination-info-cuat">Mostrando 0 de 0 cuatrimestres</div>
+          <div class="pagination-buttons" id="pagination-nav-cuat"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<p>
+  <script>
+    (function () {
+      // Inyectar estilos CSS dinámicamente para evitar sanitización de Moodle
+      (function () {
+        const style = document.createElement("style");
+        style.textContent = `
+          #panel-historico-container {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #333;
+            background-color: #fcfcfc;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05);
+            position: relative;
+          }
+          
+          .panel-header-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid hsl(168, 60%, 90%);
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+          }
+          
+          .panel-title {
+            color: hsl(168, 60%, 35%) !important;
+            font-weight: 700;
+            margin: 0 !important;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          
+          .last-update-text {
+            font-size: 13px;
+            color: #666;
+            margin-right: 8px;
+          }
+          
+          /* Botones */
+          .btn-action {
+            background: hsl(168, 60%, 35%) !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 14px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            border-radius: 6px !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            height: 38px !important;
+            transition: background 0.15s ease !important;
+          }
+          
+          .btn-action:hover:not(:disabled) {
+            background: hsl(168, 60%, 28%) !important;
+          }
+          
+          .btn-action:disabled {
+            background: #a5c7be !important;
+            cursor: not-allowed !important;
+            opacity: 0.7 !important;
+          }
+          
+          .btn-secondary-action {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+            border: 1px solid #d1d3e2 !important;
+          }
+          
+          .btn-secondary-action:hover:not(:disabled) {
+            background: #e9ecef !important;
+          }
+
+          .tabs-navigation {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            gap: 4px;
+            overflow-x: auto;
+          }
+          
+          .tab-btn {
+            background: #f8f9fa;
+            border: 1px solid #d1d3e2;
+            color: #495057 !important;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+          }
+          
+          .tab-btn:hover {
+            background: #e9ecef;
+          }
+          
+          .tab-btn.active {
+            background: hsl(168, 60%, 35%) !important;
+            color: white !important;
+            border-color: hsl(168, 60%, 35%) !important;
+            border-bottom: 1px solid hsl(168, 60%, 35%) !important;
+            z-index: 2;
+          }
+          
+          .tab-content {
+            display: none;
+          }
+          
+          .tab-content.active {
+            display: block;
+          }
+          
+          /* Cards */
+          .section-card {
+            background: white;
+            border: 1px solid #e3e6f0;
+            border-radius: 6px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+          }
+          
+          /* Filtros */
+          .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #eaecf4;
+            margin-bottom: 16px;
+            align-items: flex-end;
+          }
+          
+          .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+          }
+          
+          .filter-item label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+          }
+          
+          .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d3e2;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+            background-color: white;
+            height: 38px;
+            box-sizing: border-box;
+          }
+          
+          .filter-input:focus {
+            outline: none;
+            border-color: hsl(168, 60%, 35%);
+          }
+          
+          .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid hsl(168, 60%, 90%);
+            background: hsl(168, 60%, 98%);
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 13.5px;
+            margin-bottom: 16px;
+            user-select: none;
+            cursor: pointer;
+            transition: background 0.15s ease;
+          }
+          
+          .filters-header:hover {
+            background: hsl(168, 60%, 94%);
+          }
+          
+          .actions-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 16px;
+          }
+          
+          /* Tablas */
+          .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 16px;
+          }
+          
+          .table-historical {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+          }
+          
+          .table-historical th, .table-historical td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e3e6f0;
+            text-align: left;
+            vertical-align: middle;
+          }
+          
+          .table-historical th {
+            background-color: #f8f9fa;
+            font-weight: 700;
+            color: #495057;
+            user-select: none;
+          }
+          
+          .table-historical tr:hover {
+            background-color: #fbfbfb;
+          }
+          
+          /* Estilos de expansión */
+          .tr-expandible {
+            background-color: #f2f9f6;
+            cursor: pointer;
+            transition: background 0.15s ease;
+          }
+          
+          .tr-expandible:hover {
+            background-color: #e3f3ed !important;
+          }
+          
+          .tr-expandible td {
+            font-weight: 600;
+            color: #1e5e47;
+          }
+          
+          .toggle-icon {
+            display: inline-block;
+            width: 14px;
+            font-style: normal;
+            transition: transform 0.2s ease;
+            font-weight: bold;
+          }
+          
+          .tr-expandible.open .toggle-icon {
+            transform: rotate(90deg);
+          }
+          
+          .tr-detalle {
+            display: none;
+            background-color: #fafafa;
+          }
+          
+          .tr-detalle.visible {
+            display: table-row;
+          }
+          
+          .tr-detalle td {
+            padding: 16px 24px;
+            border-bottom: 2px solid #e3e6f0;
+          }
+          
+          /* Visualización del Email */
+          .email-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+          }
+          
+          .email-text {
+            display: inline-block;
+            max-width: 130px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #666;
+            font-size: 13px;
+          }
+          
+          .btn-show-email {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            color: hsl(168, 60%, 40%);
+            border-radius: 4px;
+            transition: background 0.1s ease;
+          }
+          
+          .btn-show-email:hover {
+            background: rgba(0,0,0,0.05);
+            color: hsl(168, 60%, 30%);
+          }
+
+          /* Badges */
+          .badge-sem {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            border-radius: 12px;
+            text-align: center;
+          }
+          
+          .badge-sem-red {
+            background-color: #fadbd8;
+            color: #78281f;
+          }
+          
+          .badge-sem-yellow {
+            background-color: #fdebd0;
+            color: #7e5109;
+          }
+          
+          .badge-sem-green {
+            background-color: #d4efdf;
+            color: #145a32;
+          }
+          
+          .badge-sem-neutral {
+            background-color: #ebedef;
+            color: #5d6d7e;
+          }
+          
+          /* Paginación */
+          .pagination-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+          }
+          
+          .pagination-buttons {
+            display: flex;
+            gap: 4px;
+          }
+          
+          .page-btn {
+            padding: 6px 12px;
+            background: #f8f9fa;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #333 !important;
+            transition: all 0.15s ease;
+          }
+          
+          .page-btn.active {
+            background: hsl(168, 60%, 35%) !important;
+            color: white !important;
+            border-color: hsl(168, 60%, 35%) !important;
+          }
+          
+          .page-btn:hover:not(.active):not(:disabled) {
+            background: #e9ecef;
+          }
+          
+          .page-btn:disabled {
+            background: #f8f9fa !important;
+            color: #aaa !important;
+            border-color: #ddd !important;
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+          
+          /* Carga */
+          .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-radius: 8px;
+            gap: 12px;
+          }
+          
+          .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid hsl(168, 60%, 35%);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+          
+          .loading-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: hsl(168, 60%, 25%);
+          }
+          
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          
+          /* Estructuras en detalle de cuatrimestre */
+          .det-grid-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+          }
+          
+          .det-kpi-card {
+            padding: 12px 16px;
+            border-radius: 6px;
+            border: 1px solid #e3e6f0;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            text-align: center;
+          }
+          
+          .det-kpi-val {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+          }
+          
+          .det-kpi-lbl {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+          }
+          
+          .det-subtabs-nav {
+            display: flex;
+            gap: 6px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 12px;
+            padding-bottom: 4px;
+          }
+          
+          .det-subtab-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.1s ease;
+          }
+          
+          .det-subtab-btn:hover {
+            background: #eee;
+            color: #333;
+          }
+          
+          .det-subtab-btn.active {
+            background: hsl(168, 60%, 42%);
+            color: white;
+          }
+          
+          .det-subtab-content {
+            display: none;
+          }
+          
+          .det-subtab-content.active {
+            display: block;
+          }
+          
+          .det-sub-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+          }
+          
+          .det-sub-table th, .det-sub-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+          }
+          
+          .det-sub-table th {
+            background-color: #fdfdfd;
+            color: #555;
+            font-weight: 700;
+          }
+        `;
+        document.head.appendChild(style);
+      })();
+
+      // Control del botón oculto para revelar el tablero real
+      document.getElementById("btn-oculto").addEventListener("click", function () {
+        document.getElementById("pantalla-falsa").style.display = "none";
+        document.getElementById("tablero").style.display = "block";
+        initPanel();
+      });
+
+      // ==========================================================
+      // ★ CONFIGURACIÓN DEL SISTEMA Y ESTADO EN MEMORIA ★
+      // ==========================================================
+      const CONFIG_DB_CMID = 54785; // CMID de la DB de Configuración
+      const CONFIG_DB_ID = 17;      // DATAID de la DB de Configuración
+      
+      let systemConfig = {
+        urls: {
+          base: window.location.origin,
+          cmids: {
+            db_historico: 54788,
+            db_historico_general: 54862
+          },
+          dataids: {
+            db_historico: 18,
+            db_historico_general: 21
+          }
+        },
+        umbrales: {
+          threshold_ird: 40,
+          cooldown_actualizar_seg: 30,
+          page_size_paneles: 30
+        }
+      };
+
+      let rawAlumnos = [];
+      let rawCuatrimestres = [];
+      
+      let listAlumnos = [];       // Alumnos agrupados
+      let listCuatrimestres = [];  // Cuatrimestres procesados
+
+      // Paginación Alumnos
+      let pageAl = 1;
+      const sizeAl = 30;
+
+      // Paginación Cuatrimestres
+      let pageCuat = 1;
+      const sizeCuat = 30;
+
+      // Filtros
+      let filterAl = {
+        search: "",
+        cuatrimestre: "",
+        desde: null,
+        hasta: null,
+        irdMin: null,
+        irdMax: null,
+        ralentMin: null,
+        ralentMax: null,
+        riesgo: "",
+        asistido: ""
+      };
+
+      let filterCuatVal = {
+        search: "",
+        desde: null,
+        hasta: null
+      };
+
+      let lastUpdateDate = null;
+      let isRefreshCooldown = false;
+      const sesskey = window.M?.cfg?.sesskey || "";
+
+      // Muestra/Oculta overlay de carga
+      function showLoading(text) {
+        const overlay = document.getElementById("loading-overlay");
+        const ltext = document.getElementById("loading-text");
+        ltext.textContent = text;
+        overlay.style.display = "flex";
+      }
+
+      function hideLoading() {
+        document.getElementById("loading-overlay").style.display = "none";
+      }
+
+      // Limpia JSON inyectado de Moodle y Unicode spaces
+      function parseCleanJSON(rawText) {
+        if (!rawText) return null;
+        let clean = rawText.replace(/<[^>]*>/g, "");
+        clean = clean.replace(/&nbsp;/g, " ").replace(/&quot;/g, '"');
+        clean = clean.replace(/\u00a0/g, " "); 
+        clean = clean.replace(/\s+/g, " ").trim();
+        try {
+          return JSON.parse(clean);
+        } catch (e) {
+          console.error("Error al parsear JSON:", rawText, e);
+          return null;
+        }
+      }
+
+      // Parsea las entradas HTML
+      function parseEntriesHTML(htmlText) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlText, "text/html");
+        
+        let entries = Array.from(doc.querySelectorAll(".defaulttemplate-listentry"));
+        if (entries.length === 0) {
+          entries = Array.from(doc.querySelectorAll(".card"));
+        }
+        return entries;
+      }
+
+      // Carga configuración inicial desde la base de datos "Db Config"
+      async function loadDbConfig() {
+        showLoading("Cargando parámetros del sistema...");
+        try {
+          const response = await fetch(`${window.location.origin}/mod/data/view.php?d=${CONFIG_DB_ID}`);
+          if (response.ok) {
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const entries = doc.querySelectorAll(".defaulttemplate-listentry, .defaulttemplate-single, .card, .generaltable td");
+            let foundJson = null;
+
+            for (let entry of entries) {
+              const text = entry.textContent;
+              const cleanText = text.replace(/\u00a0/g, " ").replace(/&nbsp;/g, " ").trim();
+              const match = cleanText.match(/\{[\s\S]*\}/);
+              if (match) {
+                const parsed = parseCleanJSON(match[0]);
+                if (parsed && (parsed.urls || parsed.umbrales)) {
+                  foundJson = parsed;
+                  break;
+                }
+              }
+            }
+
+            if (foundJson) {
+              systemConfig = foundJson;
+              console.log("Configuración cargada de la DB Moodle:", systemConfig);
+            }
+          }
+        } catch (e) {
+          console.warn("Excepción al cargar config, usando fallback:", e);
+        }
+      }
+
+      // Descarga todas las páginas de una base de datos de Moodle
+      async function fetchAllDatabaseEntries(dataId) {
+        const baseUrl = `${window.location.origin}/mod/data/view.php?d=${dataId}&perpage=100`;
+        const response = await fetch(baseUrl);
+        const html = await response.text();
+        
+        let parser = new DOMParser();
+        let doc = parser.parseFromString(html, 'text/html');
+        
+        let entries = parseEntriesHTML(html);
+        
+        const pageLinks = doc.querySelectorAll('a[href*="page="]');
+        const pageNumbers = [];
+        pageLinks.forEach(link => {
+          const match = link.href.match(/page=(\d+)/);
+          if (match) pageNumbers.push(parseInt(match[1]));
+        });
+        
+        if (pageNumbers.length > 0) {
+          const maxPage = Math.max(...pageNumbers);
+          const promises = [];
+          for (let p = 1; p <= maxPage; p++) {
+            promises.push(
+              fetch(`${window.location.origin}/mod/data/view.php?d=${dataId}&perpage=100&page=${p}`)
+                .then(r => r.text())
+                .then(pageHtml => parseEntriesHTML(pageHtml))
+            );
+          }
+          const restResults = await Promise.all(promises);
+          restResults.forEach(res => {
+            entries = entries.concat(res);
+          });
+        }
+        return entries;
+      }
+
+      // Parsea un registro de la Db histórica alumnos (d=18)
+      function parseAlumnoEntry(entry) {
+        const fields = {};
+        
+        const rows = entry.querySelectorAll(".row, div, td");
+        rows.forEach(row => {
+          const labelEl = row.querySelector(".font-weight-bold, span, th, label");
+          if (labelEl) {
+            const key = labelEl.textContent.trim().toLowerCase();
+            const valEl = row.querySelector(".col-8, .col-lg-9, p.mt-2, .data-field-html, td:nth-child(2)");
+            if (valEl) {
+              fields[key] = valEl.textContent.trim();
+            } else {
+              const nextEl = labelEl.nextElementSibling;
+              if (nextEl) fields[key] = nextEl.textContent.trim();
+            }
+          }
+        });
+        
+        // Buscar rid
+        let rid = null;
+        const actionLinks = entry.querySelectorAll("a[href*='rid=']");
+        for (let link of actionLinks) {
+          const match = link.getAttribute("href").match(/rid=(\d+)/);
+          if (match) { rid = match[1]; break; }
+        }
+        if (!rid) {
+          const match = entry.innerHTML.match(/[?&]rid=(\d+)/);
+          if (match) rid = match[1];
+        }
+        
+        if (rid) fields.rid = rid;
+        return fields;
+      }
+
+      // Parsea un registro de la Db Histórica Datos generales (d=21)
+      function parseCuatrimestreEntry(entry) {
+        const fields = {};
+        const rows = entry.querySelectorAll(".row, div, td");
+        rows.forEach(row => {
+          const labelEl = row.querySelector(".font-weight-bold, span, th, label");
+          if (labelEl) {
+            const key = labelEl.textContent.trim().toLowerCase();
+            const valEl = row.querySelector(".col-8, .col-lg-9, p.mt-2, .data-field-html, td:nth-child(2)");
+            if (valEl) {
+              fields[key] = valEl.textContent.trim();
+            } else {
+              const nextEl = labelEl.nextElementSibling;
+              if (nextEl) fields[key] = nextEl.textContent.trim();
+            }
+          }
+        });
+        
+        // Buscar rid
+        let rid = null;
+        const actionLinks = entry.querySelectorAll("a[href*='rid=']");
+        for (let link of actionLinks) {
+          const match = link.getAttribute("href").match(/rid=(\d+)/);
+          if (match) { rid = match[1]; break; }
+        }
+        if (!rid) {
+          const match = entry.innerHTML.match(/[?&]rid=(\d+)/);
+          if (match) rid = match[1];
+        }
+        
+        if (rid) fields.rid = rid;
+        return fields;
+      }
+
+      // Inicialización general
+      async function initPanel() {
+        await loadDbConfig();
+        await updateData();
+        setupEvents();
+      }
+
+      // Actualizar datos de Moodle
+      async function updateData() {
+        showLoading("Descargando datos históricos de Moodle...");
+        try {
+          const dataidAlumnos = systemConfig.urls.dataids.db_historico || 18;
+          const dataidCuatrimestres = systemConfig.urls.dataids.db_historico_general || 21;
+
+          console.log("Cargando DB histórica alumnos d=" + dataidAlumnos + " y DB cuatrimestral d=" + dataidCuatrimestres);
+
+          const [entriesAl, entriesCuat] = await Promise.all([
+            fetchAllDatabaseEntries(dataidAlumnos),
+            fetchAllDatabaseEntries(dataidCuatrimestres)
+          ]);
+
+          // Procesar Alumnos
+          const seenAlRids = new Set();
+          rawAlumnos = entriesAl.map(e => parseAlumnoEntry(e)).filter(fields => {
+            if (!fields.rid) return false;
+            if (seenAlRids.has(fields.rid)) return false;
+            seenAlRids.add(fields.rid);
+            return true;
+          });
+
+          // Normalizar llaves de alumnos
+          listAlumnos = rawAlumnos.map(r => {
+            // Resolver campos usando keywords tolerantes
+            const email = (getVal(r, ['id_alumno', 'email', 'correo']) || "").trim();
+            const nombre = (getVal(r, ['alumno', 'nombre', 'nombre_alumno', 'estudiante']) || "").trim();
+            const datosText = getVal(r, ['datos_json', 'datos', 'historial', 'respuestas_json']);
+            const cuatrimestres = parseCleanJSON(datosText) || [];
+            
+            // Ordenar cuatrimestres cronológicamente descendente
+            cuatrimestres.sort((a, b) => (b.periodo || "").localeCompare(a.periodo || ""));
+
+            return {
+              rid: r.rid,
+              nombre: nombre || "Alumno Desconocido",
+              email: email,
+              cuatrimestres: cuatrimestres
+            };
+          }).filter(al => al.nombre && al.email);
+
+          // Procesar Cuatrimestres
+          const seenCuatRids = new Set();
+          rawCuatrimestres = entriesCuat.map(e => parseCuatrimestreEntry(e)).filter(fields => {
+            if (!fields.rid) return false;
+            if (seenCuatRids.has(fields.rid)) return false;
+            seenCuatRids.add(fields.rid);
+            return true;
+          });
+
+          // Normalizar llaves de cuatrimestres
+          listCuatrimestres = rawCuatrimestres.map(r => {
+            const periodo = (getVal(r, ['cuatrimestre']) || "").trim();
+            const fechaReg = (getVal(r, ['fecha_registro', 'fecha']) || "").trim();
+            const datosText = getVal(r, ['datos_cuatrimestre_json', 'datos', 'json']);
+            const datos = parseCleanJSON(datosText) || {};
+
+            return {
+              rid: r.rid,
+              periodo: periodo,
+              fechaRegistro: fechaReg,
+              kpis: datos.kpis || { alto_riesgo: 0, medio_riesgo: 0, bajo_riesgo: 0, solicitudes_pendientes: 0 },
+              cohortes: datos.cohortes || [],
+              pesosPreguntas: datos.pesos_preguntas || []
+            };
+          }).filter(c => c.periodo);
+
+          // Ordenar cuatrimestres
+          listCuatrimestres.sort((a, b) => b.periodo.localeCompare(a.periodo));
+
+          // Cargar combos de cuatrimestres dinámicamente
+          populateCuatrimestresCombo();
+
+          // Render
+          renderAlumnos();
+          renderCuatrimestres();
+
+          // Última actualización
+          lastUpdateDate = new Date();
+          const formatDigits = (n) => n < 10 ? "0" + n : n;
+          document.getElementById("txt-last-update").textContent = `Última actualización: ${formatDigits(lastUpdateDate.getDate())}/${formatDigits(lastUpdateDate.getMonth()+1)}/${lastUpdateDate.getFullYear()} ${formatDigits(lastUpdateDate.getHours())}:${formatDigits(lastUpdateDate.getMinutes())}`;
+
+          hideLoading();
+        } catch (e) {
+          console.error("Error al procesar la actualización de datos:", e);
+          alert("Error al obtener los datos de Moodle.");
+          hideLoading();
+        }
+      }
+
+      // Mapeo flexible para leer propiedades
+      function getVal(record, keywords) {
+        const keys = Object.keys(record);
+        for (let kw of keywords) {
+          const nkw = kw.toLowerCase().replace(/[^a-z0-9]/g, '');
+          for (let k of keys) {
+            const nk = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (nk === nkw) return record[k];
+          }
+        }
+        for (let kw of keywords) {
+          const nkw = kw.toLowerCase().replace(/[^a-z0-9]/g, '');
+          for (let k of keys) {
+            const nk = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (nk.includes(nkw)) return record[k];
+          }
+        }
+        return undefined;
+      }
+
+      // Cargar lista de cuatrimestres en filtro
+      function populateCuatrimestresCombo() {
+        const select = document.getElementById("filter-al-cuat");
+        select.innerHTML = '<option value="">Todos</option>';
+        
+        const periodos = new Set();
+        listAlumnos.forEach(al => {
+          al.cuatrimestres.forEach(c => {
+            if (c.periodo) periodos.add(c.periodo);
+          });
+        });
+        
+        const sorted = Array.from(periodos).sort((a, b) => b.localeCompare(a));
+        sorted.forEach(p => {
+          const opt = document.createElement("option");
+          opt.value = p;
+          opt.textContent = p;
+          select.appendChild(opt);
+        });
+      }
+
+      // ==========================================================
+      // ★ LOGICA Y RENDER DE ALUMNOS (PESTAÑA 1) ★
+      // ==========================================================
+      function obtenerAlumnosFiltrados() {
+        return listAlumnos.map(al => {
+          // Filtrar los cuatrimestres del alumno individualmente si corresponden a los filtros
+          let cuatsFiltrados = al.cuatrimestres.filter(c => {
+            const periodo = c.periodo || "";
+            const fecha = c.fecha || "";
+            const ird = c.ird !== undefined ? parseFloat(c.ird) : null;
+            const ralent = c.ralentizacion !== undefined ? parseFloat(c.ralentizacion) : null;
+            const riesgo = c.percepcion_riesgo ? "si" : "no";
+            const asist = c.asistido ? "si" : "no";
+
+            if (filterAl.cuatrimestre && periodo !== filterAl.cuatrimestre) return false;
+            
+            if (fecha) {
+              const fObj = new Date(fecha + "T00:00:00");
+              if (filterAl.desde && fObj < filterAl.desde) return false;
+              if (filterAl.hasta && fObj > filterAl.hasta) return false;
+            } else if (filterAl.desde || filterAl.hasta) {
+              return false;
+            }
+
+            if (filterAl.irdMin !== null && (ird === null || ird < filterAl.irdMin)) return false;
+            if (filterAl.irdMax !== null && (ird === null || ird > filterAl.irdMax)) return false;
+            if (filterAl.ralentMin !== null && (ralent === null || ralent < filterAl.ralentMin)) return false;
+            if (filterAl.ralentMax !== null && (ralent === null || ralent > filterAl.ralentMax)) return false;
+            
+            if (filterAl.riesgo && riesgo !== filterAl.riesgo) return false;
+            if (filterAl.asistido && asist !== filterAl.asistido) return false;
+
+            return true;
+          });
+
+          return {
+            ...al,
+            cuatrimestresFiltrados: cuatsFiltrados
+          };
+        }).filter(al => {
+          // Filtrar por búsqueda de nombre/email y asegurar que tiene cuatrimestres que coinciden
+          if (al.cuatrimestresFiltrados.length === 0) return false;
+          
+          if (filterAl.search) {
+            const q = filterAl.search.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const nom = al.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const mail = al.email.toLowerCase();
+            if (!nom.includes(q) && !mail.includes(q)) return false;
+          }
+          
+          return true;
+        });
+      }
+
+      function renderAlumnos() {
+        const tbody = document.getElementById("alumnos-tbody");
+        const filtrados = obtenerAlumnosFiltrados();
+
+        // Paginación
+        const total = filtrados.length;
+        const totalPaginas = Math.ceil(total / sizeAl) || 1;
+        if (pageAl > totalPaginas) pageAl = totalPaginas;
+        const inicio = (pageAl - 1) * sizeAl;
+        const fin = Math.min(inicio + sizeAl, total);
+        const pagina = filtrados.slice(inicio, fin);
+
+        if (pagina.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#666;padding:32px;">No se encontraron registros de alumnos con los filtros activos.</td></tr>`;
+          document.getElementById("pagination-info-al").textContent = "Mostrando 0 de 0 alumnos";
+          document.getElementById("pagination-nav-al").innerHTML = "";
+          return;
+        }
+
+        let html = "";
+        pagina.forEach((al, idx) => {
+          const uid = `al-${inicio + idx}`;
+          
+          // Mostrar la información del cuatrimestre más reciente que coincide
+          const ultimo = al.cuatrimestresFiltrados[0]; 
+          const irdVal = ultimo.ird !== undefined ? parseFloat(ultimo.ird) : null;
+          const ralentVal = ultimo.ralentizacion !== undefined ? parseFloat(ultimo.ralentizacion) : null;
+          
+          let irdBadge = "—";
+          if (irdVal !== null) {
+            const cls = irdVal >= 80 ? 'badge-sem-red' : irdVal >= systemConfig.umbrales.threshold_ird ? 'badge-sem-yellow' : 'badge-sem-green';
+            irdBadge = `<span class="badge-sem ${cls}">${irdVal}%</span>`;
+          }
+
+          let ralentBadge = "—";
+          if (ralentVal !== null) {
+            const cls = ralentVal >= 80 ? 'badge-sem-red' : ralentVal >= 40 ? 'badge-sem-yellow' : 'badge-sem-green';
+            ralentBadge = `<span class="badge-sem ${cls}">${ralentVal}%</span>`;
+          }
+
+          const riesgoText = ultimo.percepcion_riesgo ? "Sí" : "No";
+
+          // Formateo del correo recortado
+          const emailRecortado = al.email.length > 18 ? al.email.substring(0, 15) + "..." : al.email;
+          const emailHTML = `
+            <div class="email-wrapper">
+              <span class="email-text" id="lbl-mail-${uid}" title="${al.email}">${emailRecortado}</span>
+              <button type="button" class="btn-show-email" data-mail="${al.email}" data-uid="${uid}" title="Ver email completo">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          `;
+
+          html += `
+            <tr class="tr-expandible" data-uid="${uid}">
+              <td><span class="toggle-icon">▶</span></td>
+              <td><strong>${al.nombre}</strong></td>
+              <td>${emailHTML}</td>
+              <td style="text-align: center;">${al.cuatrimestresFiltrados.length} cuatrimestre(s)</td>
+              <td style="text-align: center;">${irdBadge}</td>
+              <td style="text-align: center;">${ralentBadge}</td>
+              <td style="text-align: center;">${riesgoText}</td>
+            </tr>
+            <tr class="tr-detalle" data-parent="${uid}">
+              <td colspan="7">
+                <div style="background: #ffffff; padding: 12px; border-radius: 6px; border: 1px solid #eaecf4;">
+                  <h6 style="margin-top: 0; margin-bottom: 12px; color: hsl(168, 60%, 25%); font-weight: 700;">📈 Evolución Académica por Cuatrimestre</h6>
+                  <table class="det-sub-table">
+                    <thead>
+                      <tr>
+                        <th>Cuatrimestre</th>
+                        <th>Fecha Snapshot</th>
+                        <th style="text-align: center;">IRD</th>
+                        <th style="text-align: center;">Ralentización</th>
+                        <th style="text-align: center;">¿Se percibe en riesgo?</th>
+                        <th style="text-align: center;">¿Fue asistido?</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${al.cuatrimestresFiltrados.map(c => {
+                        const ird = c.ird !== undefined ? parseFloat(c.ird) : null;
+                        const ralent = c.ralentizacion !== undefined ? parseFloat(c.ralentizacion) : null;
+
+                        const irdBadgeC = ird !== null 
+                          ? `<span class="badge-sem ${ird >= 80 ? 'badge-sem-red' : ird >= systemConfig.umbrales.threshold_ird ? 'badge-sem-yellow' : 'badge-sem-green'}">${ird}%</span>`
+                          : '—';
+
+                        const ralentBadgeC = ralent !== null
+                          ? `<span class="badge-sem ${ralent >= 80 ? 'badge-sem-red' : ralent >= 40 ? 'badge-sem-yellow' : 'badge-sem-green'}">${ralent}%</span>`
+                          : '—';
+
+                        const riesgoC = c.percepcion_riesgo ? '<span style="color:#c0392b; font-weight:600;">Sí</span>' : 'No';
+                        const asistidoC = c.asistido ? '<span style="color:#16a085; font-weight:600;">Sí</span>' : 'No';
+
+                        return `
+                          <tr>
+                            <td><strong>${c.periodo}</strong></td>
+                            <td>${c.fecha}</td>
+                            <td style="text-align: center;">${irdBadgeC}</td>
+                            <td style="text-align: center;">${ralentBadgeC}</td>
+                            <td style="text-align: center;">${riesgoC}</td>
+                            <td style="text-align: center;">${asistidoC}</td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById("pagination-info-al").textContent = `Mostrando ${inicio + 1}-${fin} de ${total} alumnos`;
+
+        // Registrar eventos de expansión
+        tbody.querySelectorAll(".tr-expandible").forEach(tr => {
+          tr.addEventListener("click", function () {
+            const uid = tr.getAttribute("data-uid");
+            const det = tbody.querySelector(`.tr-detalle[data-parent="${uid}"]`);
+            const isOpen = tr.classList.contains("open");
+            
+            tr.classList.toggle("open", !isOpen);
+            if (det) det.classList.toggle("visible", !isOpen);
+          });
+        });
+
+        // Registrar eventos de mostrar email completo
+        tbody.querySelectorAll(".btn-show-email").forEach(btn => {
+          btn.addEventListener("click", function (e) {
+            e.stopPropagation(); // Evitar expandir fila al hacer click
+            const mail = btn.getAttribute("data-mail");
+            const uid = btn.getAttribute("data-uid");
+            const txtSpan = document.getElementById(`lbl-mail-${uid}`);
+            
+            if (txtSpan.textContent.includes("...")) {
+              txtSpan.textContent = mail;
+              txtSpan.style.maxWidth = "none";
+              btn.innerHTML = `
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              `;
+            } else {
+              const emailRecortado = mail.length > 18 ? mail.substring(0, 15) + "..." : mail;
+              txtSpan.textContent = emailRecortado;
+              txtSpan.style.maxWidth = "130px";
+              btn.innerHTML = `
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              `;
+            }
+          });
+        });
+
+        // Render Botones Paginación
+        let navHtml = `<button type="button" class="page-btn" ${pageAl === 1 ? "disabled" : ""} onclick="changePageAl(${pageAl - 1})">◀ Prev</button>`;
+        for (let i = 1; i <= totalPaginas; i++) {
+          if (i === 1 || i === totalPaginas || (i >= pageAl - 2 && i <= pageAl + 2)) {
+            navHtml += `<button type="button" class="page-btn ${pageAl === i ? "active" : ""}" onclick="changePageAl(${i})">${i}</button>`;
+          } else if (i === pageAl - 3 || i === pageAl + 3) {
+            navHtml += `<span style="padding:0 4px; align-self:flex-end;">...</span>`;
+          }
+        }
+        navHtml += `<button type="button" class="page-btn" ${pageAl === totalPaginas ? "disabled" : ""} onclick="changePageAl(${pageAl + 1})">Sig ▶</button>`;
+        document.getElementById("pagination-nav-al").innerHTML = navHtml;
+      }
+
+      window.changePageAl = function (page) {
+        pageAl = page;
+        renderAlumnos();
+      };
+
+      // ==========================================================
+      // ★ LOGICA Y RENDER DE CUATRIMESTRES (PESTAÑA 2) ★
+      // ==========================================================
+      function obtenerCuatrimestresFiltrados() {
+        return listCuatrimestres.filter(c => {
+          if (filterCuatVal.search) {
+            const q = filterCuatVal.search.toLowerCase().trim();
+            if (!c.periodo.toLowerCase().includes(q)) return false;
+          }
+
+          if (c.fechaRegistro) {
+            // Formato de fecha del registro en la DB general: 18-06-2026
+            try {
+              const parts = c.fechaRegistro.split("-");
+              const fObj = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+              if (filterCuatVal.desde && fObj < filterCuatVal.desde) return false;
+              if (filterCuatVal.hasta && fObj > filterCuatVal.hasta) return false;
+            } catch (err) {
+              return false;
+            }
+          } else if (filterCuatVal.desde || filterCuatVal.hasta) {
+            return false;
+          }
+
+          return true;
+        });
+      }
+
+      function renderCuatrimestres() {
+        const tbody = document.getElementById("cuatrimestres-tbody");
+        const filtrados = obtenerCuatrimestresFiltrados();
+
+        const total = filtrados.length;
+        const totalPaginas = Math.ceil(total / sizeCuat) || 1;
+        if (pageCuat > totalPaginas) pageCuat = totalPaginas;
+        const inicio = (pageCuat - 1) * sizeCuat;
+        const fin = Math.min(inicio + sizeCuat, total);
+        const pagina = filtrados.slice(inicio, fin);
+
+        if (pagina.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#666;padding:32px;">No se encontraron registros de cuatrimestres con los filtros activos.</td></tr>`;
+          document.getElementById("pagination-info-cuat").textContent = "Mostrando 0 de 0 cuatrimestres";
+          document.getElementById("pagination-nav-cuat").innerHTML = "";
+          return;
+        }
+
+        let html = "";
+        pagina.forEach((c, idx) => {
+          const uid = `cuat-${inicio + idx}`;
+          
+          html += `
+            <tr class="tr-expandible" data-uid="${uid}">
+              <td><span class="toggle-icon">▶</span></td>
+              <td><strong>${c.periodo}</strong></td>
+              <td>${c.fechaRegistro || "—"}</td>
+              <td style="text-align: center;"><span class="badge-sem badge-sem-red">${c.kpis.alto_riesgo}</span></td>
+              <td style="text-align: center;"><span class="badge-sem badge-sem-yellow">${c.kpis.medio_riesgo}</span></td>
+              <td style="text-align: center;"><span class="badge-sem badge-sem-green">${c.kpis.bajo_riesgo}</span></td>
+              <td style="text-align: center;"><span class="badge-sem badge-sem-neutral">${c.kpis.solicitudes_pendientes}</span></td>
+            </tr>
+            <tr class="tr-detalle" data-parent="${uid}">
+              <td colspan="7">
+                <div style="background: #ffffff; padding: 16px; border-radius: 6px; border: 1px solid #eaecf4;">
+                  
+                  <!-- KPIs del cuatrimestre -->
+                  <div class="det-grid-kpis">
+                    <div class="det-kpi-card" style="border-left: 3px solid #e74c3c;">
+                      <div class="det-kpi-val color-red" style="color: #c0392b;">${c.kpis.alto_riesgo}</div>
+                      <div class="det-kpi-lbl">Riesgo Alto</div>
+                    </div>
+                    <div class="det-kpi-card" style="border-left: 3px solid #f39c12;">
+                      <div class="det-kpi-val color-yellow" style="color: #d35400;">${c.kpis.medio_riesgo}</div>
+                      <div class="det-kpi-lbl">Riesgo Medio</div>
+                    </div>
+                    <div class="det-kpi-card" style="border-left: 3px solid #2ecc71;">
+                      <div class="det-kpi-val color-green" style="color: #16a085;">${c.kpis.bajo_riesgo}</div>
+                      <div class="det-kpi-lbl">Riesgo Bajo</div>
+                    </div>
+                    <div class="det-kpi-card" style="border-left: 3px solid #3498db;">
+                      <div class="det-kpi-val color-blue" style="color: #2980b9;">${c.kpis.solicitudes_pendientes}</div>
+                      <div class="det-kpi-lbl">Pedidos Ayuda</div>
+                    </div>
+                  </div>
+
+                  <!-- Sub-pestañas de detalle -->
+                  <div class="det-subtabs-nav" data-cuatuid="${uid}">
+                    <button type="button" class="det-subtab-btn active" data-subtab="sub-cohortes-${uid}">🎓 Cohortes</button>
+                    <button type="button" class="det-subtab-btn" data-subtab="sub-pesos-${uid}">📈 Pesos de Preguntas</button>
+                  </div>
+
+                  <!-- Detalle de Cohortes -->
+                  <div id="sub-cohortes-${uid}" class="det-subtab-content active">
+                    <table class="det-sub-table">
+                      <thead>
+                        <tr>
+                          <th>Cohorte</th>
+                          <th>Ingresantes</th>
+                          <th>Alumnos Activos (%)</th>
+                          <th>Egresados (%)</th>
+                          <th>Desertados (%)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${c.cohortes.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:#999;">No hay estadísticas de cohorte.</td></tr>' : c.cohortes.map(coh => `
+                          <tr>
+                            <td><strong>${coh.cohorte}</strong></td>
+                            <td>${coh.ingresantes}</td>
+                            <td>${coh.activos} (${coh.activosPorc})</td>
+                            <td>${coh.egresados} (${coh.egresadosPorc})</td>
+                            <td>${coh.desertados} (${coh.desertadosPorc})</td>
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Detalle de Pesos de Preguntas -->
+                  <div id="sub-pesos-${uid}" class="det-subtab-content">
+                    <table class="det-sub-table">
+                      <thead>
+                        <tr>
+                          <th style="width: 40px; text-align: center;">N°</th>
+                          <th>Pregunta / Indicador</th>
+                          <th>Origen</th>
+                          <th style="text-align: right; width: 140px;">Peso Acumulado (%)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${(function() {
+                          if (c.pesosPreguntas.length === 0) {
+                            return '<tr><td colspan="4" style="text-align:center;color:#999;">No hay datos de pesos de preguntas.</td></tr>';
+                          }
+                          const sumaPesosTotal = c.pesosPreguntas.reduce((sum, p) => sum + parseFloat(p.peso || 0), 0);
+                          return c.pesosPreguntas.map((p, pidx) => {
+                            const porc = sumaPesosTotal > 0 ? ((parseFloat(p.peso || 0) / sumaPesosTotal) * 100).toFixed(1) + "%" : "0%";
+                            return `
+                              <tr>
+                                <td style="text-align: center; color: #666; font-weight: bold;">${pidx + 1}</td>
+                                <td><strong>${p.pregunta}</strong></td>
+                                <td><span style="font-size: 10.5px; background: #eee; padding: 2px 6px; border-radius: 4px; color: #555;">${p.origen}</span></td>
+                                <td style="text-align: right; font-weight: 700; color: hsl(168, 60%, 25%);">
+                                  ${p.peso} <span style="font-size: 10.5px; font-weight: normal; color: #666; margin-left: 4px;">(${porc})</span>
+                                </td>
+                              </tr>
+                            `;
+                          }).join('');
+                        })()}
+                      </tbody>
+                    </table>
+                  </div>
+
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById("pagination-info-cuat").textContent = `Mostrando ${inicio + 1}-${fin} de ${total} cuatrimestres`;
+
+        // Registrar eventos de expansión
+        tbody.querySelectorAll(".tr-expandible").forEach(tr => {
+          tr.addEventListener("click", function () {
+            const uid = tr.getAttribute("data-uid");
+            const det = tbody.querySelector(`.tr-detalle[data-parent="${uid}"]`);
+            const isOpen = tr.classList.contains("open");
+            
+            tr.classList.toggle("open", !isOpen);
+            if (det) det.classList.toggle("visible", !isOpen);
+          });
+        });
+
+        // Registrar eventos de sub-pestañas
+        tbody.querySelectorAll(".det-subtab-btn").forEach(btn => {
+          btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const parentContainer = btn.closest(".tr-detalle");
+            const subtabId = btn.getAttribute("data-subtab");
+            
+            // Desactivar botones de esa subnav
+            parentContainer.querySelectorAll(".det-subtab-btn").forEach(b => b.classList.remove("active"));
+            parentContainer.querySelectorAll(".det-subtab-content").forEach(c => c.classList.remove("active"));
+            
+            // Activar seleccionados
+            btn.classList.add("active");
+            parentContainer.querySelector("#" + subtabId).classList.add("active");
+          });
+        });
+
+        // Render Botones Paginación
+        let navHtml = `<button type="button" class="page-btn" ${pageCuat === 1 ? "disabled" : ""} onclick="changePageCuat(${pageCuat - 1})">◀ Prev</button>`;
+        for (let i = 1; i <= totalPaginas; i++) {
+          if (i === 1 || i === totalPaginas || (i >= pageCuat - 2 && i <= pageCuat + 2)) {
+            navHtml += `<button type="button" class="page-btn ${pageCuat === i ? "active" : ""}" onclick="changePageCuat(${i})">${i}</button>`;
+          } else if (i === pageCuat - 3 || i === pageCuat + 3) {
+            navHtml += `<span style="padding:0 4px; align-self:flex-end;">...</span>`;
+          }
+        }
+        navHtml += `<button type="button" class="page-btn" ${pageCuat === totalPaginas || totalPaginas === 0 ? "disabled" : ""} onclick="changePageCuat(${pageCuat + 1})">Sig ▶</button>`;
+        document.getElementById("pagination-nav-cuat").innerHTML = navHtml;
+      }
+
+      window.changePageCuat = function (page) {
+        pageCuat = page;
+        renderCuatrimestres();
+      };
+
+      // ==========================================================
+      // ★ EXPORTACION A ARCHIVOS CSV ★
+      // ==========================================================
+      function exportarAlumnosCSV(listado, filename) {
+        if (listado.length === 0) return;
+
+        let csvContent = "\uFEFF"; // BOM para compatibilidad con Excel
+        csvContent += "Alumno;Email;Cuatrimestre;Fecha Snapshot;IRD;Ralentizacion;Se Percibe en Riesgo;Asistido\n";
+
+        listado.forEach(al => {
+          // Exportar todos los cuatrimestres que coinciden en el listado del alumno
+          al.cuatrimestresFiltrados.forEach(c => {
+            const nomEsc = `"${al.nombre.replace(/"/g, '""')}"`;
+            const emailEsc = `"${al.email.replace(/"/g, '""')}"`;
+            const periodo = c.periodo || "";
+            const fecha = c.fecha || "";
+            const ird = c.ird !== undefined ? c.ird : "";
+            const ralent = c.ralentizacion !== undefined ? c.ralentizacion : "";
+            const riesgo = c.percepcion_riesgo ? "Sí" : "No";
+            const asist = c.asistido ? "Sí" : "No";
+
+            csvContent += `${nomEsc};${emailEsc};${periodo};${fecha};${ird};${ralent};${riesgo};${asist}\n`;
+          });
+        });
+
+        descargarCSVBlob(csvContent, filename);
+      }
+
+      function exportarCuatrimestresCSV(listado, filename) {
+        if (listado.length === 0) return;
+
+        let csvContent = "\uFEFF"; 
+        csvContent += "Cuatrimestre;Fecha Registro;KPI_Alto;KPI_Medio;KPI_Bajo;KPI_Solicitudes;Tipo Registro;Detalle_Nombre;Detalle_Info1;Detalle_Info2;Detalle_Info3;Detalle_Info4;Detalle_Info5\n";
+
+        listado.forEach(c => {
+          const periodo = c.periodo;
+          const fechaReg = c.fechaRegistro || "";
+          const alto = c.kpis.alto_riesgo;
+          const medio = c.kpis.medio_riesgo;
+          const bajo = c.kpis.bajo_riesgo;
+          const sol = c.kpis.solicitudes_pendientes;
+          
+          const baseCols = `${periodo};${fechaReg};${alto};${medio};${bajo};${sol}`;
+
+          // Exportar Cohortes del cuatrimestre
+          c.cohortes.forEach(coh => {
+            const cohName = `"${coh.cohorte.replace(/"/g, '""')}"`;
+            const activos = coh.activos;
+            const activosP = coh.activosPorc;
+            const egresados = coh.egresados;
+            const egresadosP = coh.egresadosPorc;
+            const desertados = coh.desertados;
+            const desertadosP = coh.desertadosPorc;
+            
+            csvContent += `${baseCols};Cohorte;${cohName};${coh.ingresantes};${activos} (${activosP});${egresados} (${egresadosP});${desertados} (${desertadosP});\n`;
+          });
+
+          // Exportar Pesos de preguntas
+          c.pesosPreguntas.forEach(p => {
+            const pregEsc = `"${p.pregunta.replace(/"/g, '""')}"`;
+            const origEsc = `"${p.origen.replace(/"/g, '""')}"`;
+            const peso = p.peso;
+            
+            csvContent += `${baseCols};Pregunta;${pregEsc};${origEsc};${peso};;;;\n`;
+          });
+        });
+
+        descargarCSVBlob(csvContent, filename);
+      }
+
+      function descargarCSVBlob(content, filename) {
+        const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `${filename}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      // ==========================================================
+      // ★ MANEJO DE EVENTOS DE INTERFAZ ★
+      // ==========================================================
+      function setupEvents() {
+        // Pestañas Principales
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+            
+            btn.classList.add("active");
+            const tabId = btn.getAttribute("data-tab");
+            document.getElementById(tabId).classList.add("active");
+          });
+        });
+
+        // Evento Actualizar datos
+        document.getElementById("btn-refresh").addEventListener("click", async () => {
+          if (isRefreshCooldown) return;
+          
+          isRefreshCooldown = true;
+          const btn = document.getElementById("btn-refresh");
+          btn.disabled = true;
+          
+          await updateData();
+          
+          let cd = systemConfig.umbrales.cooldown_actualizar_seg || 30;
+          const timer = setInterval(() => {
+            cd--;
+            if (cd <= 0) {
+              clearInterval(timer);
+              btn.disabled = false;
+              isRefreshCooldown = false;
+              btn.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                Actualizar datos
+              `;
+            } else {
+              btn.textContent = `Esperar ${cd}s`;
+            }
+          }, 1000);
+        });
+
+        // --- Eventos Filtros Alumnos ---
+        const applyFiltersAl = () => {
+          filterAl.search = document.getElementById("search-alumno").value;
+          filterAl.cuatrimestre = document.getElementById("filter-al-cuat").value;
+          
+          const desdeVal = document.getElementById("filter-al-desde").value;
+          filterAl.desde = desdeVal ? new Date(desdeVal + "T00:00:00") : null;
+          
+          const hastaVal = document.getElementById("filter-al-hasta").value;
+          filterAl.hasta = hastaVal ? new Date(hastaVal + "T00:00:00") : null;
+
+          const irdMin = document.getElementById("filter-al-ird-min").value;
+          filterAl.irdMin = irdMin !== "" ? parseFloat(irdMin) : null;
+          const irdMax = document.getElementById("filter-al-ird-max").value;
+          filterAl.irdMax = irdMax !== "" ? parseFloat(irdMax) : null;
+
+          const ralentMin = document.getElementById("filter-al-ralent-min").value;
+          filterAl.ralentMin = ralentMin !== "" ? parseFloat(ralentMin) : null;
+          const ralentMax = document.getElementById("filter-al-ralent-max").value;
+          filterAl.ralentMax = ralentMax !== "" ? parseFloat(ralentMax) : null;
+
+          filterAl.riesgo = document.getElementById("filter-al-riesgo").value;
+          filterAl.asistido = document.getElementById("filter-al-asistido").value;
+
+          pageAl = 1;
+          renderAlumnos();
+        };
+
+        const inputsAl = ["search-alumno", "filter-al-cuat", "filter-al-desde", "filter-al-hasta", "filter-al-ird-min", "filter-al-ird-max", "filter-al-ralent-min", "filter-al-ralent-max", "filter-al-riesgo", "filter-al-asistido"];
+        inputsAl.forEach(id => {
+          const el = document.getElementById(id);
+          el.addEventListener(el.tagName === "SELECT" ? "change" : "input", applyFiltersAl);
+        });
+
+        // Botón limpiar filtros alumnos
+        document.getElementById("btn-clear-filters-al").addEventListener("click", () => {
+          inputsAl.forEach(id => {
+            document.getElementById(id).value = "";
+          });
+          filterAl = { search: "", cuatrimestre: "", desde: null, hasta: null, irdMin: null, irdMax: null, ralentMin: null, ralentMax: null, riesgo: "", asistido: "" };
+          pageAl = 1;
+          renderAlumnos();
+        });
+
+        // --- Eventos Filtros Cuatrimestres ---
+        const applyFiltersCuat = () => {
+          filterCuatVal.search = document.getElementById("search-cuatrimestre").value;
+          
+          const desdeVal = document.getElementById("filter-cuat-desde").value;
+          filterCuatVal.desde = desdeVal ? new Date(desdeVal + "T00:00:00") : null;
+          
+          const hastaVal = document.getElementById("filter-cuat-hasta").value;
+          filterCuatVal.hasta = hastaVal ? new Date(hastaVal + "T00:00:00") : null;
+
+          pageCuat = 1;
+          renderCuatrimestres();
+        };
+
+        const inputsCuat = ["search-cuatrimestre", "filter-cuat-desde", "filter-cuat-hasta"];
+        inputsCuat.forEach(id => {
+          document.getElementById(id).addEventListener("input", applyFiltersCuat);
+        });
+
+        // Botón limpiar filtros cuatrimestres
+        document.getElementById("btn-clear-filters-cuat").addEventListener("click", () => {
+          inputsCuat.forEach(id => {
+            document.getElementById(id).value = "";
+          });
+          filterCuatVal = { search: "", desde: null, hasta: null };
+          pageCuat = 1;
+          renderCuatrimestres();
+        });
+
+        // --- Eventos Exportación CSV ---
+        // Exportar Alumnos
+        document.getElementById("btn-export-al-all").addEventListener("click", () => {
+          exportarAlumnosCSV(listAlumnos.map(al => ({...al, cuatrimestresFiltrados: al.cuatrimestres})), "historico_alumnos_completo");
+        });
+        document.getElementById("btn-export-al-filtered").addEventListener("click", () => {
+          const filtrados = obtenerAlumnosFiltrados();
+          exportarAlumnosCSV(filtrados, "historico_alumnos_filtrado");
+        });
+
+        // Exportar Cuatrimestres
+        document.getElementById("btn-export-cuat-all").addEventListener("click", () => {
+          exportarCuatrimestresCSV(listCuatrimestres, "historico_cuatrimestres_completo");
+        });
+        document.getElementById("btn-export-cuat-filtered").addEventListener("click", () => {
+          const filtrados = obtenerCuatrimestresFiltrados();
+          exportarCuatrimestresCSV(filtrados, "historico_cuatrimestres_filtrado");
+        });
+
+        // Toggle colapsar/expandir filtros Alumnos
+        const filterToggleAl = document.getElementById("filters-toggle-btn-al");
+        const filtersRowAl = document.getElementById("filters-container-al");
+        const arrowIconAl = document.getElementById("filters-arrow-icon-al");
+        if (filterToggleAl && filtersRowAl && arrowIconAl) {
+          filterToggleAl.addEventListener("click", () => {
+            const isCollapsed = filtersRowAl.style.display === "none";
+            filtersRowAl.style.display = isCollapsed ? "flex" : "none";
+            arrowIconAl.textContent = isCollapsed ? "▲" : "▼";
+          });
+        }
+
+        // Toggle colapsar/expandir filtros Cuatrimestres
+        const filterToggleCuat = document.getElementById("filters-toggle-btn-cuat");
+        const filtersRowCuat = document.getElementById("filters-container-cuat");
+        const arrowIconCuat = document.getElementById("filters-arrow-icon-cuat");
+        if (filterToggleCuat && filtersRowCuat && arrowIconCuat) {
+          filterToggleCuat.addEventListener("click", () => {
+            const isCollapsed = filtersRowCuat.style.display === "none";
+            filtersRowCuat.style.display = isCollapsed ? "flex" : "none";
+            arrowIconCuat.textContent = isCollapsed ? "▲" : "▼";
+          });
+        }
+      }
+
+    })();
+  </script>
+</p>

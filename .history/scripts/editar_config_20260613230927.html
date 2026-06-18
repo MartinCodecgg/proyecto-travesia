@@ -1,0 +1,1725 @@
+<p>
+  <script>
+    // Quitar margen del <p> que Moodle crea alrededor del script
+    if (document.currentScript?.parentElement?.tagName === "P") {
+      document.currentScript.parentElement.style.margin = "0";
+    }
+
+    // Ocultar el título de la página de Moodle lo más rápido posible
+    (function () {
+      var style = document.createElement("style");
+      style.textContent = `
+         h2:first-of-type, .page-header-headings, .activity-header {
+           display: none !important;
+         }
+      `;
+      document.head.appendChild(style);
+    })();
+  </script>
+</p>
+
+<!-- Pantalla Falsa (Seguridad por Oscuridad) -->
+<div id="pantalla-falsa">
+  <p style="font-size: 15px; color: #444; line-height: 1.8;">
+    <strong>Página de pruebaa Moodle</strong>
+  </p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur.
+  </p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">
+    Pellentesque habitant morbi tristique senectus et netus et malesuada fames
+    ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget,
+    tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean
+    ultricies mi vitae est, et nunc
+    <span id="btn-oculto" style="cursor: text;">accumsan</span> vehicula nisi.
+    Mauris placerat eleifend leo, quisque sit amet est et sapien ullamcorper
+    pharetra.
+  </p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">
+    Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius,
+    turpis molestie dictum semper, quam quam congue erat, vitae sodales nisi
+    metus a nunc. Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod
+    sodales, sollicitudin vel, wisi.
+  </p>
+</div>
+
+<!-- Tablero Real de Configuración -->
+<div id="tablero" style="display: none;">
+  <div id="panel-config-container">
+    
+    <!-- Contenedor del Encabezado (Evita anidar divs dentro de h3) -->
+    <div class="panel-header-wrapper">
+      <h3 class="panel-title">⚙️ Editor de Configuración del Sistema (IRD)</h3>
+    </div>
+
+    <!-- Barra de Estado Dinámica -->
+    <div id="status-bar" class="status-bar-info" style="display: none;"></div>
+
+    <!-- Navegación por Pestañas -->
+    <div class="tabs-nav">
+      <button type="button" class="tab-btn active" data-tab="tab-general">⚙️ General y Umbrales</button>
+      <button type="button" class="tab-btn" data-tab="tab-encuesta-inicial">📋 Encuesta Inicial</button>
+      <button type="button" class="tab-btn" data-tab="tab-encuesta-cuatrimestral">📊 Encuesta Cuatrimestral</button>
+      <button type="button" class="tab-btn" data-tab="tab-especiales">🎯 Anclas Especiales</button>
+    </div>
+
+    <!-- Formulario Principal -->
+    <form id="config-form" novalidate>
+      
+      <!-- Pestaña 1: General y Umbrales -->
+      <div id="tab-general" class="tab-content active">
+        <div class="card-section">
+          <h4>🌐 Direcciones y Curso Moodle</h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="url-base">URL Base del Campus Moodle</label>
+              <input type="url" id="url-base" required placeholder="Ej. campus.mdp.edu.ar" />
+            </div>
+            <div class="form-group">
+              <label for="curso-id">ID del Curso Moodle</label>
+              <input type="number" id="curso-id" required min="1" placeholder="1732" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h4>🔢 Identificadores de Actividades (CMIDs)</h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="cmid-inicial">Feedback Encuesta Inicial</label>
+              <input type="number" id="cmid-inicial" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="cmid-cuatrimestral">Feedback Encuesta Cuatrimestral</label>
+              <input type="number" id="cmid-cuatrimestral" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="cmid-solicitudes">Base de Datos Solicitudes</label>
+              <input type="number" id="cmid-solicitudes" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="cmid-logs">Base de Datos Logs</label>
+              <input type="number" id="cmid-logs" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="cmid-historico">Base de Datos Histórico</label>
+              <input type="number" id="cmid-historico" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="cmid-1er-anio">Base de Datos 1er Año</label>
+              <input type="number" id="cmid-1er-anio" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="cmid-hist-1er-anio">Base de Datos Histórico 1er Año</label>
+              <input type="number" id="cmid-hist-1er-anio" required min="1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h4>🗄️ Identificadores Internos de DB (DATAIDs)</h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="dataid-solicitudes">DB Solicitudes (d=X)</label>
+              <input type="number" id="dataid-solicitudes" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="dataid-logs">DB Logs (d=X)</label>
+              <input type="number" id="dataid-logs" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="dataid-historico">DB Histórico (d=X)</label>
+              <input type="number" id="dataid-historico" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="dataid-1er-anio">DB 1er Año (d=X)</label>
+              <input type="number" id="dataid-1er-anio" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="dataid-hist-1er-anio">DB Histórico 1er Año (d=X)</label>
+              <input type="number" id="dataid-hist-1er-anio" required min="1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h4>📈 Umbrales y Tiempos de Espera</h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="threshold-ird">Umbral IRD de Alerta (Rojo/Amarillo)</label>
+              <input type="number" id="threshold-ird" required min="0" max="100" />
+            </div>
+            <div class="form-group">
+              <label for="cooldown-actualizar">Cooldown botón Actualizar (segundos)</label>
+              <input type="number" id="cooldown-actualizar" required min="0" />
+            </div>
+            <div class="form-group">
+              <label for="warning-days">Días para Alerta de Encuesta Desactualizada</label>
+              <input type="number" id="warning-days" required min="0" />
+            </div>
+            <div class="form-group">
+              <label for="cuatrimestres-desercion">Cuatrimestres sin Encuesta para considerar Deserción</label>
+              <input type="number" id="cuatrimestres-desercion" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="delay-ms">Delay de escritura Histórica (ms)</label>
+              <input type="number" id="delay-ms" required min="0" step="50" />
+            </div>
+            <div class="form-group">
+              <label for="moodle-page-size">Tamaño de página Scraping Moodle (feedback/db)</label>
+              <input type="number" id="moodle-page-size" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="panel-page-size">Tamaño de página visualización Tableros</label>
+              <input type="number" id="panel-page-size" required min="1" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pestaña 2: Encuesta Inicial -->
+      <div id="tab-encuesta-inicial" class="tab-content">
+        <div class="section-actions-top">
+          <h5>Lista de Preguntas que contribuyen al Cálculo del IRD</h5>
+          <button type="button" id="btn-add-pregunta-inicial" class="btn-action">➕ Añadir Pregunta</button>
+        </div>
+        <div id="preguntas-inicial-container" class="preguntas-list"></div>
+      </div>
+
+      <!-- Pestaña 3: Encuesta Cuatrimestral -->
+      <div id="tab-encuesta-cuatrimestral" class="tab-content">
+        <div class="section-actions-top">
+          <h5>Lista de Preguntas que contribuyen al Cálculo del IRD</h5>
+          <button type="button" id="btn-add-pregunta-cuatrimestral" class="btn-action">➕ Añadir Pregunta</button>
+        </div>
+        <div id="preguntas-cuatrimestral-container" class="preguntas-list"></div>
+      </div>
+
+      <!-- Pestaña 4: Anclas Especiales -->
+      <div id="tab-especiales" class="tab-content">
+        <div class="card-section">
+          <h4>🎯 Preguntas de Anclaje de Estado o Lógica Especial</h4>
+          <p class="section-desc">
+            Estas preguntas son requeridas por el sistema para procesos lógicos especiales. 
+            El valor asignado debe ser el **encabezado exacto de columna del CSV** en Moodle.
+          </p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="id-percepcion-riesgo">Pregunta de Autopercepción de Riesgo de Abandono</label>
+              <input type="text" id="id-percepcion-riesgo" required placeholder="Ej. (ABANDONAR_CARRERA) ¿Crees que estás en riesgo...?" />
+            </div>
+            <div class="form-group">
+              <label for="id-anio-ingreso">Pregunta de Año de Ingreso (Cohorte)</label>
+              <input type="text" id="id-anio-ingreso" required placeholder="Ej. ¿En qué año ingresaste a la carrera...?" />
+            </div>
+            <div class="form-group">
+              <label for="id-egreso">Pregunta de Estado de Egreso</label>
+              <input type="text" id="id-egreso" required placeholder="Ej. (EGRESO) ¿Ha egresado?" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón de Guardado General -->
+      <div class="form-submit-container">
+        <button type="button" id="btn-submit-config" class="btn-action btn-submit-large">💾 Guardar Configuración</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<p>
+  <script>
+    (function () {
+      // Inyectar estilos CSS específicos de la UI de configuración dinámica para evitar la sanitización de Moodle
+      (function () {
+        const style = document.createElement("style");
+        style.textContent = `
+          #panel-config-container {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #333;
+            background-color: #fdfdfd;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05);
+          }
+          
+          .panel-header-wrapper {
+            border-bottom: 2px solid hsl(168, 60%, 90%);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+          }
+          
+          .panel-title {
+            color: hsl(168, 60%, 35%) !important;
+            font-weight: 700;
+            margin: 0 !important;
+            font-size: 20px;
+          }
+          
+          .section-desc {
+            font-size: 13px;
+            color: #666;
+            margin-top: -6px;
+            margin-bottom: 16px;
+          }
+
+          /* Barra de estado */
+          #status-bar {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          
+          .status-bar-info {
+            background-color: #e8f4f1;
+            color: hsl(168, 60%, 25%);
+            border: 1px solid hsl(168, 60%, 85%);
+          }
+          
+          .status-bar-success {
+            background-color: #d4efdf;
+            color: #145a32;
+            border: 1px solid #a2e4b8;
+          }
+          
+          .status-bar-error {
+            background-color: #fce4e4;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+          }
+          
+          /* Pestañas */
+          .tabs-nav {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #e3e6f0;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+          }
+          
+          .tab-btn {
+            background: #f8f9fa;
+            border: 1px solid #d1d3e2;
+            color: #495057 !important;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+          }
+          
+          .tab-btn:hover {
+            background: #e9ecef;
+          }
+          
+          .tab-btn.active {
+            background: hsl(168, 60%, 35%) !important;
+            color: white !important;
+            border-color: hsl(168, 60%, 35%) !important;
+          }
+          
+          .tab-content {
+            display: none;
+          }
+          
+          .tab-content.active {
+            display: block;
+          }
+          
+          /* Cards de secciones */
+          .card-section {
+            background: #ffffff;
+            border: 1px solid #e3e6f0;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+          }
+          
+          .card-section h4 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            color: hsl(168, 60%, 25%);
+            font-size: 16px;
+            font-weight: 700;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 8px;
+          }
+          
+          /* Formularios */
+          .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+          }
+          
+          .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+          }
+          
+          .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+          }
+          
+          .form-group input, .form-group select {
+            padding: 8px 12px;
+            border: 1px solid #d1d3e2;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            width: 100%;
+          }
+          
+          .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: hsl(168, 60%, 35%);
+          }
+          
+          /* Lista de preguntas */
+          .section-actions-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+          }
+          
+          .section-actions-top h5 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+          }
+          
+          .preguntas-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+          }
+          
+          .card-pregunta {
+            background: #ffffff;
+            border: 1px solid #d1d3e2;
+            border-left: 4px solid hsl(168, 60%, 35%);
+            border-radius: 6px;
+            padding: 16px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+          }
+          
+          .card-pregunta-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 16px;
+          }
+          
+          .btn-delete-item {
+            background: #fce4e4;
+            color: #c0392b !important;
+            border: 1px solid #f5c6cb;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+          }
+          
+          .btn-delete-item:hover {
+            background: #f8d7da;
+          }
+          
+          /* Respuestas mapeadas */
+          .respuestas-section {
+            background: #f8f9fa;
+            border: 1px solid #eaecf4;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 12px;
+          }
+          
+          .respuestas-section h6 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          
+          .respuestas-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+          }
+          
+          .respuesta-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+          }
+          
+          .respuesta-row input {
+            padding: 6px 10px;
+            border: 1px solid #d1d3e2;
+            border-radius: 4px;
+            font-size: 13px;
+          }
+          
+          .input-opcion-text {
+            flex: 2;
+          }
+          
+          .input-opcion-value {
+            width: 100px;
+          }
+          
+          /* Botones genéricos */
+          .btn-action {
+            background: hsl(168, 60%, 35%);
+            color: white !important;
+            border: none;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s ease;
+          }
+          
+          .btn-action:hover:not(:disabled) {
+            background: hsl(168, 60%, 28%);
+          }
+          
+          .btn-action:disabled {
+            background: #a5c7be;
+            cursor: not-allowed;
+          }
+          
+          .btn-add-small {
+            padding: 3px 8px;
+            font-size: 11px;
+            background: hsl(168, 60%, 40%);
+          }
+          
+          /* Subpreguntas */
+          .subpreguntas-container {
+            margin-left: 20px;
+            border-left: 2px dashed #d1d3e2;
+            padding-left: 12px;
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+          }
+          
+          .card-subpregunta {
+            background: #ffffff;
+            border: 1px dashed #d1d3e2;
+            border-radius: 6px;
+            padding: 12px;
+            position: relative;
+          }
+          
+          /* Contenedor del Botón Guardar */
+          .form-submit-container {
+            margin-top: 30px;
+            border-top: 1px solid #e3e6f0;
+            padding-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+          }
+          
+          .btn-submit-large {
+            padding: 12px 28px;
+            font-size: 15px;
+            background: hsl(168, 60%, 35%) !important;
+            color: white !important;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          }
+          
+          .btn-submit-large:hover {
+            background: hsl(168, 60%, 28%) !important;
+          }
+          
+          /* Inputs con error */
+          .input-invalid {
+            border-color: #e74c3c !important;
+            background-color: #fdf2f2;
+          }
+          
+          .error-msg {
+            color: #e74c3c;
+            font-size: 11px;
+            margin-top: 3px;
+            font-weight: 500;
+          }
+        `;
+        document.head.appendChild(style);
+      })();
+
+      // Configuración de constantes para la Base de Datos Moodle
+      const MOODLE_BASE_URL = window.location.origin;
+      const CONFIG_DB_CMID = 54785;  // CMID de Db Config
+      const CONFIG_DB_ID = 17;       // DATAID de Db Config (d=17)
+
+      // Fallback de configuración por defecto
+      const DEFAULT_CONFIG = {
+        "_INFO": {
+          "version": "1.0",
+          "ultima_revision": "2026-06-13",
+          "descripcion": "Configuracion del sistema de Indice de Riesgo de Desercion (IRD). Solo incluye preguntas que aportan al calculo (beta/X) o que el sistema necesita como anclas especiales.",
+          "IMPORTANTE_IDS": "El campo 'id' de cada pregunta es el encabezado de columna EXACTO del CSV exportado por Moodle."
+        },
+        "urls": {
+          "base": "https" + "://ingenieria.campus.mdp.edu.ar",
+          "curso_id": 1732,
+          "cmids": {
+            "encuesta_inicial": 54062,
+            "encuesta_cuatrimestral": 54284,
+            "db_solicitudes": 54783,
+            "db_logs": 54784,
+            "db_historico": 54788,
+            "db_1er_anio": 54789,
+            "db_historico_1er_anio": 54791
+          },
+          "dataids": {
+            "db_solicitudes": 15,
+            "db_logs": 16,
+            "db_historico": 18,
+            "db_1er_anio": 19,
+            "db_historico_1er_anio": 20
+          }
+        },
+        "umbrales": {
+          "threshold_ird": 40,
+          "cooldown_actualizar_seg": 30,
+          "quarterly_warning_days": 90,
+          "cuatrimestres_desercion": 2,
+          "historico_delay_ms": 500,
+          "results_per_page_moodle": 10,
+          "page_size_paneles": 30
+        },
+        "encuesta_inicial": {
+          "cmid": 54062,
+          "preguntas": [
+            {
+              "id": "Orientación de tu colegio secundario",
+              "tipo": "seleccion_unica",
+              "beta": 0.5,
+              "max_value": 0.2,
+              "respuestas": {
+                "Técnico": 0,
+                "Bachiller": 0.2
+              }
+            },
+            {
+              "id": "¿Cual es el máximo nivel académico alcanzado por alguno de tus Padres/Tutores?",
+              "tipo": "seleccion_unica",
+              "beta": 1,
+              "max_value": 0.8,
+              "respuestas": {
+                "No posee": 0.8,
+                "Primario completo": 0.6,
+                "Secundario completo": 0.3,
+                "Terciario - Universitario completo": 0.1
+              }
+            },
+            {
+              "id": "(CARRERA) ¿Es tu primera carrera universitaria dentro de la facultad?",
+              "tipo": "si_no",
+              "beta": 0.5,
+              "max_value": 0.3,
+              "respuestas": {
+                "Si": 0.3,
+                "No": 0
+              }
+            },
+            {
+              "id": "¿Cuántas personas tenes a cargo?",
+              "tipo": "numerico",
+              "beta": 2,
+              "max_value": null,
+              "respuestas": null
+            },
+            {
+              "id": "(TRABAJO) ¿Trabaja actualmente?",
+              "tipo": "si_no",
+              "beta": 1.5,
+              "max_value": 0.45,
+              "respuestas": {
+                "No": 0,
+                "Sí": "calculado en código según subpregunta"
+              },
+              "subpreguntas": [
+                {
+                  "id": "¿Cuántas horas semanales trabajas?",
+                  "tipo": "seleccion_unica",
+                  "condicion": "Sí",
+                  "respuestas": {
+                    "Menos de 5hs": 0.0,
+                    "Entre 6hs y 20hs": 0.1,
+                    "Entre 21hs y 40hs": 0.25,
+                    "Más de 40hs": 0.45
+                  }
+                }
+              ]
+            },
+            {
+              "id": "Situación económica",
+              "tipo": "seleccion_unica",
+              "beta": 2,
+              "max_value": 1,
+              "respuestas": {
+                "1 - Muy mala": 1,
+                "2 - Mala": 0.5,
+                "3 - Regular": 0.2,
+                "4 - Buena": -0.2,
+                "5 - Muy buena": -0.5
+              }
+            },
+            {
+              "id": "¿Con cuánta disponibilidad de tiempo posees para estudiar?",
+              "tipo": "seleccion_unica",
+              "beta": 2.5,
+              "max_value": 0.9,
+              "respuestas": {
+                "1 - Muy poco tiempo": 0.9,
+                "2 - Poco tiempo": 0.7,
+                "3 - Tiempo regular": 0.0,
+                "4 - Tiempo suficiente": -0.2,
+                "5 - Mucho tiempo": -0.5
+              }
+            },
+            {
+              "id": "¿Cuánto tiempo tardas en llegar a la facultad?",
+              "tipo": "seleccion_unica",
+              "beta": 1,
+              "max_value": 0.25,
+              "respuestas": {
+                "Menos de 20 minutos": 0,
+                "Entre 20 y 40 minutos": 0.08,
+                "Entre 41 y 60 minutos": 0.156,
+                "Más de 60 minutos": 0.25
+              }
+            },
+            {
+              "id": "¿Cómo financiás económicamente tus estudios?",
+              "tipo": "seleccion_unica",
+              "beta": 1.8,
+              "max_value": 1,
+              "respuestas": {
+                "Beca Estudiantil": -1,
+                "Financiamiento Familiar": 0,
+                "Financiamiento Propio": 0.5,
+                "Otros": null
+              }
+            },
+            {
+              "id": "¿Por qué eligió la carrera?",
+              "tipo": "seleccion_unica",
+              "beta": 0.5,
+              "max_value": 0.6,
+              "respuestas": {
+                "Vocación": 0.2,
+                "Salida Laboral": 0.6,
+                "Recomendación": 0.4,
+                "Otro": null
+              }
+            }
+          ]
+        },
+        "encuesta_cuatrimestral": {
+          "cmid": 54284,
+          "preguntas": [
+            {
+              "id": "(ABANDONAR_MATERIAS) En este cuatrimestre ¿Abandonó alguna materia?",
+              "tipo": "si_no",
+              "beta": 2,
+              "max_value": null,
+              "respuestas": {
+                "No": 0,
+                "Si": "calculado en código según cantidad de materias abandonadas"
+              }
+            },
+            {
+              "id": "Satisfacción con respecto al cuatrimestre cursado",
+              "tipo": "seleccion_unica",
+              "beta": 1,
+              "max_value": 1,
+              "respuestas": {
+                "1 - No satisfactorio": 1,
+                "2 - Poco satisfactorio": 0.5,
+                "3 - Regular": 0,
+                "4 - Satisfactorio": -0.5,
+                "5 - Muy satisfactorio": -1
+              }
+            },
+            {
+              "id": "Nivel de estrés que sufrió durante el cuatrimestre",
+              "tipo": "seleccion_unica",
+              "beta": 1.5,
+              "max_value": 0.7,
+              "respuestas": {
+                "1 - Sin estrés": 0,
+                "2 - Estrés bajo": 0.2,
+                "3 - Estrés moderado": 0.35,
+                "4 - Estrés medio": 0.5,
+                "5 - Estrés elevado": 0.7
+              }
+            },
+            {
+              "id": "¿Qué tan motivado está a continuar la carrera?",
+              "tipo": "seleccion_unica",
+              "beta": 2.5,
+              "max_value": 1,
+              "respuestas": {
+                "1 - No estoy motivado": 1,
+                "2 - Motivación baja": 0.5,
+                "3 - Motivación moderada": 0,
+                "4 - Motivación alta": -0.5,
+                "5 - Muy motivado": -1
+              }
+            },
+            {
+              "id": "¿Qué tan al día estás con el plan de estudios?",
+              "tipo": "seleccion_unica",
+              "beta": 1.5,
+              "max_value": 0.8,
+              "respuestas": {
+                "1 - Adelantado": -1,
+                "2 - Al día": 0,
+                "3 - Atrasado un cuatrimestre": 0.25,
+                "4 - Atrasado un año": 0.5,
+                "5 - Atrasado más de un año": 0.8
+              }
+            },
+            {
+              "id": "¿Tenés grupo de estudio/compañeros con los que estudiar?",
+              "tipo": "si_no",
+              "beta": 1,
+              "max_value": 0.4,
+              "respuestas": {
+                "Sí": -0.1,
+                "No": 0.4
+              }
+            }
+          ]
+        },
+        "preguntas_especiales": {
+          "id_percepcion_riesgo": "(ABANDONAR_CARRERA) ¿Crees que estás en riesgo de abandonar la carrera?",
+          "id_anio_ingreso": "¿En qué año ingresaste a la carrera? (Primer cuatrimestre cursado)",
+          "id_egreso": "(EGRESO) ¿Ha egresado?"
+        }
+      };
+
+      // Estado en memoria
+      let configData = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+      let currentRid = 0;
+      let targetFieldName = ""; // Se resolverá dinámicamente
+
+      // Revelado del tablero con clic en accumsan
+      document.getElementById("btn-oculto").addEventListener("click", function () {
+        document.getElementById("pantalla-falsa").style.display = "none";
+        document.getElementById("tablero").style.display = "block";
+        initPanel();
+      });
+
+      // Muestra un mensaje en la barra de estado
+      function showStatus(text, type = "info") {
+        const bar = document.getElementById("status-bar");
+        bar.textContent = text;
+        bar.className = `status-bar-${type}`;
+        bar.style.display = "flex";
+      }
+
+      // Oculta la barra de estado
+      function hideStatus() {
+        document.getElementById("status-bar").style.display = "none";
+      }
+
+      // Obtener el sesskey de la sesión actual de Moodle
+      function getSesskey() {
+        if (window.M && M.cfg && M.cfg.sesskey) return M.cfg.sesskey;
+        const meta = document.querySelector('meta[name="sesskey"]');
+        if (meta) return meta.getAttribute("content");
+        const input = document.querySelector('input[name="sesskey"]');
+        if (input) return input.value;
+        const link = document.querySelector('a[href*="sesskey="]');
+        if (link) {
+          const match = link.href.match(/sesskey=([a-zA-Z0-9]+)/);
+          if (match) return match[1];
+        }
+        return null;
+      }
+
+      // Limpia etiquetas HTML insertadas por Moodle
+      function parseCleanJSON(rawText) {
+        if (!rawText) return null;
+        let clean = rawText.replace(/<br\s*\/?>/gi, "\n");
+        clean = clean.replace(/<[^>]*>/g, "");
+        clean = clean.replace(/&nbsp;/g, " ")
+                     .replace(/&quot;/g, '"')
+                     .replace(/&lt;/g, '<')
+                     .replace(/&gt;/g, '>')
+                     .replace(/&amp;/g, '&');
+        try {
+          return JSON.parse(clean);
+        } catch (e) {
+          console.error("Error al parsear el JSON de configuración:", clean, e);
+          return null;
+        }
+      }
+
+      // Hace el scraping del HTML de vista para obtener la configuración y el RID de edición
+      function parseViewHTML(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        
+        // Extraer rid de los enlaces de edición de la entrada
+        let rid = 0;
+        const editLinks = doc.querySelectorAll('a[href*="edit.php"][href*="rid="]');
+        for (let link of editLinks) {
+          const match = link.href.match(/rid=(\d+)/);
+          if (match) {
+            rid = parseInt(match[1]);
+            break;
+          }
+        }
+
+        // Buscar el contenido del campo json_config
+        let jsonText = "";
+        const htmlFields = doc.querySelectorAll(".data-field-html, .col-8, .col-lg-9");
+        for (let field of htmlFields) {
+          const text = field.textContent.trim();
+          if (text.startsWith("{") && text.endsWith("}")) {
+            jsonText = text;
+            break;
+          }
+        }
+
+        // Si no se encuentra con la estructura básica, buscar en el HTML crudo
+        if (!jsonText) {
+          const match = html.match(/{[\s\S]*?"urls"[\s\S]*?}/);
+          if (match) jsonText = match[0];
+        }
+
+        return { rid, jsonText };
+      }
+
+      // Resuelve dinámicamente el id del campo (field_XX) de Moodle para json_config
+      async function resolveFieldMapping(rid) {
+        const url = `${MOODLE_BASE_URL}/mod/data/edit.php?d=${CONFIG_DB_ID}&rid=${rid}`;
+        try {
+          const response = await fetch(url);
+          const html = await response.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+
+          // 1. Buscar el input/textarea cuya etiqueta o label contenga "json_config"
+          const labels = doc.querySelectorAll('label[for^="field_"]');
+          for (let label of labels) {
+            if (label.textContent.toLowerCase().includes("json_config")) {
+              const forAttr = label.getAttribute("for");
+              const m = forAttr.match(/field_(\d+)/);
+              if (m) return `field_${m[1]}`;
+            }
+          }
+
+          // 2. Fallback: buscar divs con clase font-weight-bold
+          const boldLabels = doc.querySelectorAll(".font-weight-bold");
+          for (let bold of boldLabels) {
+            if (bold.textContent.toLowerCase().includes("json_config")) {
+              const formGroup = bold.closest("div, td, tr");
+              const area = formGroup?.querySelector('textarea[name^="field_"], input[name^="field_"]');
+              if (area) {
+                const match = area.name.match(/field_(\d+)/);
+                if (match) return `field_${match[1]}`;
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Error al obtener el mapeo dinámico del campo Moodle:", e);
+        }
+        // Fallback histórico/por defecto
+        return "field_47";
+      }
+
+      // Inicializa el panel y carga la configuración
+      async function initPanel() {
+        showStatus("⏳ Cargando configuración actual desde Moodle...", "info");
+        try {
+          const viewUrl = `${MOODLE_BASE_URL}/mod/data/view.php?d=${CONFIG_DB_ID}`;
+          const res = await fetch(viewUrl);
+          const html = await res.text();
+          
+          const parsed = parseViewHTML(html);
+          currentRid = parsed.rid;
+
+          if (parsed.jsonText) {
+            const cleanObj = parseCleanJSON(parsed.jsonText);
+            if (cleanObj) {
+              configData = cleanObj;
+              showStatus("✅ Configuración cargada correctamente.", "success");
+              setTimeout(hideStatus, 3000);
+            } else {
+              showStatus("⚠️ La base de datos tiene datos corruptos. Se cargó la configuración por defecto.", "info");
+            }
+          } else {
+            showStatus("ℹ️ No se encontró configuración previa en Moodle. Se inicializa con valores por defecto.", "info");
+          }
+
+          // Obtener el mapeo de campos dinámico
+          targetFieldName = await resolveFieldMapping(currentRid);
+
+          // Rellenar la UI y configurar listeners
+          fillGeneralTab();
+          fillEspecialesTab();
+          renderPreguntasList("inicial");
+          renderPreguntasList("cuatrimestral");
+          setupTabEvents();
+          setupDynamicEvents();
+
+        } catch (e) {
+          console.error("Error en inicialización del panel:", e);
+          showStatus("⚠️ Error al conectar con Moodle. Se muestran datos por defecto.", "error");
+          targetFieldName = "field_47";
+          fillGeneralTab();
+          fillEspecialesTab();
+          renderPreguntasList("inicial");
+          renderPreguntasList("cuatrimestral");
+          setupTabEvents();
+          setupDynamicEvents();
+        }
+      }
+
+      // Control de la navegación de pestañas
+      function setupTabEvents() {
+        const tabBtns = document.querySelectorAll(".tab-btn");
+        tabBtns.forEach(btn => {
+          btn.addEventListener("click", function () {
+            // Quitar clase activa
+            tabBtns.forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+            
+            // Añadir activa al clickeado
+            btn.classList.add("active");
+            const targetTab = btn.getAttribute("data-tab");
+            document.getElementById(targetTab).classList.add("active");
+          });
+        });
+      }
+
+      // Rellena la pestaña general a partir de configData
+      function fillGeneralTab() {
+        document.getElementById("url-base").value = configData.urls.base || "";
+        document.getElementById("curso-id").value = configData.urls.curso_id || "";
+
+        // CMIDs
+        document.getElementById("cmid-inicial").value = configData.urls.cmids.encuesta_inicial || "";
+        document.getElementById("cmid-cuatrimestral").value = configData.urls.cmids.encuesta_cuatrimestral || "";
+        document.getElementById("cmid-solicitudes").value = configData.urls.cmids.db_solicitudes || "";
+        document.getElementById("cmid-logs").value = configData.urls.cmids.db_logs || "";
+        document.getElementById("cmid-historico").value = configData.urls.cmids.db_historico || "";
+        document.getElementById("cmid-1er-anio").value = configData.urls.cmids.db_1er_anio || "";
+        document.getElementById("cmid-hist-1er-anio").value = configData.urls.cmids.db_historico_1er_anio || "";
+
+        // DATAIDs
+        document.getElementById("dataid-solicitudes").value = configData.urls.dataids.db_solicitudes || "";
+        document.getElementById("dataid-logs").value = configData.urls.dataids.db_logs || "";
+        document.getElementById("dataid-historico").value = configData.urls.dataids.db_historico || "";
+        document.getElementById("dataid-1er-anio").value = configData.urls.dataids.db_1er_anio || "";
+        document.getElementById("dataid-hist-1er-anio").value = configData.urls.dataids.db_historico_1er_anio || "";
+
+        // Umbrales
+        document.getElementById("threshold-ird").value = configData.umbrales.threshold_ird || 0;
+        document.getElementById("cooldown-actualizar").value = configData.umbrales.cooldown_actualizar_seg || 0;
+        document.getElementById("warning-days").value = configData.umbrales.quarterly_warning_days || 0;
+        document.getElementById("cuatrimestres-desercion").value = configData.umbrales.cuatrimestres_desercion || 2;
+        document.getElementById("delay-ms").value = configData.umbrales.historico_delay_ms || 500;
+        document.getElementById("moodle-page-size").value = configData.umbrales.results_per_page_moodle || 10;
+        document.getElementById("panel-page-size").value = configData.umbrales.page_size_paneles || 30;
+      }
+
+      // Rellena la pestaña de anclas especiales
+      function fillEspecialesTab() {
+        document.getElementById("id-percepcion-riesgo").value = configData.preguntas_especiales.id_percepcion_riesgo || "";
+        document.getElementById("id-anio-ingreso").value = configData.preguntas_especiales.id_anio_ingreso || "";
+        document.getElementById("id-egreso").value = configData.preguntas_especiales.id_egreso || "";
+      }
+
+      // Renderiza el listado de preguntas de una encuesta determinada (inicial/cuatrimestral)
+      function renderPreguntasList(tipoEncuesta) {
+        const container = document.getElementById(`preguntas-${tipoEncuesta}-container`);
+        container.innerHTML = "";
+
+        const encuestaKey = `encuesta_${tipoEncuesta}`;
+        const preguntas = configData[encuestaKey].preguntas;
+
+        if (preguntas.length === 0) {
+          container.innerHTML = `<div class="card-section" style="text-align: center; color: #888;">⚠️ No hay preguntas registradas para esta encuesta.</div>`;
+          return;
+        }
+
+        preguntas.forEach((pregunta, idx) => {
+          const card = document.createElement("div");
+          card.className = "card-pregunta";
+          card.dataset.index = idx;
+          card.dataset.encuesta = tipoEncuesta;
+
+          // Construcción de respuestas mapeadas
+          let respuestasHTML = "";
+          if (pregunta.tipo !== "numerico") {
+            respuestasHTML = `
+              <div class="respuestas-section">
+                <h6>
+                  <span>Opciones de Respuesta Mapeadas (Texto y Valor X)</span>
+                  <button type="button" class="btn-action btn-add-small btn-add-respuesta" data-index="${idx}" data-encuesta="${tipoEncuesta}">➕ Opción</button>
+                </h6>
+                <div class="respuestas-grid" data-index="${idx}" data-encuesta="${tipoEncuesta}">
+            `;
+            if (pregunta.respuestas) {
+              Object.entries(pregunta.respuestas).forEach(([texto, valor]) => {
+                const isSpecial = typeof valor === "string";
+                respuestasHTML += `
+                  <div class="respuesta-row">
+                    <input type="text" class="input-opcion-text" placeholder="Texto exacto..." value="${texto.replace(/"/g, '&quot;')}" />
+                    <input type="${isSpecial ? 'text' : 'number'}" class="input-opcion-value" step="any" placeholder="Valor X..." value="${valor !== null ? valor : ''}" ${isSpecial ? 'style="border-color: #f39c12; background-color: #fef9e7;"' : ''} />
+                    <button type="button" class="btn-delete-item btn-del-respuesta">❌</button>
+                  </div>
+                `;
+              });
+            }
+            respuestasHTML += `
+                </div>
+              </div>
+            `;
+          }
+
+          // Subpreguntas (si existen)
+          let subpreguntasHTML = "";
+          if (pregunta.subpreguntas && pregunta.subpreguntas.length > 0) {
+            subpreguntasHTML = `
+              <div class="subpreguntas-container">
+                <div style="font-size: 12px; font-weight: 700; color: #444;">Subpreguntas Condicionales:</div>
+            `;
+            pregunta.subpreguntas.forEach((sub, sidx) => {
+              subpreguntasHTML += `
+                <div class="card-subpregunta" data-subindex="${sidx}" data-index="${idx}">
+                  <div class="card-pregunta-header">
+                    <div class="form-grid" style="width: 100%;">
+                      <div class="form-group" style="grid-column: span 2;">
+                        <label>DNI/ID Columna CSV (Subpregunta)</label>
+                        <input type="text" class="input-sub-id" value="${sub.id.replace(/"/g, '&quot;')}" required />
+                      </div>
+                      <div class="form-group">
+                        <label>Condición Gatillo</label>
+                        <input type="text" class="input-sub-condicion" value="${sub.condicion}" required placeholder="Ej. Sí" />
+                      </div>
+                      <div class="form-group">
+                        <label>Tipo</label>
+                        <select class="select-sub-tipo">
+                          <option value="seleccion_unica" ${sub.tipo === 'seleccion_unica' ? 'selected' : ''}>Selección Única</option>
+                          <option value="si_no" ${sub.tipo === 'si_no' ? 'selected' : ''}>Sí / No</option>
+                          <option value="numerico" ${sub.tipo === 'numerico' ? 'selected' : ''}>Numérico</option>
+                        </select>
+                      </div>
+                    </div>
+                    <button type="button" class="btn-delete-item btn-del-subpregunta" style="margin-top: 24px;">❌ Quitar</button>
+                  </div>
+                  
+                  <div class="respuestas-section" style="background-color: #fff;">
+                    <h6>
+                      <span>Respuestas de Subpregunta</span>
+                      <button type="button" class="btn-action btn-add-small btn-add-sub-respuesta" data-index="${idx}" data-subindex="${sidx}" data-encuesta="${tipoEncuesta}">➕ Opción</button>
+                    </h6>
+                    <div class="sub-respuestas-grid">
+              `;
+              if (sub.respuestas) {
+                Object.entries(sub.respuestas).forEach(([stext, sval]) => {
+                  subpreguntasHTML += `
+                    <div class="respuesta-row">
+                      <input type="text" class="input-sub-opcion-text" placeholder="Texto..." value="${stext.replace(/"/g, '&quot;')}" />
+                      <input type="number" class="input-sub-opcion-value" step="any" placeholder="Valor X..." value="${sval !== null ? sval : ''}" />
+                      <button type="button" class="btn-delete-item btn-del-sub-respuesta">❌</button>
+                    </div>
+                  `;
+                });
+              }
+              subpreguntasHTML += `
+                    </div>
+                  </div>
+                </div>
+              `;
+            });
+            subpreguntasHTML += `
+              </div>
+            `;
+          }
+
+          // HTML Completo de la Card de Pregunta
+          card.innerHTML = `
+            <div class="card-pregunta-header">
+              <div class="form-grid" style="width: 100%;">
+                <div class="form-group" style="grid-column: span 2;">
+                  <label>DNI/ID Columna CSV (Identificador exacto)</label>
+                  <input type="text" class="input-pregunta-id" value="${pregunta.id.replace(/"/g, '&quot;')}" required />
+                </div>
+                <div class="form-group">
+                  <label>Tipo de Pregunta</label>
+                  <select class="select-pregunta-tipo">
+                    <option value="seleccion_unica" ${pregunta.tipo === 'seleccion_unica' ? 'selected' : ''}>Selección Única</option>
+                    <option value="si_no" ${pregunta.tipo === 'si_no' ? 'selected' : ''}>Sí / No</option>
+                    <option value="numerico" ${pregunta.tipo === 'numerico' ? 'selected' : ''}>Numérico</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Peso Beta (β)</label>
+                  <input type="number" class="input-pregunta-beta" step="0.1" value="${pregunta.beta !== undefined ? pregunta.beta : ''}" required />
+                </div>
+                <div class="form-group">
+                  <label>Valor X Máximo Teórico</label>
+                  <input type="number" class="input-pregunta-max" step="0.1" value="${pregunta.max_value !== null && pregunta.max_value !== undefined ? pregunta.max_value : ''}" placeholder="Ej. 1.0 (Vacío = null)" />
+                </div>
+              </div>
+              <button type="button" class="btn-delete-item btn-del-pregunta" style="margin-top: 24px;">❌ Eliminar</button>
+            </div>
+            
+            ${respuestasHTML}
+            ${subpreguntasHTML}
+
+            ${pregunta.tipo === 'si_no' ? `
+              <div style="margin-top: 10px; display: flex; gap: 10px;">
+                <button type="button" class="btn-action btn-add-small btn-add-subpregunta" style="background-color: #34495e;">➕ Subpregunta Condicional</button>
+              </div>
+            ` : ''}
+          `;
+
+          container.appendChild(card);
+        });
+      }
+
+      // Eventos dinámicos en los listados de preguntas (botones añadir/quitar)
+      function setupDynamicEvents() {
+        // Añadir Pregunta Inicial
+        document.getElementById("btn-add-pregunta-inicial").addEventListener("click", function () {
+          saveToState();
+          configData.encuesta_inicial.preguntas.push({
+            id: "NUEVA_PREGUNTA_INICIAL_" + Date.now().toString().slice(-4),
+            tipo: "seleccion_unica",
+            beta: 1.0,
+            max_value: 1.0,
+            respuestas: { "Opción 1": 0 }
+          });
+          renderPreguntasList("inicial");
+          setupDynamicEvents();
+        });
+
+        // Añadir Pregunta Cuatrimestral
+        document.getElementById("btn-add-pregunta-cuatrimestral").addEventListener("click", function () {
+          saveToState();
+          configData.encuesta_cuatrimestral.preguntas.push({
+            id: "NUEVA_PREGUNTA_CUATRIMESTRAL_" + Date.now().toString().slice(-4),
+            tipo: "seleccion_unica",
+            beta: 1.0,
+            max_value: 1.0,
+            respuestas: { "Opción 1": 0 }
+          });
+          renderPreguntasList("cuatrimestral");
+          setupDynamicEvents();
+        });
+
+        // Clics delegados en contenedores de preguntas
+        ["inicial", "cuatrimestral"].forEach(tipo => {
+          const container = document.getElementById(`preguntas-${tipo}-container`);
+          
+          container.addEventListener("click", function (e) {
+            const target = e.target;
+            const card = target.closest(".card-pregunta");
+            if (!card) return;
+            const pIdx = parseInt(card.dataset.index);
+            const encuestaKey = `encuesta_${tipo}`;
+
+            // 1. Eliminar Pregunta
+            if (target.classList.contains("btn-del-pregunta")) {
+              saveToState();
+              configData[encuestaKey].preguntas.splice(pIdx, 1);
+              renderPreguntasList(tipo);
+              setupDynamicEvents();
+              return;
+            }
+
+            // 2. Agregar Respuesta Mapeada
+            if (target.classList.contains("btn-add-respuesta")) {
+              saveToState();
+              if (!configData[encuestaKey].preguntas[pIdx].respuestas) {
+                configData[encuestaKey].preguntas[pIdx].respuestas = {};
+              }
+              const optCount = Object.keys(configData[encuestaKey].preguntas[pIdx].respuestas).length + 1;
+              configData[encuestaKey].preguntas[pIdx].respuestas["Nueva Opción " + optCount] = 0;
+              renderPreguntasList(tipo);
+              setupDynamicEvents();
+              return;
+            }
+
+            // 3. Eliminar Respuesta Mapeada
+            if (target.classList.contains("btn-del-respuesta")) {
+              const row = target.closest(".respuesta-row");
+              const textKey = row.querySelector(".input-opcion-text").value.trim();
+              saveToState();
+              if (configData[encuestaKey].preguntas[pIdx].respuestas) {
+                delete configData[encuestaKey].preguntas[pIdx].respuestas[textKey];
+              }
+              renderPreguntasList(tipo);
+              setupDynamicEvents();
+              return;
+            }
+
+            // 4. Agregar Subpregunta Condicional
+            if (target.classList.contains("btn-add-subpregunta")) {
+              saveToState();
+              if (!configData[encuestaKey].preguntas[pIdx].subpreguntas) {
+                configData[encuestaKey].preguntas[pIdx].subpreguntas = [];
+              }
+              configData[encuestaKey].preguntas[pIdx].subpreguntas.push({
+                id: "¿Subpregunta del trabajo?",
+                tipo: "seleccion_unica",
+                condicion: "Sí",
+                respuestas: { "Opción Sub 1": 0 }
+              });
+              renderPreguntasList(tipo);
+              setupDynamicEvents();
+              return;
+            }
+
+            // 5. Eliminar Subpregunta Condicional
+            if (target.classList.contains("btn-del-subpregunta")) {
+              const subcard = target.closest(".card-subpregunta");
+              const sIdx = parseInt(subcard.dataset.subindex);
+              saveToState();
+              configData[encuestaKey].preguntas[pIdx].subpreguntas.splice(sIdx, 1);
+              renderPreguntasList(tipo);
+              setupDynamicEvents();
+              return;
+            }
+
+            // 6. Agregar Respuesta en Subpregunta
+            if (target.classList.contains("btn-add-sub-respuesta")) {
+              const subcard = target.closest(".card-subpregunta");
+              const sIdx = parseInt(subcard.dataset.subindex);
+              saveToState();
+              if (!configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas) {
+                configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas = {};
+              }
+              const optCount = Object.keys(configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas).length + 1;
+              configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas["Nueva Sub Opción " + optCount] = 0;
+              renderPreguntasList(tipo);
+              setupDynamicEvents();
+              return;
+            }
+
+            // 7. Eliminar Respuesta en Subpregunta
+            if (target.classList.contains("btn-del-sub-respuesta")) {
+              const subcard = target.closest(".card-subpregunta");
+              const sIdx = parseInt(subcard.dataset.subindex);
+              const row = target.closest(".respuesta-row");
+              const textKey = row.querySelector(".input-sub-opcion-text").value.trim();
+              saveToState();
+              if (configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas) {
+                delete configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas[textKey];
+              }
+              renderPreguntasList(tipo);
+              setupDynamicEvents();
+              return;
+            }
+          });
+
+          // Evento "change" en selects para redibujar formulario (especialmente al cambiar tipo a/desde numerico)
+          container.addEventListener("change", function (e) {
+            if (e.target.classList.contains("select-pregunta-tipo") || e.target.classList.contains("select-sub-tipo")) {
+              saveToState();
+              renderPreguntasList(tipo);
+              setupDynamicEvents();
+            }
+          });
+        });
+      }
+
+      // Convierte los valores de los inputs del DOM de vuelta al objeto configData en memoria
+      function saveToState() {
+        // Tab General
+        configData.urls.base = document.getElementById("url-base").value.trim();
+        configData.urls.curso_id = parseInt(document.getElementById("curso-id").value) || 0;
+
+        // CMIDs
+        configData.urls.cmids.encuesta_inicial = parseInt(document.getElementById("cmid-inicial").value) || 0;
+        configData.urls.cmids.encuesta_cuatrimestral = parseInt(document.getElementById("cmid-cuatrimestral").value) || 0;
+        configData.urls.cmids.db_solicitudes = parseInt(document.getElementById("cmid-solicitudes").value) || 0;
+        configData.urls.cmids.db_logs = parseInt(document.getElementById("cmid-logs").value) || 0;
+        configData.urls.cmids.db_historico = parseInt(document.getElementById("cmid-historico").value) || 0;
+        configData.urls.cmids.db_1er_anio = parseInt(document.getElementById("cmid-1er-anio").value) || 0;
+        configData.urls.cmids.db_historico_1er_anio = parseInt(document.getElementById("cmid-hist-1er-anio").value) || 0;
+
+        // DATAIDs
+        configData.urls.dataids.db_solicitudes = parseInt(document.getElementById("dataid-solicitudes").value) || 0;
+        configData.urls.dataids.db_logs = parseInt(document.getElementById("dataid-logs").value) || 0;
+        configData.urls.dataids.db_historico = parseInt(document.getElementById("dataid-historico").value) || 0;
+        configData.urls.dataids.db_1er_anio = parseInt(document.getElementById("dataid-1er-anio").value) || 0;
+        configData.urls.dataids.db_historico_1er_anio = parseInt(document.getElementById("data-hist-1er-anio")?.value || document.getElementById("dataid-hist-1er-anio").value) || 0;
+
+        // Umbrales
+        configData.umbrales.threshold_ird = parseFloat(document.getElementById("threshold-ird").value) || 0;
+        configData.umbrales.cooldown_actualizar_seg = parseInt(document.getElementById("cooldown-actualizar").value) || 0;
+        configData.umbrales.quarterly_warning_days = parseInt(document.getElementById("warning-days").value) || 0;
+        configData.umbrales.cuatrimestres_desercion = parseInt(document.getElementById("cuatrimestres-desercion").value) || 2;
+        configData.umbrales.historico_delay_ms = parseInt(document.getElementById("delay-ms").value) || 500;
+        configData.umbrales.results_per_page_moodle = parseInt(document.getElementById("moodle-page-size").value) || 10;
+        configData.umbrales.page_size_paneles = parseInt(document.getElementById("panel-page-size").value) || 30;
+
+        // Tab Especiales
+        configData.preguntas_especiales.id_percepcion_riesgo = document.getElementById("id-percepcion-riesgo").value.trim();
+        configData.preguntas_especiales.id_anio_ingreso = document.getElementById("id-anio-ingreso").value.trim();
+        configData.preguntas_especiales.id_egreso = document.getElementById("id-egreso").value.trim();
+
+        // Guardar Preguntas
+        ["inicial", "cuatrimestral"].forEach(tipo => {
+          const container = document.getElementById(`preguntas-${tipo}-container`);
+          const cards = container.querySelectorAll(".card-pregunta");
+          const encuestaKey = `encuesta_${tipo}`;
+          const list = [];
+
+          cards.forEach(card => {
+            const pId = card.querySelector(".input-pregunta-id").value.trim();
+            const pTipo = card.querySelector(".select-pregunta-tipo").value;
+            const pBeta = parseFloat(card.querySelector(".input-pregunta-beta").value) || 0;
+            const pMaxVal = card.querySelector(".input-pregunta-max").value !== "" ? parseFloat(card.querySelector(".input-pregunta-max").value) : null;
+
+            const pregunta = {
+              id: pId,
+              tipo: pTipo,
+              beta: pBeta,
+              max_value: pMaxVal
+            };
+
+            // Parsear opciones de respuestas mapeadas
+            if (pTipo !== "numerico") {
+              pregunta.respuestas = {};
+              const rows = card.querySelectorAll(".respuestas-grid .respuesta-row");
+              rows.forEach(row => {
+                const optText = row.querySelector(".input-opcion-text").value.trim();
+                const optValRaw = row.querySelector(".input-opcion-value").value.trim();
+                if (optText) {
+                  // Manejar valores numéricos y texto especial
+                  if (optValRaw === "" || isNaN(optValRaw)) {
+                    pregunta.respuestas[optText] = optValRaw !== "" ? optValRaw : null;
+                  } else {
+                    pregunta.respuestas[optText] = parseFloat(optValRaw);
+                  }
+                }
+              });
+            } else {
+              pregunta.respuestas = null;
+            }
+
+            // Parsear subpreguntas
+            const subcards = card.querySelectorAll(".card-subpregunta");
+            if (subcards.length > 0) {
+              pregunta.subpreguntas = [];
+              subcards.forEach(subcard => {
+                const sId = subcard.querySelector(".input-sub-id").value.trim();
+                const sCond = subcard.querySelector(".input-sub-condicion").value.trim();
+                const sTipo = subcard.querySelector(".select-sub-tipo").value;
+
+                const subpregunta = {
+                  id: sId,
+                  tipo: sTipo,
+                  condicion: sCond
+                };
+
+                if (sTipo !== "numerico") {
+                  subpregunta.respuestas = {};
+                  const srows = subcard.querySelectorAll(".sub-respuestas-grid .respuesta-row");
+                  srows.forEach(srow => {
+                    const sOptText = srow.querySelector(".input-sub-opcion-text").value.trim();
+                    const sOptValRaw = srow.querySelector(".input-sub-opcion-value").value.trim();
+                    if (sOptText) {
+                      subpregunta.respuestas[sOptText] = sOptValRaw !== "" ? parseFloat(sOptValRaw) : null;
+                    }
+                  });
+                } else {
+                  subpregunta.respuestas = null;
+                }
+                pregunta.subpreguntas.push(subpregunta);
+              });
+            }
+
+            list.push(pregunta);
+          });
+
+          configData[encuestaKey].preguntas = list;
+          // Actualizar CMID interno de las encuestas para consistencia
+          configData[encuestaKey].cmid = configData.urls.cmids[`encuesta_${tipo}`];
+        });
+      }
+
+      // Validador de formulario del frontend
+      function validateForm() {
+        let isValid = true;
+        
+        // Limpiar errores previos
+        document.querySelectorAll(".input-invalid").forEach(el => el.classList.remove("input-invalid"));
+        document.querySelectorAll(".error-msg").forEach(el => el.remove());
+
+        // Helper para inyectar un mensaje de error bajo un input
+        function setError(element, message) {
+          element.classList.add("input-invalid");
+          const error = document.createElement("div");
+          error.className = "error-msg";
+          error.textContent = message;
+          element.parentNode.appendChild(error);
+          isValid = false;
+        }
+
+        // 1. Validar Pestaña General
+        const urlBase = document.getElementById("url-base");
+        const baseVal = urlBase.value.trim();
+        if (!baseVal.startsWith("http" + "://") && !baseVal.startsWith("http" + "s://")) {
+          setError(urlBase, "Debe introducir una URL válida.");
+        }
+
+        const cursoId = document.getElementById("curso-id");
+        if (parseInt(cursoId.value) <= 0 || isNaN(parseInt(cursoId.value))) {
+          setError(cursoId, "Debe introducir un ID de curso válido.");
+        }
+
+        // Validar que todos los CMIDs y DATAIDs sean números positivos
+        const ids = [
+          "cmid-inicial", "cmid-cuatrimestral", "cmid-solicitudes", "cmid-logs", "cmid-historico", "cmid-1er-anio", "cmid-hist-1er-anio",
+          "dataid-solicitudes", "dataid-logs", "dataid-historico", "dataid-1er-anio", "dataid-hist-1er-anio"
+        ];
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          if (parseInt(el.value) <= 0 || isNaN(parseInt(el.value))) {
+            setError(el, "Este valor debe ser un ID de Moodle numérico positivo.");
+          }
+        });
+
+        // Validar umbrales
+        const threshold = document.getElementById("threshold-ird");
+        const valTh = parseFloat(threshold.value);
+        if (isNaN(valTh) || valTh < 0 || valTh > 100) {
+          setError(threshold, "El umbral del IRD debe estar entre 0 y 100.");
+        }
+
+        // 2. Validar Preguntas
+        ["inicial", "cuatrimestral"].forEach(tipo => {
+          const container = document.getElementById(`preguntas-${tipo}-container`);
+          
+          // Validar identificador único de columna
+          const idInputs = container.querySelectorAll(".input-pregunta-id");
+          const seenIds = new Set();
+          idInputs.forEach(input => {
+            const val = input.value.trim();
+            if (!val) {
+              setError(input, "El identificador de columna no puede estar vacío.");
+            } else if (seenIds.has(val)) {
+              setError(input, "Este identificador está duplicado en esta encuesta.");
+            } else {
+              seenIds.add(val);
+            }
+          });
+
+          // Validar betas
+          const betaInputs = container.querySelectorAll(".input-pregunta-beta");
+          betaInputs.forEach(input => {
+            const val = parseFloat(input.value);
+            if (isNaN(val)) {
+              setError(input, "El peso Beta (β) debe ser un número.");
+            }
+          });
+
+          // Validar respuestas mapeadas
+          const cards = container.querySelectorAll(".card-pregunta");
+          cards.forEach(card => {
+            const pTipo = card.querySelector(".select-pregunta-tipo").value;
+            if (pTipo !== "numerico") {
+              const optTextInputs = card.querySelectorAll(".respuestas-grid .input-opcion-text");
+              const seenOpts = new Set();
+              
+              if (optTextInputs.length === 0) {
+                setError(card.querySelector(".btn-add-respuesta"), "Debe tener al menos una opción de respuesta.");
+              }
+
+              optTextInputs.forEach(input => {
+                const val = input.value.trim();
+                if (!val) {
+                  setError(input, "El texto de la opción no puede estar vacío.");
+                } else if (seenOpts.has(val)) {
+                  setError(input, "Opción duplicada.");
+                } else {
+                  seenOpts.add(val);
+                }
+              });
+
+              // Validar que los valores X sean numéricos (excepto en casos especiales)
+              const optValInputs = card.querySelectorAll(".respuestas-grid .input-opcion-value");
+              optValInputs.forEach(input => {
+                const val = input.value.trim();
+                if (val !== "" && isNaN(val) && val !== "calculado en código según subpregunta" && val !== "null") {
+                  // Permitir texto especial, sino es error
+                  setError(input, "Debe ser un número o una palabra clave de código.");
+                }
+              });
+            }
+
+            // Validar subpreguntas
+            const subcards = card.querySelectorAll(".card-subpregunta");
+            subcards.forEach(subcard => {
+              const sId = subcard.querySelector(".input-sub-id");
+              if (!sId.value.trim()) {
+                setError(sId, "Identificador de columna requerido.");
+              }
+              const sCond = subcard.querySelector(".input-sub-condicion");
+              if (!sCond.value.trim()) {
+                setError(sCond, "Condición gatillo requerida.");
+              }
+              const sType = subcard.querySelector(".select-sub-tipo").value;
+              if (sType !== "numerico") {
+                const sOpts = subcard.querySelectorAll(".input-sub-opcion-text");
+                sOpts.forEach(input => {
+                  if (!input.value.trim()) setError(input, "Texto requerido.");
+                });
+                const sVals = subcard.querySelectorAll(".input-sub-opcion-value");
+                sVals.forEach(input => {
+                  if (input.value.trim() === "" || isNaN(input.value.trim())) {
+                    setError(input, "Valor numérico requerido.");
+                  }
+                });
+              }
+            });
+          });
+        });
+
+        // 3. Validar Especiales
+        const espIds = ["id-percepcion-riesgo", "id-anio-ingreso", "id-egreso"];
+        espIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (!el.value.trim()) {
+            setError(el, "Este campo es obligatorio.");
+          }
+        });
+
+        return isValid;
+      }
+
+      // Procesa el formulario, valida y realiza la solicitud de guardado a Moodle
+      document.getElementById("btn-submit-config").addEventListener("click", async function () {
+        hideStatus();
+        
+        // Ejecutar validaciones del frontend
+        if (!validateForm()) {
+          showStatus("⚠️ Hay errores en el formulario. Por favor, corrígelos antes de guardar.", "error");
+          
+          // Redirigir a la pestaña con el primer error visible
+          const firstErr = document.querySelector(".input-invalid");
+          if (firstErr) {
+            const pane = firstErr.closest(".tab-content");
+            if (pane) {
+              const tabId = pane.id;
+              const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+              if (btn) btn.click();
+            }
+            firstErr.scrollIntoView({ behavior: "smooth", block: "center" });
+            firstErr.focus();
+          }
+          return;
+        }
+
+        // Salvar inputs al estado en memoria
+        saveToState();
+
+        const sesskey = getSesskey();
+        if (!sesskey) {
+          showStatus("❌ Error: No se pudo obtener la clave de sesión Moodle (sesskey). Recarga la página.", "error");
+          return;
+        }
+
+        showStatus("⏳ Guardando configuración en Moodle...", "info");
+
+        // Serializar a JSON plano
+        const jsonString = JSON.stringify(configData, null, 2);
+
+        // Crear FormData para la petición POST
+        var formData = new FormData();
+        formData.append("d", CONFIG_DB_ID.toString());
+        formData.append("rid", currentRid.toString());
+        formData.append("sesskey", sesskey);
+        formData.append(targetFieldName, jsonString);
+        formData.append(targetFieldName + "_content1", "1"); // Modo editor por defecto
+        formData.append("saveandview", "Guardar");
+
+        const submitUrl = `${MOODLE_BASE_URL}/mod/data/edit.php?id=${CONFIG_DB_CMID}`;
+
+        try {
+          const res = await fetch(submitUrl, {
+            method: "POST",
+            body: formData,
+            credentials: "include",
+            redirect: "manual"
+          });
+
+          // En fetch, los redirects manuales son detectados por status 0, 303 o type opaqueredirect
+          if (res.status === 303 || res.status === 200 || res.type === "opaqueredirect") {
+            showStatus("✅ Configuración guardada correctamente en la base de datos de Moodle.", "success");
+            // Esperar 2 segundos y recargar para refrescar el estado de Moodle
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          } else {
+            showStatus(`⚠️ Respuesta de servidor inesperada (HTTP ${res.status}). Verifica la configuración en la base de datos.`, "error");
+          }
+        } catch (err) {
+          if (err.message && err.message.includes("opaque")) {
+            // El redirect fue bloqueado/controlado, pero se completó el POST exitosamente
+            showStatus("✅ Configuración guardada correctamente.", "success");
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          } else {
+            console.error("Error al enviar configuración:", err);
+            showStatus(`❌ Error al conectar con Moodle: ${err.message}`, "error");
+          }
+        }
+      });
+
+    })();
+  </script>
+</p>

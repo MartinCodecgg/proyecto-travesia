@@ -1,0 +1,1642 @@
+<p>
+  <script>
+    // Quitar margen del <p> que Moodle crea alrededor del script
+    if (document.currentScript?.parentElement?.tagName === "P") {
+      document.currentScript.parentElement.style.margin = "0";
+    }
+    
+    // Ocultar el título de la página de Moodle lo más rápido posible
+    (function() {
+      var style = document.createElement("style");
+      style.textContent = `
+         h2:first-of-type, .page-header-headings, .activity-header {
+           display: none !important;
+         }
+      `;
+      document.head.appendChild(style);
+    })();
+  </script>
+</p>
+
+<!-- Pantalla Falsa (Seguridad por Oscuridad) -->
+<div id="pantalla-falsa">
+  <p style="font-size: 15px; color: #444; line-height: 1.8;"><strong>Página de pruebaa Moodle</strong></p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est, et nunc <span id="btn-oculto" style="cursor: text;">accumsan</span> vehicula nisi. Mauris placerat eleifend leo, quisque sit amet est et sapien ullamcorper pharetra.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis molestie dictum semper, quam quam congue erat, vitae sodales nisi metus a nunc. Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod sodales, sollicitudin vel, wisi.</p>
+</div>
+
+<!-- Tablero Real -->
+<div id="tablero" style="display: none;">
+  <!-- Estilos del Tablero (removidos de aquí e inyectados dinámicamente mediante JS para evitar la sanitización de Moodle) -->
+
+  <div id="panel-1er-anio-container">
+    <h3>
+      📖 Panel de 1er Año - Gestión de Alumnos Ingresantes
+    </h3>
+
+    <div class="grid-controles">
+      <!-- Carga de Alumnos (CSV A) -->
+      <div class="card-control">
+        <h4>Cargar Alumnos (CSV A)</h4>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <button type="button" id="btn-trigger-csv-a" class="btn-action btn-secondary-action" style="padding: 8px 12px; font-size: 13px;">
+              📁 Seleccionar CSV Alta
+            </button>
+            <span id="name-csv-a" style="font-size: 13px; color: #666; font-style: italic;">Ningún archivo seleccionado</span>
+            <input type="file" id="input-csv-a" accept=".csv" style="opacity: 0; width: 0; height: 0; position: absolute; z-index: -1;" />
+          </div>
+          <div id="preview-csv-a" class="preview-box">
+            <div class="preview-info" id="info-csv-a">Cargado: 0 alumnos.</div>
+            <button id="btn-import-a" class="btn-action" disabled>Confirmar Alta</button>
+          </div>
+          <div id="progress-a" class="progress-bar-container">
+            <div id="fill-a" class="progress-bar-fill"></div>
+          </div>
+          <div id="status-a" class="status-text"></div>
+      </div>
+
+      <!-- Carga de Notas (CSV B) -->
+      <div class="card-control">
+        <h4>Cargar Notas (CSV B)</h4>
+        <div class="input-file-wrapper">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <button type="button" id="btn-trigger-csv-b" class="btn-action btn-secondary-action" style="padding: 8px 12px; font-size: 13px;">
+              📁 Seleccionar CSV Notas
+            </button>
+            <span id="name-csv-b" style="font-size: 13px; color: #666; font-style: italic;">Ningún archivo seleccionado</span>
+            <input type="file" id="input-csv-b" accept=".csv" style="opacity: 0; width: 0; height: 0; position: absolute; z-index: -1;" />
+          </div>
+          <div id="preview-csv-b" class="preview-box">
+            <div class="preview-info" id="info-csv-b">Cargado: 0 notas.</div>
+            <button id="btn-import-b" class="btn-action" disabled>Confirmar Notas</button>
+          </div>
+          <div id="progress-b" class="progress-bar-container">
+            <div id="fill-b" class="progress-bar-fill"></div>
+          </div>
+          <div id="status-b" class="status-text"></div>
+        </div>
+      </div>
+
+      <!-- Acciones de Snapshot -->
+      <div class="card-control">
+        <h4>Historial del Cuatrimestre</h4>
+        <p style="font-size: 13px; color: #666; margin-top: 0;">Guarda una captura de los datos de todos los alumnos correspondientes a este cuatrimestre.</p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button id="btn-guardar-historico" class="btn-action">
+            💾 Guardar Histórico 1er Año
+          </button>
+          <span id="cooldown-timer" style="font-size: 12px; color: #666; font-weight: 500;"></span>
+        </div>
+        <div id="progress-hist" class="progress-bar-container" style="margin-top: 10px;">
+          <div id="fill-hist" class="progress-bar-fill"></div>
+        </div>
+        <div id="status-hist" class="status-text"></div>
+      </div>
+    </div>
+
+    <!-- Sección Tabla de Alumnos -->
+    <div class="section-tabla">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+        <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #495057;">Listado de Alumnos</h4>
+      </div>
+
+      <!-- Fila de Filtros -->
+      <div class="filters-row">
+        <div class="filter-item">
+          <label for="search-student">Buscar alumno (Nombre o DNI)</label>
+          <input type="text" id="search-student" class="filter-input" placeholder="Ej: Perez o 412345..." />
+        </div>
+        <div class="filter-item">
+          <label for="filter-alargamiento-min">Alargamiento Mínimo (%)</label>
+          <input type="number" id="filter-alargamiento-min" class="filter-input" style="width: 100px;" min="0" max="100" />
+        </div>
+        <div class="filter-item">
+          <label for="filter-alargamiento-max">Alargamiento Máximo (%)</label>
+          <input type="number" id="filter-alargamiento-max" class="filter-input" style="width: 100px;" min="0" max="100" />
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table-students" id="table-students-list">
+          <thead>
+            <tr>
+              <th data-sort="id_alumno">DNI ↕</th>
+              <th data-sort="alumno">Nombre ↕</th>
+              <th>Materias</th>
+              <th data-sort="aprobadas">Aprobadas ↕</th>
+              <th data-sort="ralentizacion">Alargamiento ↕</th>
+            </tr>
+          </thead>
+          <tbody id="students-tbody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: #666; padding: 24px;">⏳ Cargando alumnos desde Moodle...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Fila de Paginación -->
+      <div class="pagination-row">
+        <div style="font-size: 13px; color: #666;" id="pagination-info">Mostrando 0-0 de 0 alumnos</div>
+        <div class="pagination-buttons" id="pagination-nav"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>
+  <script>
+    (function() {
+      // Inyectar estilos CSS del tablero dinámicamente para evitar la sanitización de Moodle
+      (function() {
+        const style = document.createElement("style");
+        style.textContent = `
+          #panel-1er-anio-container {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #333;
+            background-color: #fdfdfd;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05);
+          }
+          
+          #panel-1er-anio-container h3 {
+            color: hsl(168, 60%, 35%);
+            font-weight: 700;
+            border-bottom: 2px solid hsl(168, 60%, 90%);
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+          
+          .grid-controles {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+          }
+          
+          @media (max-width: 992px) {
+            .grid-controles {
+              grid-template-columns: 1fr;
+            }
+          }
+          
+          .card-control {
+            background: #ffffff;
+            border: 1px solid #e3e6f0;
+            border-radius: 6px;
+            padding: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+          }
+          
+          .card-control h4 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: hsl(168, 60%, 25%);
+            font-size: 16px;
+            font-weight: 600;
+          }
+          
+          .input-file-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
+          
+          .input-csv-file {
+            border: 1px solid #d1d3e2;
+            border-radius: 6px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            color: #495057;
+            font-size: 13px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+          }
+          
+          .input-csv-file:hover {
+            border-color: hsl(168, 60%, 35%);
+            background: #fff;
+          }
+          
+          .input-csv-file::file-selector-button {
+            background: hsl(168, 60%, 35%);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.15s ease;
+          }
+          
+          .input-csv-file::file-selector-button:hover {
+            background: hsl(168, 60%, 28%);
+          }
+          
+          .btn-action {
+            background: hsl(168, 60%, 35%);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.15s ease;
+          }
+          
+          .btn-action:hover:not(:disabled) {
+            background: hsl(168, 60%, 28%);
+          }
+          
+          .btn-action:disabled {
+            background: #a5c7be;
+            cursor: not-allowed;
+          }
+          
+          .btn-secondary-action {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #ccc;
+          }
+          
+          .btn-secondary-action:hover:not(:disabled) {
+            background: #e9ecef;
+          }
+          
+          /* Previsualización del CSV */
+          .preview-box {
+            margin-top: 12px;
+            background: #fdfdfd;
+            border: 1px solid hsl(168, 60%, 90%);
+            border-radius: 6px;
+            padding: 12px;
+            display: none;
+          }
+          
+          .preview-info {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+          }
+          
+          /* Barra de Progreso y Estados */
+          .progress-bar-container {
+            margin-top: 12px;
+            background-color: #eaecf4;
+            border-radius: 4px;
+            height: 12px;
+            overflow: hidden;
+            display: none;
+          }
+          
+          .progress-bar-fill {
+            height: 100%;
+            background-color: hsl(168, 60%, 35%);
+            width: 0%;
+            transition: width 0.1s ease;
+          }
+          
+          .status-text {
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 6px;
+            color: #555;
+          }
+          
+          /* Filtros y Tabla */
+          .section-tabla {
+            margin-top: 24px;
+            background: white;
+            border: 1px solid #e3e6f0;
+            border-radius: 6px;
+            padding: 16px;
+          }
+          
+          .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+            align-items: flex-end;
+          }
+          
+          .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+          }
+          
+          .filter-item label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+          }
+          
+          .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d3e2;
+            border-radius: 6px;
+            font-size: 14px;
+          }
+          
+          .filter-input:focus {
+            outline: none;
+            border-color: hsl(168, 60%, 35%);
+          }
+          
+          /* Tabla */
+          .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 16px;
+          }
+          
+          .table-students {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+          }
+          
+          .table-students th, .table-students td {
+            padding: 12px;
+            border-bottom: 1px solid #e3e6f0;
+            text-align: left;
+          }
+          
+          .table-students th {
+            background-color: #f8f9fa;
+            font-weight: 700;
+            color: #495057;
+            cursor: pointer;
+            user-select: none;
+          }
+          
+          .table-students th:hover {
+            background-color: #e9ecef;
+          }
+          
+          .table-students tr:hover {
+            background-color: #f8f9fa;
+          }
+          
+          /* Badges */
+          .badge-alargamiento {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 12px;
+          }
+          
+          .badge-red {
+            background-color: #fadbd8;
+            color: #78281f;
+          }
+          
+          .badge-yellow {
+            background-color: #fdebd0;
+            color: #7e5109;
+          }
+          
+          .badge-green {
+            background-color: #d4efdf;
+            color: #145a32;
+          }
+          
+          .badge-neutral {
+            background-color: #ebedef;
+            color: #5d6d7e;
+          }
+          
+          .chip-materia {
+            display: inline-block;
+            background: hsl(168, 60%, 95%);
+            color: hsl(168, 60%, 20%);
+            border: 1px solid hsl(168, 60%, 85%);
+            border-radius: 4px;
+            padding: 2px 6px;
+            margin: 2px;
+            font-size: 12px;
+          }
+          
+          /* Paginación */
+          .pagination-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+          }
+          
+          .pagination-buttons {
+            display: flex;
+            gap: 6px;
+          }
+          
+          .page-btn {
+            padding: 6px 12px;
+            background: #f8f9fa;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+          }
+          
+          .page-btn.active {
+            background: hsl(168, 60%, 35%);
+            color: white;
+            border-color: hsl(168, 60%, 35%);
+          }
+          
+          .page-btn:hover:not(.active):not(:disabled) {
+            background: #e9ecef;
+          }
+          
+          .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        `;
+        document.head.appendChild(style);
+      })();
+
+      // Revelado del tablero con click en accumsan
+      document.getElementById('btn-oculto').addEventListener('click', function() {
+        document.getElementById('pantalla-falsa').style.display = 'none';
+        document.getElementById('tablero').style.display = 'block';
+        initPanel(); // Inicializar el panel al revelar
+      });
+
+      // Configuración de Moodle
+      const MOODLE_BASE_URL = window.location.origin;
+      const DATAID_DB_1ER_ANIO = 19;       // DB 1er Año
+      const DATAID_DB_HIST_1ER_ANIO = 20;  // DB Histórico 1er Año
+      const MATERIAS_ESPERADAS_1ER_ANIO = 7;
+      const COOLDOWN_SNAPSHOT_SEG = 30;
+
+      // Estado de datos en memoria
+      let alumnosCargados = [];
+      let mappedFieldsDB = null;
+      let mappedFieldsHist = null;
+
+      // Variables para paginación, orden y filtros
+      let pageActual = 1;
+      const PAGE_SIZE = 30;
+      let filterText = "";
+      let filterMinAlarg = null;
+      let filterMaxAlarg = null;
+      let colOrden = "alumno";
+      let dirOrden = "asc"; // asc o desc
+
+      // Parsea el JSON almacenado con formato Moodle (limpia etiquetas HTML)
+      function parseCleanJSON(rawText) {
+        if (!rawText) return [];
+        let clean = rawText.replace(/<[^>]*>/g, '');
+        clean = clean.replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"');
+        clean = clean.replace(/\s+/g, ' ').trim();
+        try {
+          return JSON.parse(clean);
+        } catch (e) {
+          console.error("Error al parsear JSON:", rawText, e);
+          return [];
+        }
+      }
+
+      // Busca un valor en un registro de alumno usando palabras clave tolerantes (coincidencia exacta y fallback seguro)
+      function getRecordValueByKeyword(record, keywords) {
+        if (!record) return undefined;
+        const keys = Object.keys(record);
+        
+        // 1. Intentar coincidencia exacta normalizada
+        for (let key of keys) {
+          const normalizedKey = key.toLowerCase()
+                                   .normalize("NFD")
+                                   .replace(/[\u0300-\u036f]/g, "")
+                                   .replace(/[^a-z0-9]/g, "");
+          for (let kw of keywords) {
+            const normalizedKw = kw.toLowerCase()
+                                   .normalize("NFD")
+                                   .replace(/[\u0300-\u036f]/g, "")
+                                   .replace(/[^a-z0-9]/g, "");
+            if (normalizedKey === normalizedKw) {
+              return record[key];
+            }
+          }
+        }
+        
+        // 2. Fallback: coincidencia parcial (evitando colisión de 'alumno' en 'idalumno')
+        for (let key of keys) {
+          const normalizedKey = key.toLowerCase()
+                                   .normalize("NFD")
+                                   .replace(/[\u0300-\u036f]/g, "")
+                                   .replace(/[^a-z0-9]/g, "");
+          for (let kw of keywords) {
+            const normalizedKw = kw.toLowerCase()
+                                   .normalize("NFD")
+                                   .replace(/[\u0300-\u036f]/g, "")
+                                   .replace(/[^a-z0-9]/g, "");
+            if (normalizedKw === "alumno" && normalizedKey.includes("idalumno")) {
+              continue;
+            }
+            if (normalizedKey.includes(normalizedKw)) {
+              return record[key];
+            }
+          }
+        }
+        return undefined;
+      }
+
+      // Parsea los alumnos de la respuesta HTML de Moodle
+      function parseDatabaseHTML(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Usamos .defaulttemplate-listentry como wrapper principal (contiene datos Y el menú de acciones con rid)
+        let targets = Array.from(doc.querySelectorAll('.defaulttemplate-listentry'));
+        
+        // Fallback: si no hay listentry, buscar cards genéricas
+        if (targets.length === 0) {
+          targets = Array.from(doc.querySelectorAll('.card'));
+        }
+
+        const records = [];
+        
+        targets.forEach(wrapper => {
+          const fields = {};
+          
+          // Leer los campos de datos del hijo .defaulttemplate-list-body
+          const body = wrapper.querySelector('.defaulttemplate-list-body') || wrapper;
+          const rows = body.querySelectorAll('.row, div');
+          rows.forEach(row => {
+            const labelEl = row.querySelector('.font-weight-bold');
+            if (labelEl) {
+              const key = labelEl.textContent.trim().toLowerCase();
+              const valEl = row.querySelector('.col-8, .col-lg-9, p.mt-2, .data-field-html');
+              if (valEl) {
+                fields[key] = valEl.textContent.trim();
+              } else {
+                const nextEl = labelEl.nextElementSibling;
+                if (nextEl) {
+                  fields[key] = nextEl.textContent.trim();
+                }
+              }
+            }
+          });
+          
+          // Extraer rid del menú de acciones (que está en el mismo wrapper .defaulttemplate-listentry)
+          // Los links del dropdown de acciones contienen rid= en su href
+          let extractedRid = null;
+          const actionLinks = wrapper.querySelectorAll('.dropdown-menu a[href*="rid="], a.dropdown-item[href*="rid="]');
+          for (let link of actionLinks) {
+            const href = link.href || link.getAttribute('href') || '';
+            const match = href.match(/(?:&|&amp;|\?)rid=(\d+)/);
+            if (match) {
+              extractedRid = match[1];
+              break;
+            }
+          }
+          
+          // Fallback: buscar rid= en cualquier link del wrapper
+          if (!extractedRid) {
+            const allLinks = wrapper.querySelectorAll('a');
+            for (let link of allLinks) {
+              const href = link.href || link.getAttribute('href') || '';
+              const match = href.match(/(?:&|&amp;|\?)rid=(\d+)/);
+              if (match) {
+                extractedRid = match[1];
+                break;
+              }
+            }
+          }
+          
+          // Fallback: regex directa sobre innerHTML del wrapper completo
+          if (!extractedRid) {
+            const match = wrapper.innerHTML.match(/[?&]rid=(\d+)/);
+            if (match) extractedRid = match[1];
+          }
+          
+          if (extractedRid) {
+            fields.rid = extractedRid;
+          }
+          
+          if (Object.keys(fields).length > 0) {
+            records.push(fields);
+          }
+        });
+        
+        // Desduplicar registros finales por 'rid' y por 'id_alumno' (DNI)
+        const uniqueRecords = [];
+        const seenRids = new Set();
+        const seenDnis = new Set();
+        
+        records.forEach(r => {
+          const ridKey = r.rid || null;
+          const dniKey = getRecordValueByKeyword(r, ['id_alumno', 'dni', 'documento']) || null;
+          
+          let isDuplicate = false;
+          if (ridKey && seenRids.has(ridKey)) isDuplicate = true;
+          if (dniKey && seenDnis.has(dniKey)) isDuplicate = true;
+          
+          if (!isDuplicate) {
+            if (ridKey) seenRids.add(ridKey);
+            if (dniKey) seenDnis.add(dniKey);
+            uniqueRecords.push(r);
+          }
+        });
+        
+        return uniqueRecords;
+      }
+
+      // Obtiene sesskey
+      function getSesskey() {
+        if (window.M && M.cfg && M.cfg.sesskey) return M.cfg.sesskey;
+        const meta = document.querySelector('meta[name="sesskey"]');
+        if (meta) return meta.getAttribute("content");
+        const input = document.querySelector('input[name="sesskey"]');
+        if (input) return input.value;
+        const link = document.querySelector('a[href*="sesskey="]');
+        if (link) {
+          const match = link.href.match(/sesskey=([a-zA-Z0-9]+)/);
+          if (match) return match[1];
+        }
+        return null;
+      }
+
+      // Carga todos los registros de la DB paginada en Moodle
+      async function fetchAllDatabaseEntries(dataId) {
+        const baseUrl = `${MOODLE_BASE_URL}/mod/data/view.php?d=${dataId}&perpage=1000`;
+        const response = await fetch(baseUrl);
+        const html = await response.text();
+        let entries = parseDatabaseHTML(html);
+        
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const pageLinks = doc.querySelectorAll('a[href*="page="]');
+        const pageNumbers = [];
+        pageLinks.forEach(link => {
+          const match = link.href.match(/page=(\d+)/);
+          if (match) pageNumbers.push(parseInt(match[1]));
+        });
+        
+        if (pageNumbers.length > 0) {
+          const maxPage = Math.max(...pageNumbers);
+          const promises = [];
+          for (let p = 1; p <= maxPage; p++) {
+            promises.push(
+              fetch(`${MOODLE_BASE_URL}/mod/data/view.php?d=${dataId}&perpage=1000&page=${p}`)
+                .then(r => r.text())
+                .then(pageHtml => parseDatabaseHTML(pageHtml))
+            );
+          }
+          const restResults = await Promise.all(promises);
+          restResults.forEach(res => {
+            entries = entries.concat(res);
+          });
+        }
+        return entries;
+      }
+
+      // Carga todos los registros históricos SIN deduplicar por DNI.
+      // La DB histórica puede tener N entradas por alumno (una por cuatrimestre),
+      // por lo que la deduplicación por DNI de parseDatabaseHTML no aplica aquí.
+      async function fetchAllHistoricoEntries(dataId) {
+        const baseUrl = `${MOODLE_BASE_URL}/mod/data/view.php?d=${dataId}&perpage=1000`;
+        const response = await fetch(baseUrl);
+        const html = await response.text();
+        
+        // Parsear sin deduplicar por DNI
+        function parseHistoricoHTML(htmlStr) {
+          const p = new DOMParser();
+          const d = p.parseFromString(htmlStr, 'text/html');
+          let targets = Array.from(d.querySelectorAll('.defaulttemplate-listentry'));
+          if (targets.length === 0) targets = Array.from(d.querySelectorAll('.card'));
+          const records = [];
+          targets.forEach(wrapper => {
+            const fields = {};
+            const body = wrapper.querySelector('.defaulttemplate-list-body') || wrapper;
+            const rows = body.querySelectorAll('.row, div');
+            rows.forEach(row => {
+              const labelEl = row.querySelector('.font-weight-bold');
+              if (labelEl) {
+                const key = labelEl.textContent.trim().toLowerCase();
+                const valEl = row.querySelector('.col-8, .col-lg-9, p.mt-2, .data-field-html');
+                if (valEl) { fields[key] = valEl.textContent.trim(); }
+                else { const nx = labelEl.nextElementSibling; if (nx) fields[key] = nx.textContent.trim(); }
+              }
+            });
+            // Extraer rid
+            let rid = null;
+            const links = wrapper.querySelectorAll('a[href*="rid="]');
+            for (let lk of links) {
+              const m = (lk.href || lk.getAttribute('href') || '').match(/(?:&|&amp;|\?)rid=(\d+)/);
+              if (m) { rid = m[1]; break; }
+            }
+            if (!rid) {
+              const m = wrapper.innerHTML.match(/[?&]rid=(\d+)/);
+              if (m) rid = m[1];
+            }
+            if (rid) fields.rid = rid;
+            if (Object.keys(fields).length > 0) records.push(fields);
+          });
+          // Solo deduplicar por rid (no por DNI)
+          const seenRids = new Set();
+          return records.filter(r => {
+            if (r.rid && seenRids.has(r.rid)) return false;
+            if (r.rid) seenRids.add(r.rid);
+            return true;
+          });
+        }
+
+        let entries = parseHistoricoHTML(html);
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const pageNumbers = [];
+        doc.querySelectorAll('a[href*="page="]').forEach(link => {
+          const m = link.href.match(/page=(\d+)/);
+          if (m) pageNumbers.push(parseInt(m[1]));
+        });
+        if (pageNumbers.length > 0) {
+          const maxPage = Math.max(...pageNumbers);
+          const promises = [];
+          for (let p = 1; p <= maxPage; p++) {
+            promises.push(
+              fetch(`${MOODLE_BASE_URL}/mod/data/view.php?d=${dataId}&perpage=1000&page=${p}`)
+                .then(r => r.text())
+                .then(ph => parseHistoricoHTML(ph))
+            );
+          }
+          const rest = await Promise.all(promises);
+          rest.forEach(res => { entries = entries.concat(res); });
+        }
+        return entries;
+      }
+
+      // Obtiene el mapeo dinámico de campos
+      async function getFieldMapping(dataId) {
+        const url = `${MOODLE_BASE_URL}/mod/data/edit.php?d=${dataId}`;
+        const response = await fetch(url);
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const mapping = {};
+        
+        // Mapeo por labels del input
+        const labels = doc.querySelectorAll('label[for^="field_"]');
+        labels.forEach(label => {
+          const labelText = label.textContent.trim().toLowerCase();
+          const forAttr = label.getAttribute('for');
+          const match = forAttr.match(/field_(\d+)/);
+          if (match && labelText) {
+            mapping[labelText] = match[1];
+          }
+        });
+        
+        // Fallback por contenedores
+        const boldLabels = doc.querySelectorAll('.font-weight-bold');
+        boldLabels.forEach(label => {
+          const labelText = label.textContent.trim().toLowerCase();
+          if (mapping[labelText]) return;
+          
+          let parent = label.parentElement;
+          let input = null;
+          for (let depth = 0; depth < 3 && parent; depth++) {
+            input = parent.querySelector('[name^="field_"], [id^="field_"]');
+            if (input) break;
+            parent = parent.parentElement;
+          }
+          
+          if (input) {
+            const nameOrId = input.name || input.id;
+            const match = nameOrId.match(/field_(\d+)/);
+            if (match) {
+              mapping[labelText] = match[1];
+            }
+          }
+        });
+        
+        return mapping;
+      }
+
+      // Calcula cuatrimestre actual
+      function getCuatrimestreActual() {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = date.getMonth(); // 0 a 11
+        const cuat = month <= 6 ? 1 : 2;
+        return `${year}-${cuat}`;
+      }
+
+      // Busca un ID de campo de Moodle a partir de palabras clave (coincidencia exacta y fallback seguro)
+      function getFieldIdByKeyword(mapping, keywords) {
+        if (!mapping) return "";
+        const keys = Object.keys(mapping);
+        
+        // 1. Intentar coincidencia exacta normalizada
+        for (let key of keys) {
+          const normalizedKey = key.toLowerCase()
+                                   .normalize("NFD")
+                                   .replace(/[\u0300-\u036f]/g, "")
+                                   .replace(/[^a-z0-9]/g, "");
+          for (let kw of keywords) {
+            const normalizedKw = kw.toLowerCase()
+                                   .normalize("NFD")
+                                   .replace(/[\u0300-\u036f]/g, "")
+                                   .replace(/[^a-z0-9]/g, "");
+            if (normalizedKey === normalizedKw) {
+              return mapping[key];
+            }
+          }
+        }
+        
+        // 2. Fallback: coincidencia parcial (evitando colisión de 'alumno' en 'idalumno')
+        for (let key of keys) {
+          const normalizedKey = key.toLowerCase()
+                                   .normalize("NFD")
+                                   .replace(/[\u0300-\u036f]/g, "")
+                                   .replace(/[^a-z0-9]/g, "");
+          for (let kw of keywords) {
+            const normalizedKw = kw.toLowerCase()
+                                   .normalize("NFD")
+                                   .replace(/[\u0300-\u036f]/g, "")
+                                   .replace(/[^a-z0-9]/g, "");
+            if (normalizedKw === "alumno" && normalizedKey.includes("idalumno")) {
+              continue;
+            }
+            if (normalizedKey.includes(normalizedKw)) {
+              return mapping[key];
+            }
+          }
+        }
+        return "";
+      }
+
+      // Inicializa los datos del panel
+      async function initPanel() {
+        try {
+          // Cargar alumnos y resolver mapeo en paralelo
+          const [alumnos, fields] = await Promise.all([
+            fetchAllDatabaseEntries(DATAID_DB_1ER_ANIO),
+            getFieldMapping(DATAID_DB_1ER_ANIO)
+          ]);
+          
+          alumnosCargados = alumnos;
+          
+          // Mapear los nombres de campos de forma flexible y tolerante a palabras clave
+          mappedFieldsDB = {
+            id_alumno: getFieldIdByKeyword(fields, ['id_alumno', 'dni', 'documento']),
+            alumno: getFieldIdByKeyword(fields, ['alumno', 'nombre', 'estudiante']),
+            anio_ingreso: getFieldIdByKeyword(fields, ['anio_ingreso', 'ano_ingreso', 'año_ingreso', 'anio', 'año']),
+            cuatrimestre_ingreso: getFieldIdByKeyword(fields, ['cuatrimestre_ingreso', 'cuatrimestre']),
+            aprobadas: getFieldIdByKeyword(fields, ['aprobadas', 'materias_aprobadas']),
+            ralentizacion: getFieldIdByKeyword(fields, ['ralentizacion', 'alargamiento']),
+            materias: getFieldIdByKeyword(fields, ['materias', 'notas', 'materias_json'])
+          };
+          
+          renderTable();
+          setupEventListeners();
+        } catch (e) {
+          console.error("Error al iniciar el tablero:", e);
+          document.getElementById('students-tbody').innerHTML = 
+            `<tr><td colspan="5" style="text-align: center; color: #c0392b; padding: 24px; font-weight: bold;">❌ Error al conectar con la base de datos de Moodle. Recarga la página.</td></tr>`;
+        }
+      }
+
+      // Setup de Event Listeners
+      let fileAData = [];
+      let fileBData = [];
+
+      function setupEventListeners() {
+        const container = document.getElementById('panel-1er-anio-container');
+        if (!container || container.dataset.listenersReady === "true") return;
+        container.dataset.listenersReady = "true";
+        // Disparadores premium en español
+        document.getElementById('btn-trigger-csv-a').addEventListener('click', () => {
+          document.getElementById('input-csv-a').click();
+        });
+        document.getElementById('btn-trigger-csv-b').addEventListener('click', () => {
+          document.getElementById('input-csv-b').click();
+        });
+
+        // Selector CSV A
+        const inputA = document.getElementById('input-csv-a');
+        inputA.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+          
+          document.getElementById('name-csv-a').textContent = file.name;
+          
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            const parsed = parseCSV(evt.target.result);
+            fileAData = parsed;
+            
+            // Validar que tenga las columnas correctas
+            if (parsed.length > 0 && parsed[0].hasOwnProperty('id_alumno') && parsed[0].hasOwnProperty('alumno')) {
+              document.getElementById('info-csv-a').textContent = `Detectados: ${parsed.length} alumnos para dar de alta.`;
+              document.getElementById('preview-csv-a').style.display = 'block';
+              document.getElementById('btn-import-a').disabled = false;
+            } else {
+              document.getElementById('info-csv-a').textContent = `❌ Formato inválido. Debe tener columnas: id_alumno, alumno, año, cuatrimestre.`;
+              document.getElementById('preview-csv-a').style.display = 'block';
+              document.getElementById('btn-import-a').disabled = true;
+            }
+          };
+          reader.readAsText(file, "UTF-8");
+        });
+
+        // Selector CSV B
+        const inputB = document.getElementById('input-csv-b');
+        inputB.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+          
+          document.getElementById('name-csv-b').textContent = file.name;
+          
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            const parsed = parseCSV(evt.target.result);
+            fileBData = parsed;
+            
+            // Validar columnas
+            if (parsed.length > 0 && parsed[0].hasOwnProperty('id_alumno') && parsed[0].hasOwnProperty('materia') && parsed[0].hasOwnProperty('nota')) {
+              document.getElementById('info-csv-b').textContent = `Detectados: ${parsed.length} materias/notas registradas.`;
+              document.getElementById('preview-csv-b').style.display = 'block';
+              document.getElementById('btn-import-b').disabled = false;
+            } else {
+              document.getElementById('info-csv-b').textContent = `❌ Formato inválido. Debe tener columnas: id_alumno, materia, nota.`;
+              document.getElementById('preview-csv-b').style.display = 'block';
+              document.getElementById('btn-import-b').disabled = true;
+            }
+          };
+          reader.readAsText(file, "UTF-8");
+        });
+
+        // Botón Importar A
+        document.getElementById('import-actions-a')?.remove(); // Evitar duplicaciones
+        const btnImportA = document.getElementById('btn-import-a');
+        btnImportA.addEventListener('click', async function() {
+          btnImportA.disabled = true;
+          document.getElementById('progress-a').style.display = 'block';
+          const fill = document.getElementById('fill-a');
+          const status = document.getElementById('status-a');
+          
+          status.style.color = '#555';
+          status.textContent = '⏳ Iniciando importación...';
+          
+          // Filtrar los que no existen (comparación robusta)
+          const existentes = new Set(alumnosCargados.map(a => {
+            const val = getRecordValueByKeyword(a, ['id_alumno', 'dni', 'documento']);
+            return val ? val.toString().replace(/[^\d]/g, '') : "";
+          }));
+          const nuevos = fileAData.filter(row => {
+            const dniVal = getRecordValueByKeyword(row, ['id_alumno', 'dni', 'documento']);
+            if (!dniVal) return false;
+            const cleanDni = dniVal.toString().replace(/[^\d]/g, '');
+            return !existentes.has(cleanDni);
+          });
+          
+          if (nuevos.length === 0) {
+            status.style.color = '#27ae60';
+            status.textContent = '✅ Todos los alumnos del CSV ya existen en el sistema.';
+            fill.style.width = '100%';
+            return;
+          }
+
+          let correctos = 0;
+          let fallidos = 0;
+          const sesskey = getSesskey();
+
+          for (let i = 0; i < nuevos.length; i++) {
+            const row = nuevos[i];
+            const alumnoVal = getRecordValueByKeyword(row, ['alumno', 'nombre', 'estudiante']) || "Alumno";
+            status.textContent = `⏳ Subiendo alumno: ${alumnoVal} (${i+1}/${nuevos.length})...`;
+            
+            const formData = new FormData();
+            formData.append("d", DATAID_DB_1ER_ANIO.toString());
+            formData.append("rid", "0");
+            formData.append("sesskey", sesskey);
+            formData.append("saveandview", "Guardar");
+            
+            const dniVal = getRecordValueByKeyword(row, ['id_alumno', 'dni', 'documento']) || "";
+            const anioVal = row.ano || row.anio || row.anio_ingreso || new Date().getFullYear().toString();
+            const cuatVal = row.cuatrimestre || row.cuatrimestre_ingreso || "1";
+
+            formData.append("field_" + mappedFieldsDB.id_alumno, dniVal);
+            formData.append("field_" + mappedFieldsDB.alumno, alumnoVal);
+            formData.append("field_" + mappedFieldsDB.anio_ingreso, anioVal);
+            formData.append("field_" + mappedFieldsDB.cuatrimestre_ingreso, cuatVal);
+            formData.append("field_" + mappedFieldsDB.aprobadas, "0");
+            formData.append("field_" + mappedFieldsDB.ralentizacion, "100");
+            formData.append("field_" + mappedFieldsDB.materias, "[]");
+
+            try {
+              const res = await fetch(`${MOODLE_BASE_URL}/mod/data/edit.php`, {
+                method: "POST",
+                body: formData,
+                credentials: "include"
+              });
+              if (res.status === 200 || res.status === 303 || res.type === "opaqueredirect") {
+                correctos++;
+              } else {
+                fallidos++;
+              }
+            } catch (err) {
+              fallidos++;
+            }
+
+            // Barra de progreso
+            const percent = Math.round(((i + 1) / nuevos.length) * 100);
+            fill.style.width = percent + '%';
+            
+            // Delay de 500ms
+            await new Promise(r => setTimeout(r, 500));
+          }
+
+          status.style.color = fallidos === 0 ? '#27ae60' : '#c0392b';
+          status.textContent = `✅ Finalizado. Exitosos: ${correctos}. Fallidos: ${fallidos}.`;
+          
+          // Recargar tabla
+          initPanel();
+        });
+
+        // Botón Importar B
+        const btnImportB = document.getElementById('btn-import-b');
+        btnImportB.addEventListener('click', async function() {
+          btnImportB.disabled = true;
+          document.getElementById('progress-b').style.display = 'block';
+          const fill = document.getElementById('fill-b');
+          const status = document.getElementById('status-b');
+          
+          status.style.color = '#555';
+          status.textContent = '⏳ Procesando notas...';
+          
+          console.log("=== INICIANDO IMPORTACIÓN DE NOTAS (CSV B) ===");
+          console.log("Registros leídos del CSV B (fileBData):", fileBData);
+          console.log("Alumnos cargados desde la base de datos de Moodle:", alumnosCargados);
+
+          // Agrupar las materias y notas por id_alumno (DNI)
+          const notasPorAlumno = {};
+          fileBData.forEach(row => {
+            const dniVal = getRecordValueByKeyword(row, ['id_alumno', 'dni', 'documento']);
+            const materiaVal = getRecordValueByKeyword(row, ['materia', 'asignatura']);
+            const notaVal = getRecordValueByKeyword(row, ['nota', 'calificacion']);
+            
+            if (!dniVal || !materiaVal || !notaVal) {
+              console.warn("Fila omitida en parseo de CSV B por datos faltantes:", row);
+              return;
+            }
+            const cleanDni = dniVal.toString().replace(/[^\d]/g, '');
+            if (!notasPorAlumno[cleanDni]) {
+              notasPorAlumno[cleanDni] = [];
+            }
+            notasPorAlumno[cleanDni].push({
+              materia: materiaVal,
+              nota: parseFloat(notaVal)
+            });
+          });
+
+          console.log("Notas agrupadas por DNI de alumno (dígitos limpios):", notasPorAlumno);
+
+          // Obtener alumnos actuales para mapear sus rids y datos previos
+          const totalAlumnos = Object.keys(notasPorAlumno);
+          let correctos = 0;
+          let fallidos = 0;
+          const sesskey = getSesskey();
+
+          console.log("Lista de DNIs únicos a procesar:", totalAlumnos);
+          console.log("Estado de RIDs en alumnosCargados:", alumnosCargados.map(a => ({
+            dni: getRecordValueByKeyword(a, ['id_alumno', 'dni', 'documento']),
+            rid: a.rid,
+            tieneRid: !!a.rid,
+            todasLasClaves: Object.keys(a)
+          })));
+
+          for (let i = 0; i < totalAlumnos.length; i++) {
+            const idAlumno = totalAlumnos[i];
+            
+            // Comparación de DNIs extremadamente robusta e insensible a espacios y nombres de columnas usando sólo dígitos
+            const cleanIdAlumno = idAlumno.toString().replace(/[^\d]/g, '');
+            const alumnoDB = alumnosCargados.find(a => {
+              const dniVal = getRecordValueByKeyword(a, ['id_alumno', 'dni', 'documento']);
+              if (!dniVal) return false;
+              const cleanDniDB = dniVal.toString().replace(/[^\d]/g, '');
+              return cleanDniDB === cleanIdAlumno;
+            });
+            
+            console.log(`[Registro ${i+1}/${totalAlumnos.length}] Buscando DNI: "${idAlumno}" (Limpio: "${cleanIdAlumno}")... Encontrado: ${!!alumnoDB}, RID: ${alumnoDB ? alumnoDB.rid : 'N/A'}`);
+
+            if (!alumnoDB) {
+              console.error(`[FALLO - NO ENCONTRADO] No hay alumno con DNI "${cleanIdAlumno}" en alumnosCargados.`);
+              fallidos++;
+              continue;
+            }
+            
+            if (!alumnoDB.rid) {
+              console.error(`[FALLO - SIN RID] Alumno con DNI "${cleanIdAlumno}" encontrado PERO sin RID. Datos del alumno:`, alumnoDB);
+              fallidos++;
+              continue;
+            }
+
+            console.log(`[ÉXITO] Alumno encontrado: "${alumnoDB.alumno || 'Sin Nombre'}" (RID: ${alumnoDB.rid})`);
+
+            status.textContent = `⏳ Actualizando notas del alumno con DNI ${idAlumno} (${i+1}/${totalAlumnos.length})...`;
+            
+            // Materias previas
+            const materiasVal = getRecordValueByKeyword(alumnoDB, ['materias', 'notas', 'materias_json']);
+            let materiasArray = parseCleanJSON(materiasVal);
+            console.log("  Materias previas en DB:", materiasArray);
+            
+            // Merge con las notas del CSV (sobrescribe si coincide el nombre de la materia)
+            const nuevasNotas = notasPorAlumno[idAlumno];
+            console.log("  Nuevas notas a incorporar:", nuevasNotas);
+            nuevasNotas.forEach(nueva => {
+              const prevIndex = materiasArray.findIndex(m => m.materia.trim().toLowerCase() === nueva.materia.trim().toLowerCase());
+              if (prevIndex > -1) {
+                materiasArray[prevIndex].nota = nueva.nota;
+              } else {
+                materiasArray.push(nueva);
+              }
+            });
+
+            console.log("  Listado final de materias combinado:", materiasArray);
+
+            // Recalcular aprobadas (nota >= 5) y alargamiento
+            const aprobadas = materiasArray.filter(m => m.nota >= 5).length;
+            const alargamiento = Math.max(0, Math.round((1 - (aprobadas / MATERIAS_ESPERADAS_1ER_ANIO)) * 100));
+
+            console.log(`  Cálculos: aprobadas=${aprobadas}, alargamiento=${alargamiento}%`);
+
+            // Guardar en Moodle
+            const formData = new FormData();
+            formData.append("d", DATAID_DB_1ER_ANIO.toString());
+            formData.append("rid", alumnoDB.rid);
+            formData.append("sesskey", sesskey);
+            formData.append("saveandview", "Guardar");
+            
+            // Re-enviar datos obligatorios o estables
+            const dniVal = getRecordValueByKeyword(alumnoDB, ['id_alumno', 'dni', 'documento']) || "";
+            const nombreVal = getRecordValueByKeyword(alumnoDB, ['alumno', 'nombre', 'estudiante']) || "";
+            const anioVal = getRecordValueByKeyword(alumnoDB, ['anio_ingreso', 'ano_ingreso', 'año_ingreso', 'anio', 'año']) || "";
+            const cuatVal = getRecordValueByKeyword(alumnoDB, ['cuatrimestre_ingreso', 'cuatrimestre']) || "";
+
+            formData.append("field_" + mappedFieldsDB.id_alumno, dniVal);
+            formData.append("field_" + mappedFieldsDB.alumno, nombreVal);
+            formData.append("field_" + mappedFieldsDB.anio_ingreso, anioVal);
+            formData.append("field_" + mappedFieldsDB.cuatrimestre_ingreso, cuatVal);
+            
+            // Campos calculados
+            formData.append("field_" + mappedFieldsDB.aprobadas, aprobadas.toString());
+            formData.append("field_" + mappedFieldsDB.ralentizacion, alargamiento.toString());
+            formData.append("field_" + mappedFieldsDB.materias, JSON.stringify(materiasArray));
+
+            console.log("  Enviando petición POST a edit.php con FormData...");
+
+            try {
+              const res = await fetch(`${MOODLE_BASE_URL}/mod/data/edit.php`, {
+                method: "POST",
+                body: formData,
+                credentials: "include"
+              });
+              console.log(`  Respuesta de Moodle: Status=${res.status}, Type=${res.type}`);
+              if (res.status === 200 || res.status === 303 || res.type === "opaqueredirect") {
+                correctos++;
+              } else {
+                console.error("  Error en respuesta de Moodle al guardar.");
+                fallidos++;
+              }
+            } catch (err) {
+              console.error("  Excepción de red al enviar a Moodle:", err);
+              fallidos++;
+            }
+
+            const percent = Math.round(((i + 1) / totalAlumnos.length) * 100);
+            fill.style.width = percent + '%';
+            
+            await new Promise(r => setTimeout(r, 500));
+          }
+
+          status.style.color = fallidos === 0 ? '#27ae60' : '#c0392b';
+          status.textContent = `✅ Finalizado. Exitosos: ${correctos}. Fallidos: ${fallidos}.`;
+          
+          initPanel();
+        });
+
+        // Botón Guardar Histórico
+        const btnHist = document.getElementById('btn-guardar-historico');
+        btnHist.addEventListener('click', async function() {
+          btnHist.disabled = true;
+          document.getElementById('progress-hist').style.display = 'block';
+          const fill = document.getElementById('fill-hist');
+          const status = document.getElementById('status-hist');
+          
+          status.style.color = '#555';
+          status.textContent = '⏳ Obteniendo mapeo de campos y registros históricos existentes...';
+          fill.style.width = '5%';
+
+          const cuatActual = getCuatrimestreActual();
+          let fieldsHist, registrosHist;
+
+          // Paso 1: Obtener mapeo de campos y registros existentes en paralelo
+          try {
+            [fieldsHist, registrosHist] = await Promise.all([
+              getFieldMapping(DATAID_DB_HIST_1ER_ANIO),
+              fetchAllHistoricoEntries(DATAID_DB_HIST_1ER_ANIO)
+            ]);
+          } catch(err) {
+            status.style.color = '#c0392b';
+            status.textContent = '❌ Error al consultar la base de datos histórica: ' + err.message;
+            btnHist.disabled = false;
+            return;
+          }
+
+          // Mapear campos del formulario histórico
+          mappedFieldsHist = {
+            id_alumno:      getFieldIdByKeyword(fieldsHist, ['id_alumno', 'dni', 'documento']),
+            alumno:         getFieldIdByKeyword(fieldsHist, ['alumno', 'nombre', 'estudiante']),
+            cuatrimestre:   getFieldIdByKeyword(fieldsHist, ['cuatrimestre']),
+            fecha_snapshot: getFieldIdByKeyword(fieldsHist, ['fecha_snapshot', 'fecha']),
+            aprobadas:      getFieldIdByKeyword(fieldsHist, ['aprobadas', 'materias_aprobadas']),
+            ralentizacion:  getFieldIdByKeyword(fieldsHist, ['ralentizacion', 'alargamiento']),
+            materias:       getFieldIdByKeyword(fieldsHist, ['materias', 'notas', 'materias_json'])
+          };
+
+          // Paso 2: Construir mapa de búsqueda: "DNI|cuatrimestre" → rid
+          // Esto permite encontrar si ya existe un snapshot de este alumno en este cuatrimestre
+          const claveArid = new Map();
+          for (const reg of registrosHist) {
+            const dniHist  = (getRecordValueByKeyword(reg, ['id_alumno', 'dni', 'documento']) || '').trim();
+            const cuatHist = (getRecordValueByKeyword(reg, ['cuatrimestre']) || '').trim();
+            const ridHist  = reg.rid;
+            if (dniHist && cuatHist && ridHist) {
+              claveArid.set(`${dniHist}|${cuatHist}`, ridHist);
+            }
+          }
+
+          console.log(`[Histórico] Registros existentes en DB: ${registrosHist.length}. Entradas para cuatrimestre ${cuatActual}: ${[...claveArid.keys()].filter(k => k.endsWith('|' + cuatActual)).length}.`);
+
+          // Paso 3: Filtrar alumnos activos válidos
+          const alumnosAHistorial = alumnosCargados.filter(a => {
+            const dniVal    = getRecordValueByKeyword(a, ['id_alumno', 'dni', 'documento']);
+            const nombreVal = getRecordValueByKeyword(a, ['alumno', 'nombre', 'estudiante']);
+            return dniVal && nombreVal;
+          });
+
+          if (alumnosAHistorial.length === 0) {
+            status.style.color = '#e67e22';
+            status.textContent = '⚠️ No hay alumnos válidos para registrar en el histórico.';
+            fill.style.width = '100%';
+            activarCooldownSnapshot();
+            return;
+          }
+
+          // Paso 4: Sincronizar cada alumno
+          let creados = 0;
+          let actualizados = 0;
+          let omitidos = 0;
+          let fallidos = 0;
+          const sesskey = getSesskey();
+          const fechaSnapshot = new Date().toISOString().split('T')[0];
+
+          for (let i = 0; i < alumnosAHistorial.length; i++) {
+            const al = alumnosAHistorial[i];
+            const dniVal          = (getRecordValueByKeyword(al, ['id_alumno', 'dni', 'documento']) || '').trim();
+            const alumnoVal       = getRecordValueByKeyword(al, ['alumno', 'nombre', 'estudiante']) || 'Alumno';
+            const aprobadasVal    = getRecordValueByKeyword(al, ['aprobadas', 'materias_aprobadas']) || '0';
+            const ralentizacionVal = getRecordValueByKeyword(al, ['ralentizacion', 'alargamiento']) || '100';
+            const materiasVal     = getRecordValueByKeyword(al, ['materias', 'notas', 'materias_json']) || '[]';
+
+            // Determinar si crear (rid=0) o actualizar (rid existente)
+            const claveAlumno = `${dniVal}|${cuatActual}`;
+            const ridExistente = claveArid.get(claveAlumno);
+            const esActualizacion = !!ridExistente;
+
+            status.textContent = `⏳ ${esActualizacion ? 'Actualizando' : 'Creando'} snapshot: ${alumnoVal} (${i+1}/${alumnosAHistorial.length})...`;
+
+            const formData = new FormData();
+            formData.append('d', DATAID_DB_HIST_1ER_ANIO.toString());
+            formData.append('rid', esActualizacion ? ridExistente : '0');
+            formData.append('sesskey', sesskey);
+            formData.append('saveandview', 'Guardar');
+
+            formData.append('field_' + mappedFieldsHist.id_alumno,      dniVal);
+            formData.append('field_' + mappedFieldsHist.alumno,          alumnoVal);
+            formData.append('field_' + mappedFieldsHist.cuatrimestre,    cuatActual);
+            formData.append('field_' + mappedFieldsHist.fecha_snapshot,  fechaSnapshot);
+            formData.append('field_' + mappedFieldsHist.aprobadas,       aprobadasVal);
+            formData.append('field_' + mappedFieldsHist.ralentizacion,   ralentizacionVal);
+            if (mappedFieldsHist.materias) {
+              formData.append('field_' + mappedFieldsHist.materias,     materiasVal);
+            }
+
+            try {
+              const res = await fetch(`${MOODLE_BASE_URL}/mod/data/edit.php`, {
+                method: 'POST',
+                body: formData,
+                credentials: 'include'
+              });
+              if (res.status === 200 || res.status === 303 || res.type === 'opaqueredirect') {
+                if (esActualizacion) actualizados++; else creados++;
+              } else {
+                fallidos++;
+                console.error(`[Histórico] Fallo HTTP ${res.status} para alumno ${dniVal}`);
+              }
+            } catch (err) {
+              fallidos++;
+              console.error(`[Histórico] Error de red para alumno ${dniVal}:`, err);
+            }
+
+            const percent = Math.round(((i + 1) / alumnosAHistorial.length) * 100);
+            fill.style.width = percent + '%';
+
+            await new Promise(r => setTimeout(r, 400));
+          }
+
+          const resumen = `✅ Histórico sincronizado. Nuevos: ${creados} | Actualizados: ${actualizados} | Fallidos: ${fallidos}.`;
+          status.style.color = fallidos === 0 ? '#27ae60' : '#c0392b';
+          status.textContent = resumen;
+          console.log('[Histórico]', resumen);
+
+          activarCooldownSnapshot();
+        });
+
+        // Filtros e inputs de búsqueda
+        const searchInput = document.getElementById('search-student');
+        searchInput.addEventListener('input', function(e) {
+          filterText = e.target.value.toLowerCase().trim();
+          pageActual = 1;
+          renderTable();
+        });
+
+        const minAlargInput = document.getElementById('filter-alargamiento-min');
+        minAlargInput.addEventListener('input', function(e) {
+          filterMinAlarg = e.target.value !== "" ? parseFloat(e.target.value) : null;
+          pageActual = 1;
+          renderTable();
+        });
+
+        const maxAlargInput = document.getElementById('filter-alargamiento-max');
+        maxAlargInput.addEventListener('input', function(e) {
+          filterMaxAlarg = e.target.value !== "" ? parseFloat(e.target.value) : null;
+          pageActual = 1;
+          renderTable();
+        });
+
+        // Botón Exportar CSV removido
+
+        // Sorting de columnas
+        const headers = document.querySelectorAll('.table-students th[data-sort]');
+        headers.forEach(h => {
+          h.addEventListener('click', function() {
+            const col = h.getAttribute('data-sort');
+            if (colOrden === col) {
+              dirOrden = dirOrden === 'asc' ? 'desc' : 'asc';
+            } else {
+              colOrden = col;
+              dirOrden = 'asc';
+            }
+            renderTable();
+          });
+        });
+      }
+
+      // Activa cooldown del botón snapshot
+      function activarCooldownSnapshot() {
+        const btn = document.getElementById('btn-guardar-historico');
+        const timer = document.getElementById('cooldown-timer');
+        let remaining = COOLDOWN_SNAPSHOT_SEG;
+        
+        btn.disabled = true;
+        
+        const interval = setInterval(function() {
+          remaining--;
+          if (remaining <= 0) {
+            clearInterval(interval);
+            btn.disabled = false;
+            timer.textContent = '';
+            document.getElementById('progress-hist').style.display = 'none';
+            document.getElementById('status-hist').textContent = '';
+          } else {
+            timer.textContent = `⏳ Esperar ${remaining}s antes de guardar de nuevo.`;
+          }
+        }, 1000);
+      }
+
+      // Parsea CSV genérico (separa por líneas y comas, respetando comillas)
+      function parseCSV(text) {
+        const lines = text.split(/\r?\n/);
+        if (lines.length === 0) return [];
+        
+        function parseLine(line) {
+          const result = [];
+          let current = "";
+          let inQuotes = false;
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              result.push(current.trim());
+              current = "";
+            } else {
+              current += char;
+            }
+          }
+          result.push(current.trim());
+          return result;
+        }
+        
+        const rawHeaders = parseLine(lines[0]);
+        // Normalizar cabeceras a minúsculas y quitar acentos/caracteres especiales
+        const headers = rawHeaders.map(h => 
+          h.toLowerCase()
+           .normalize("NFD")
+           .replace(/[\u0300-\u036f]/g, "") // Remueve acentos
+           .replace(/[^a-z0-9_]/g, "")     // Solo letras, números y guión bajo
+        );
+        
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          const values = parseLine(lines[i]);
+          if (values.length < headers.length) continue;
+          const row = {};
+          headers.forEach((header, index) => {
+            row[header] = values[index];
+          });
+          rows.push(row);
+        }
+        return rows;
+      }
+
+      // Renderiza la tabla de estudiantes con ordenamiento, filtrado y paginación
+      function renderTable() {
+        const tbody = document.getElementById('students-tbody');
+        
+        // 1. Filtrado
+        let alumnosFiltrados = alumnosCargados.filter(al => {
+          const dniVal = getRecordValueByKeyword(al, ['id_alumno', 'dni', 'documento']);
+          const nombreVal = getRecordValueByKeyword(al, ['alumno', 'nombre', 'estudiante']);
+          const ralentizacionVal = getRecordValueByKeyword(al, ['ralentizacion', 'alargamiento']);
+
+          // Búsqueda textual
+          const nombreMatch = nombreVal ? nombreVal.toLowerCase().includes(filterText) : false;
+          const dniMatch = dniVal ? dniVal.toString().toLowerCase().includes(filterText) : false;
+          if (filterText && !nombreMatch && !dniMatch) return false;
+          
+          // Alargamiento (ralentización)
+          const alarg = ralentizacionVal ? parseFloat(ralentizacionVal) : 0;
+          if (filterMinAlarg !== null && alarg < filterMinAlarg) return false;
+          if (filterMaxAlarg !== null && alarg > filterMaxAlarg) return false;
+          
+          return true;
+        });
+
+        // 2. Ordenamiento
+        alumnosFiltrados.sort((a, b) => {
+          let valA = "";
+          let valB = "";
+          
+          if (colOrden === 'aprobadas') {
+            const aprA = getRecordValueByKeyword(a, ['aprobadas', 'materias_aprobadas']) || "0";
+            const aprB = getRecordValueByKeyword(b, ['aprobadas', 'materias_aprobadas']) || "0";
+            valA = parseFloat(aprA);
+            valB = parseFloat(aprB);
+          } else if (colOrden === 'ralentizacion') {
+            const ralA = getRecordValueByKeyword(a, ['ralentizacion', 'alargamiento']) || "0";
+            const ralB = getRecordValueByKeyword(b, ['ralentizacion', 'alargamiento']) || "0";
+            valA = parseFloat(ralA);
+            valB = parseFloat(ralB);
+          } else if (colOrden === 'id_alumno') {
+            const dniA = getRecordValueByKeyword(a, ['id_alumno', 'dni', 'documento']) || "";
+            const dniB = getRecordValueByKeyword(b, ['id_alumno', 'dni', 'documento']) || "";
+            valA = dniA.toString().toLowerCase();
+            valB = dniB.toString().toLowerCase();
+          } else {
+            // alumno / nombre
+            const nomA = getRecordValueByKeyword(a, ['alumno', 'nombre', 'estudiante']) || "";
+            const nomB = getRecordValueByKeyword(b, ['alumno', 'nombre', 'estudiante']) || "";
+            valA = nomA.toString().toLowerCase();
+            valB = nomB.toString().toLowerCase();
+          }
+
+          if (valA < valB) return dirOrden === 'asc' ? -1 : 1;
+          if (valA > valB) return dirOrden === 'asc' ? 1 : -1;
+          return 0;
+        });
+
+        // 3. Paginación
+        const total = alumnosFiltrados.length;
+        const totalPaginas = Math.ceil(total / PAGE_SIZE) || 1;
+        if (pageActual > totalPaginas) pageActual = totalPaginas;
+
+        const inicio = (pageActual - 1) * PAGE_SIZE;
+        const fin = Math.min(inicio + PAGE_SIZE, total);
+        const alumnosPagina = alumnosFiltrados.slice(inicio, fin);
+
+        // Renderizar filas
+        if (alumnosPagina.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #666; padding: 24px;">No se encontraron alumnos con los filtros seleccionados.</td></tr>`;
+          document.getElementById('pagination-info').textContent = 'Mostrando 0 de 0 alumnos';
+          document.getElementById('pagination-nav').innerHTML = '';
+          return;
+        }
+
+        let html = "";
+        alumnosPagina.forEach(al => {
+          const dniVal = getRecordValueByKeyword(al, ['id_alumno', 'dni', 'documento']) || '-';
+          const nombreVal = getRecordValueByKeyword(al, ['alumno', 'nombre', 'estudiante']) || '-';
+          const materiasVal = getRecordValueByKeyword(al, ['materias', 'notas', 'materias_json']);
+          const aprobadasVal = getRecordValueByKeyword(al, ['aprobadas', 'materias_aprobadas']) || '0';
+          const ralentizacionVal = getRecordValueByKeyword(al, ['ralentizacion', 'alargamiento']);
+
+          const materias = parseCleanJSON(materiasVal);
+          let materiasHTML = "";
+          if (materias.length === 0) {
+            materiasHTML = `<span style="color: #888; font-style: italic;">Sin notas cargadas</span>`;
+          } else {
+            materiasHTML = materias.map(m => `<span class="chip-materia">${m.materia}: <strong>${m.nota}</strong></span>`).join(' ');
+          }
+
+          // Badge de alargamiento
+          const alarg = ralentizacionVal !== undefined ? parseFloat(ralentizacionVal) : null;
+          let badgeClass = "badge-neutral";
+          let badgeText = "Sin datos";
+          
+          if (alarg !== null) {
+            badgeText = `${alarg.toFixed(1)}%`;
+            if (materias.length === 0) {
+              // Estudiante recién ingresado sin materias cargadas
+              badgeClass = "badge-neutral";
+              badgeText = "-";
+            } else if (alarg >= 80) {
+              badgeClass = "badge-red";
+            } else if (alarg >= 40) {
+              badgeClass = "badge-yellow";
+            } else {
+              badgeClass = "badge-green";
+            }
+          }
+
+          html += `
+            <tr>
+              <td><strong>${dniVal}</strong></td>
+              <td>${nombreVal}</td>
+              <td>${materiasHTML}</td>
+              <td style="text-align: center;">${aprobadasVal}</td>
+              <td>
+                <span class="badge-alargamiento ${badgeClass}">${badgeText}</span>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+
+        // Info de paginación
+        document.getElementById('pagination-info').textContent = `Mostrando ${total === 0 ? 0 : inicio + 1}-${fin} de ${total} alumnos`;
+
+        // Renderizar botones de navegación
+        let navHtml = "";
+        navHtml += `<button class="page-btn" ${pageActual === 1 ? 'disabled' : ''} id="btn-prev-page">◀ Prev</button>`;
+        for (let i = 1; i <= totalPaginas; i++) {
+          if (i === 1 || i === totalPaginas || (i >= pageActual - 2 && i <= pageActual + 2)) {
+            navHtml += `<button class="page-btn ${pageActual === i ? 'active' : ''}" data-page="${i}">${i}</button>`;
+          } else if (i === pageActual - 3 || i === pageActual + 3) {
+            navHtml += `<span style="padding: 0 4px; align-self: flex-end;">...</span>`;
+          }
+        }
+        navHtml += `<button class="page-btn" ${pageActual === totalPaginas ? 'disabled' : ''} id="btn-next-page">Sig ▶</button>`;
+        
+        const navContainer = document.getElementById('pagination-nav');
+        navContainer.innerHTML = navHtml;
+
+        // Registrar eventos de navegación
+        document.getElementById('btn-prev-page').addEventListener('click', () => { pageActual--; renderTable(); });
+        document.getElementById('btn-next-page').addEventListener('click', () => { pageActual++; renderTable(); });
+        navContainer.querySelectorAll('.page-btn[data-page]').forEach(btn => {
+          btn.addEventListener('click', function() {
+            pageActual = parseInt(btn.getAttribute('data-page'));
+            renderTable();
+          });
+        });
+      }
+
+      // Función exportarListadoActual removida
+
+    })();
+  </script>
+</p>

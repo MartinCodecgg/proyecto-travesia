@@ -1,0 +1,904 @@
+<p>
+  <script>
+    // Quitar margen del <p> que Moodle crea alrededor del script
+    if (document.currentScript?.parentElement?.tagName === "P") {
+      document.currentScript.parentElement.style.margin = "0";
+    }
+    
+    // Ocultar el título de la página de Moodle lo más rápido posible
+    (function() {
+      var style = document.createElement("style");
+      style.textContent = `
+         h2:first-of-type, .page-header-headings, .activity-header {
+           display: none !important;
+         }
+      `;
+      document.head.appendChild(style);
+    })();
+  </script>
+</p>
+
+<!-- Pantalla Falsa (Seguridad por Oscuridad) -->
+<div id="pantalla-falsa">
+  <p style="font-size: 15px; color: #444; line-height: 1.8;"><strong>Página de pruebaa Moodle</strong></p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est, et nunc <span id="btn-oculto" style="cursor: text;">accumsan</span> vehicula nisi. Mauris placerat eleifend leo, quisque sit amet est et sapien ullamcorper pharetra.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis molestie dictum semper, quam quam congue erat, vitae sodales nisi metus a nunc. Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod sodales, sollicitudin vel, wisi.</p>
+</div>
+
+<!-- Tablero Real -->
+<div id="tablero" style="display: none;">
+  <!-- Estilos del Tablero (removidos de aquí e inyectados dinámicamente mediante JS para evitar la sanitización de Moodle) -->
+
+  <div id="panel-historico-container">
+    <h3>
+      📅 Panel Histórico 1er Año - Evolución del Alargamiento
+    </h3>
+
+    <div class="section-tabla">
+      <!-- Fila de Filtros -->
+      <div class="filters-row">
+        <div class="filter-item" style="flex: 2; min-width: 200px;">
+          <label for="search-student">Buscar por Alumno o DNI</label>
+          <input type="text" id="search-student" class="filter-input" placeholder="Nombre o DNI..." />
+        </div>
+        
+        <div class="filter-item" style="min-width: 150px;">
+          <label for="filter-cuatrimestre">Cuatrimestre</label>
+          <select id="filter-cuatrimestre" class="filter-input">
+            <option value="">Todos</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label for="filter-fecha-desde">Desde (Fecha Snapshot)</label>
+          <input type="date" id="filter-fecha-desde" class="filter-input" />
+        </div>
+
+        <div class="filter-item">
+          <label for="filter-fecha-hasta">Hasta (Fecha Snapshot)</label>
+          <input type="date" id="filter-fecha-hasta" class="filter-input" />
+        </div>
+
+        <div class="filter-item">
+          <label for="filter-alarg-min">Alargamiento Mín (%)</label>
+          <input type="number" id="filter-alarg-min" class="filter-input" style="width: 80px;" min="0" max="100" />
+        </div>
+
+        <div class="filter-item">
+          <label for="filter-alarg-max">Alargamiento Máx (%)</label>
+          <input type="number" id="filter-alarg-max" class="filter-input" style="width: 80px;" min="0" max="100" />
+        </div>
+      </div>
+
+      <!-- Fila de Acciones de Exportación -->
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 16px;">
+        <button id="btn-export-all" class="btn-action btn-secondary-action">
+          📥 Exportar Todo (CSV)
+        </button>
+        <button id="btn-export-filtered" class="btn-action">
+          📥 Exportar Filtrado (CSV)
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table-students" id="table-historical-list">
+          <thead>
+            <tr>
+              <th style="width:30px"></th>
+              <th>DNI</th>
+              <th>Alumno</th>
+              <th style="text-align:center">Cuatrimestres</th>
+              <th style="text-align:center">Last Aprobadas</th>
+              <th style="text-align:center">Last Alargamiento</th>
+            </tr>
+          </thead>
+          <tbody id="historical-tbody">
+            <tr>
+              <td colspan="6" style="text-align: center; color: #666; padding: 24px;">⏳ Cargando registros históricos desde Moodle...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Fila de Paginación -->
+      <div class="pagination-row">
+        <div style="font-size: 13px; color: #666;" id="pagination-info">Mostrando 0-0 de 0 registros</div>
+        <div class="pagination-buttons" id="pagination-nav"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>
+  <script>
+    (function() {
+      // Inyectar estilos CSS del tablero dinámicamente para evitar la sanitización de Moodle
+      (function() {
+        const style = document.createElement("style");
+        style.textContent = `
+          #panel-historico-container {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #333;
+            background-color: #fdfdfd;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05);
+          }
+          
+          #panel-historico-container h3 {
+            color: hsl(168, 60%, 35%);
+            font-weight: 700;
+            border-bottom: 2px solid hsl(168, 60%, 90%);
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+          
+          .btn-action {
+            background: hsl(168, 60%, 35%);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.15s ease;
+          }
+          
+          .btn-action:hover:not(:disabled) {
+            background: hsl(168, 60%, 28%);
+          }
+          
+          .btn-secondary-action {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #ccc;
+          }
+          
+          .btn-secondary-action:hover:not(:disabled) {
+            background: #e9ecef;
+          }
+          
+          /* Filtros y Tabla */
+          .section-tabla {
+            background: white;
+            border: 1px solid #e3e6f0;
+            border-radius: 6px;
+            padding: 16px;
+          }
+          
+          .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: flex-end;
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #eaecf4;
+          }
+          
+          .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+          }
+          
+          .filter-item label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+          }
+          
+          .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d3e2;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: white;
+          }
+          
+          .filter-input:focus {
+            outline: none;
+            border-color: hsl(168, 60%, 35%);
+          }
+          
+          /* Tabla */
+          .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 16px;
+          }
+          
+          .table-students {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+          }
+          
+          .table-students th, .table-students td {
+            padding: 12px;
+            border-bottom: 1px solid #e3e6f0;
+            text-align: left;
+          }
+          
+          .table-students th {
+            background-color: #f8f9fa;
+            font-weight: 700;
+            color: #495057;
+            cursor: pointer;
+            user-select: none;
+          }
+          
+          .table-students th:hover {
+            background-color: #e9ecef;
+          }
+          
+          .table-students tr:hover {
+            background-color: #f8f9fa;
+          }
+          
+          /* Badges */
+          .badge-alargamiento {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 12px;
+          }
+          
+          .badge-red {
+            background-color: #fadbd8;
+            color: #78281f;
+          }
+          
+          .badge-yellow {
+            background-color: #fdebd0;
+            color: #7e5109;
+          }
+          
+          .badge-green {
+            background-color: #d4efdf;
+            color: #145a32;
+          }
+          
+          .badge-neutral {
+            background-color: #ebedef;
+            color: #5d6d7e;
+          }
+          
+          /* Filas agrupadas por alumno */
+          .tr-alumno {
+            background-color: #f0faf6;
+            cursor: pointer;
+            user-select: none;
+          }
+
+          .tr-alumno:hover {
+            background-color: #d9f2e8 !important;
+          }
+
+          .tr-alumno td {
+            font-weight: 600;
+            color: #1a5c42;
+          }
+
+          .tr-alumno .toggle-icon {
+            display: inline-block;
+            width: 18px;
+            transition: transform 0.2s ease;
+            font-style: normal;
+          }
+
+          .tr-alumno.open .toggle-icon {
+            transform: rotate(90deg);
+          }
+
+          .tr-cuatrimestre {
+            display: none;
+            background-color: #fafafa;
+          }
+
+          .tr-cuatrimestre.visible {
+            display: table-row;
+          }
+
+          .tr-cuatrimestre td:first-child {
+            padding-left: 36px;
+            color: #888;
+            font-size: 12px;
+          }
+
+          .tr-materias {
+            display: none;
+            background-color: #f4fdf9;
+          }
+
+          .tr-materias.visible {
+            display: table-row;
+          }
+
+          .tr-materias td {
+            padding-left: 36px;
+            font-size: 12px;
+            color: #555;
+            border-bottom: 1px dashed #ddd;
+          }
+
+          .materias-lista {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 6px 0;
+          }
+
+          .materia-chip {
+            background: #e8f8f2;
+            border: 1px solid #b2dfce;
+            border-radius: 12px;
+            padding: 3px 10px;
+            font-size: 12px;
+            color: #1a5c42;
+          }
+
+          .materia-chip.aprobada {
+            background: #d4efdf;
+            border-color: #82c9a4;
+          }
+
+          .materia-chip.reprobada {
+            background: #fadbd8;
+            border-color: #f1948a;
+            color: #78281f;
+          }
+
+          /* Paginación */
+          .pagination-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+          }
+          
+          .pagination-buttons {
+            display: flex;
+            gap: 6px;
+          }
+          
+          .page-btn {
+            padding: 6px 12px;
+            background: #f8f9fa;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #333 !important;
+          }
+          
+          .page-btn.active {
+            background: hsl(168, 60%, 35%) !important;
+            color: white !important;
+            border-color: hsl(168, 60%, 35%) !important;
+          }
+          
+          .page-btn:hover:not(.active):not(:disabled) {
+            background: #e9ecef;
+            color: #333 !important;
+          }
+          
+          .page-btn:disabled {
+            background: #f8f9fa !important;
+            color: #aaa !important;
+            border-color: #ddd !important;
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        `;
+        document.head.appendChild(style);
+      })();
+
+      // Revelado del tablero con click en accumsan
+      document.getElementById('btn-oculto').addEventListener('click', function() {
+        document.getElementById('pantalla-falsa').style.display = 'none';
+        document.getElementById('tablero').style.display = 'block';
+        initPanel(); // Inicializar panel al revelar
+      });
+
+      const MOODLE_BASE_URL = window.location.origin;
+      const DATAID_DB_HIST_1ER_ANIO = 20; // DB Histórico 1er Año
+
+      let registrosHistoricos = [];
+      let pageActual = 1;
+      const PAGE_SIZE = 30;
+
+      // Variables de filtros y orden
+      let filterText = "";
+      let filterCuat = "";
+      let filterDesde = null;
+      let filterHasta = null;
+      let filterMinAlarg = null;
+      let filterMaxAlarg = null;
+
+      let colOrden = "fecha_snapshot";
+      let dirOrden = "desc"; // Por defecto, orden descendente de fecha
+
+      // Parsea registros del HTML de Moodle
+      function parseDatabaseHTML(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Usamos .defaulttemplate-listentry como wrapper principal (contiene datos Y el menú de acciones con rid)
+        let targets = Array.from(doc.querySelectorAll('.defaulttemplate-listentry'));
+        
+        // Fallback: si no hay listentry, buscar cards genéricas
+        if (targets.length === 0) {
+          targets = Array.from(doc.querySelectorAll('.card'));
+        }
+
+        const records = [];
+        
+        targets.forEach(wrapper => {
+          const fields = {};
+          
+          // Leer los campos de datos del hijo .defaulttemplate-list-body
+          const body = wrapper.querySelector('.defaulttemplate-list-body') || wrapper;
+          const rows = body.querySelectorAll('.row, div');
+          rows.forEach(row => {
+            const labelEl = row.querySelector('.font-weight-bold');
+            if (labelEl) {
+              const key = labelEl.textContent.trim().toLowerCase();
+              const valEl = row.querySelector('.col-8, .col-lg-9, p.mt-2, .data-field-html');
+              if (valEl) {
+                fields[key] = valEl.textContent.trim();
+              } else {
+                const nextEl = labelEl.nextElementSibling;
+                if (nextEl) {
+                  fields[key] = nextEl.textContent.trim();
+                }
+              }
+            }
+          });
+          
+          // Extraer rid del menú de acciones dentro del wrapper .defaulttemplate-listentry
+          let extractedRid = null;
+          const actionLinks = wrapper.querySelectorAll('.dropdown-menu a[href*="rid="], a.dropdown-item[href*="rid="]');
+          for (let link of actionLinks) {
+            const href = link.href || link.getAttribute('href') || '';
+            const match = href.match(/(?:&|&amp;|\?)rid=(\d+)/);
+            if (match) {
+              extractedRid = match[1];
+              break;
+            }
+          }
+          
+          // Fallback: buscar rid= en cualquier link del wrapper
+          if (!extractedRid) {
+            const allLinks = wrapper.querySelectorAll('a');
+            for (let link of allLinks) {
+              const href = link.href || link.getAttribute('href') || '';
+              const match = href.match(/(?:&|&amp;|\?)rid=(\d+)/);
+              if (match) {
+                extractedRid = match[1];
+                break;
+              }
+            }
+          }
+          
+          // Fallback: regex directa sobre innerHTML del wrapper completo
+          if (!extractedRid) {
+            const match = wrapper.innerHTML.match(/[?&]rid=(\d+)/);
+            if (match) extractedRid = match[1];
+          }
+          
+          if (extractedRid) {
+            fields.rid = extractedRid;
+          }
+          
+          if (Object.keys(fields).length > 0) {
+            records.push(fields);
+          }
+        });
+        
+        // Deduplicar solo por rid (no por DNI: un alumno tiene N cuatrimestres)
+        const seenRids = new Set();
+        return records.filter(r => {
+          if (r.rid && seenRids.has(r.rid)) return false;
+          if (r.rid) seenRids.add(r.rid);
+          return true;
+        });
+      }
+
+      // Carga todos los registros históricos (soporta paginación de Moodle)
+      async function fetchAllDatabaseEntries(dataId) {
+        const baseUrl = `${MOODLE_BASE_URL}/mod/data/view.php?d=${dataId}&perpage=1000`;
+        const response = await fetch(baseUrl);
+        const html = await response.text();
+        let entries = parseDatabaseHTML(html);
+        
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const pageLinks = doc.querySelectorAll('a[href*="page="]');
+        const pageNumbers = [];
+        pageLinks.forEach(link => {
+          const match = link.href.match(/page=(\d+)/);
+          if (match) pageNumbers.push(parseInt(match[1]));
+        });
+        
+        if (pageNumbers.length > 0) {
+          const maxPage = Math.max(...pageNumbers);
+          const promises = [];
+          for (let p = 1; p <= maxPage; p++) {
+            promises.push(
+              fetch(`${MOODLE_BASE_URL}/mod/data/view.php?d=${dataId}&perpage=1000&page=${p}`)
+                .then(r => r.text())
+                .then(pageHtml => parseDatabaseHTML(pageHtml))
+            );
+          }
+          const restResults = await Promise.all(promises);
+          restResults.forEach(res => {
+            entries = entries.concat(res);
+          });
+        }
+        return entries;
+      }
+
+      // Normaliza una clave de campo (igual que en panel_1er_anio) para búsqueda flexible
+      function normKey(str) {
+        return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+      }
+
+      // Obtiene el valor de un registro usando palabras clave tolerantes
+      function getVal(record, keywords) {
+        const keys = Object.keys(record);
+        for (let kw of keywords) {
+          const nkw = normKey(kw);
+          // Coincidencia exacta
+          for (let k of keys) {
+            if (normKey(k) === nkw) return record[k];
+          }
+        }
+        // Parcial
+        for (let kw of keywords) {
+          const nkw = normKey(kw);
+          for (let k of keys) {
+            const nk = normKey(k);
+            if (nkw === 'alumno' && nk.includes('idalumno')) continue;
+            if (nk.includes(nkw)) return record[k];
+          }
+        }
+        return undefined;
+      }
+
+      // Parsea el JSON de materias guardado en Moodle
+      function parseMaterias(raw) {
+        if (!raw) return [];
+        let clean = raw.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
+        try { return JSON.parse(clean); } catch(e) { return []; }
+      }
+
+      // Inicializa el panel histórico
+      async function initPanel() {
+        try {
+          const registros = await fetchAllDatabaseEntries(DATAID_DB_HIST_1ER_ANIO);
+          // Filtrar registros con al menos DNI y alumno
+          registrosHistoricos = registros.filter(r => {
+            const dni = getVal(r, ['id_alumno', 'dni', 'documento']);
+            const nom = getVal(r, ['alumno', 'nombre', 'estudiante']);
+            return dni && nom;
+          });
+
+          populateCuatrimestres();
+          renderTable();
+          setupEventListeners();
+        } catch (e) {
+          console.error('Error al obtener histórico:', e);
+          document.getElementById('historical-tbody').innerHTML =
+            `<tr><td colspan="6" style="text-align:center;color:#c0392b;padding:24px;font-weight:bold;">❌ Error al cargar el listado histórico de Moodle.</td></tr>`;
+        }
+      }
+
+      // Llena el combo de cuatrimestres dinámicamente
+      function populateCuatrimestres() {
+        const select = document.getElementById('filter-cuatrimestre');
+        const cuats = new Set();
+        registrosHistoricos.forEach(r => {
+          const c = getVal(r, ['cuatrimestre']);
+          if (c) cuats.add(c);
+        });
+        const sortedCuats = Array.from(cuats).sort((a, b) => b.localeCompare(a));
+        sortedCuats.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c;
+          opt.textContent = c;
+          select.appendChild(opt);
+        });
+      }
+
+      // Configura eventos
+      function setupEventListeners() {
+        document.getElementById('search-student').addEventListener('input', function(e) {
+          filterText = e.target.value.toLowerCase().trim();
+          pageActual = 1;
+          renderTable();
+        });
+
+        document.getElementById('filter-cuatrimestre').addEventListener('change', function(e) {
+          filterCuat = e.target.value;
+          pageActual = 1;
+          renderTable();
+        });
+
+        document.getElementById('filter-fecha-desde').addEventListener('change', function(e) {
+          filterDesde = e.target.value ? new Date(e.target.value) : null;
+          pageActual = 1;
+          renderTable();
+        });
+
+        document.getElementById('filter-fecha-hasta').addEventListener('change', function(e) {
+          filterHasta = e.target.value ? new Date(e.target.value) : null;
+          pageActual = 1;
+          renderTable();
+        });
+
+        document.getElementById('filter-alarg-min').addEventListener('input', function(e) {
+          filterMinAlarg = e.target.value !== "" ? parseFloat(e.target.value) : null;
+          pageActual = 1;
+          renderTable();
+        });
+
+        document.getElementById('filter-alarg-max').addEventListener('input', function(e) {
+          filterMaxAlarg = e.target.value !== "" ? parseFloat(e.target.value) : null;
+          pageActual = 1;
+          renderTable();
+        });
+
+        // Eventos de exportación
+        document.getElementById('btn-export-all').addEventListener('click', () => exportarCSV(registrosHistoricos, "historico_1er_anio_completo"));
+        document.getElementById('btn-export-filtered').addEventListener('click', () => {
+          const filtrados = obtenerFiltrados();
+          exportarCSV(filtrados, "historico_1er_anio_filtrado");
+        });
+
+        // Cabeceras ordenables
+        const headers = document.querySelectorAll('.table-students th[data-sort]');
+        headers.forEach(h => {
+          h.addEventListener('click', function() {
+            const col = h.getAttribute('data-sort');
+            if (colOrden === col) {
+              dirOrden = dirOrden === 'asc' ? 'desc' : 'asc';
+            } else {
+              colOrden = col;
+              dirOrden = 'asc';
+            }
+            renderTable();
+          });
+        });
+      }
+
+      // Obtiene listado filtrado según inputs (opera sobre registros individuales)
+      function obtenerFiltrados() {
+        return registrosHistoricos.filter(r => {
+          const nombre = getVal(r, ['alumno', 'nombre', 'estudiante']) || '';
+          const dni    = getVal(r, ['id_alumno', 'dni', 'documento']) || '';
+          const cuat   = getVal(r, ['cuatrimestre']) || '';
+          const fechaSnap = getVal(r, ['fecha_snapshot', 'fecha']) || '';
+          const alarg  = parseFloat(getVal(r, ['ralentizacion', 'alargamiento']) || 0);
+
+          if (filterText && !nombre.toLowerCase().includes(filterText) && !dni.toLowerCase().includes(filterText)) return false;
+          if (filterCuat && cuat !== filterCuat) return false;
+          if (fechaSnap) {
+            const fSnap = new Date(fechaSnap);
+            if (filterDesde && fSnap < filterDesde) return false;
+            if (filterHasta && fSnap > filterHasta) return false;
+          } else if (filterDesde || filterHasta) { return false; }
+          if (filterMinAlarg !== null && alarg < filterMinAlarg) return false;
+          if (filterMaxAlarg !== null && alarg > filterMaxAlarg) return false;
+
+          return true;
+        });
+      }
+
+      // Agrupa los registros filtrados por DNI
+      function agruparPorAlumno(filtrados) {
+        const mapa = new Map();
+        filtrados.forEach(r => {
+          const dni  = (getVal(r, ['id_alumno', 'dni', 'documento']) || '').trim();
+          const nom  = getVal(r, ['alumno', 'nombre', 'estudiante']) || '-';
+          if (!mapa.has(dni)) mapa.set(dni, { dni, nombre: nom, cuatrimestres: [] });
+          mapa.get(dni).cuatrimestres.push(r);
+        });
+        // Ordenar cuatrimestres dentro de cada alumno (desc)
+        mapa.forEach(al => {
+          al.cuatrimestres.sort((a, b) => {
+            const ca = getVal(a, ['cuatrimestre']) || '';
+            const cb = getVal(b, ['cuatrimestre']) || '';
+            return cb.localeCompare(ca);
+          });
+        });
+        return Array.from(mapa.values());
+      }
+
+      // Genera el badge de alargamiento
+      function badgeAlarg(raw) {
+        const v = raw !== undefined && raw !== '' ? parseFloat(raw) : null;
+        if (v === null) return '<span class="badge-alargamiento badge-neutral">Sin datos</span>';
+        const cls = v >= 80 ? 'badge-red' : v >= 40 ? 'badge-yellow' : 'badge-green';
+        return `<span class="badge-alargamiento ${cls}">${v.toFixed(1)}%</span>`;
+      }
+
+      // Renderiza la tabla agrupada por alumno
+      function renderTable() {
+        const tbody = document.getElementById('historical-tbody');
+        const filtrados = obtenerFiltrados();
+        const agrupados = agruparPorAlumno(filtrados);
+
+        // Ordenar alumnos por nombre asc/desc
+        agrupados.sort((a, b) => {
+          const na = a.nombre.toLowerCase();
+          const nb = b.nombre.toLowerCase();
+          if (na < nb) return dirOrden === 'asc' ? -1 : 1;
+          if (na > nb) return dirOrden === 'asc' ? 1 : -1;
+          return 0;
+        });
+
+        // Paginación por alumno
+        const total = agrupados.length;
+        const totalPaginas = Math.ceil(total / PAGE_SIZE) || 1;
+        if (pageActual > totalPaginas) pageActual = totalPaginas;
+        const inicio = (pageActual - 1) * PAGE_SIZE;
+        const fin = Math.min(inicio + PAGE_SIZE, total);
+        const pagina = agrupados.slice(inicio, fin);
+
+        if (pagina.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#666;padding:24px;">No se encontraron registros históricos.</td></tr>`;
+          document.getElementById('pagination-info').textContent = 'Mostrando 0 de 0 alumnos';
+          document.getElementById('pagination-nav').innerHTML = '';
+          return;
+        }
+
+        let html = '';
+        pagina.forEach((al, idx) => {
+          const uid = `al-${inicio + idx}`;
+          // Último cuatrimestre para mostrar en fila principal
+          const ultimo = al.cuatrimestres[0];
+          const lastApr = getVal(ultimo, ['aprobadas', 'materias_aprobadas']) || '0';
+          const lastAlarg = getVal(ultimo, ['ralentizacion', 'alargamiento']);
+
+          html += `<tr class="tr-alumno" data-uid="${uid}">
+            <td><i class="toggle-icon">▶</i></td>
+            <td><strong>${al.dni}</strong></td>
+            <td>${al.nombre}</td>
+            <td style="text-align:center;color:#555;font-weight:400;">${al.cuatrimestres.length} cuatrimestre(s)</td>
+            <td style="text-align:center;">${lastApr}</td>
+            <td>${badgeAlarg(lastAlarg)}</td>
+          </tr>`;
+
+          al.cuatrimestres.forEach((r, ci) => {
+            const cuat   = getVal(r, ['cuatrimestre']) || '-';
+            const fecha  = getVal(r, ['fecha_snapshot', 'fecha']) || '-';
+            const apr    = getVal(r, ['aprobadas', 'materias_aprobadas']) || '0';
+            const alarg  = getVal(r, ['ralentizacion', 'alargamiento']);
+            const matRaw = getVal(r, ['materias', 'notas', 'materias_json']);
+            const mats   = parseMaterias(matRaw);
+            const matId  = `${uid}-mat-${ci}`;
+
+            // Sub-fila del cuatrimestre
+            html += `<tr class="tr-cuatrimestre" data-parent="${uid}" data-matid="${matId}" style="cursor:${mats.length ? 'pointer' : 'default'}">
+              <td></td>
+              <td style="padding-left:36px;color:#888;font-size:12px;">${cuat}</td>
+              <td style="font-size:13px;color:#555;">${fecha}</td>
+              <td style="text-align:center;font-size:13px;">${mats.length ? '📋 ' + mats.length + ' materia(s)' : '-'}</td>
+              <td style="text-align:center;">${apr}</td>
+              <td>${badgeAlarg(alarg)}</td>
+            </tr>`;
+
+            // Sub-fila de materias (oculta, se expande desde cuatrimestre)
+            if (mats.length) {
+              const chipsHTML = mats.map(m => {
+                const nota = parseFloat(m.nota);
+                const cls = nota >= 5 ? 'aprobada' : 'reprobada';
+                return `<span class="materia-chip ${cls}">${m.materia}: <strong>${m.nota}</strong></span>`;
+              }).join('');
+              html += `<tr class="tr-materias" data-matid="${matId}">
+                <td colspan="6"><div class="materias-lista">${chipsHTML}</div></td>
+              </tr>`;
+            }
+          });
+        });
+
+        tbody.innerHTML = html;
+
+        // Eventos de expansión de alumno
+        tbody.querySelectorAll('.tr-alumno').forEach(trAlumno => {
+          trAlumno.addEventListener('click', function() {
+            const uid = trAlumno.getAttribute('data-uid');
+            const isOpen = trAlumno.classList.contains('open');
+            trAlumno.classList.toggle('open', !isOpen);
+            tbody.querySelectorAll(`.tr-cuatrimestre[data-parent="${uid}"]`).forEach(tr => {
+              tr.classList.toggle('visible', !isOpen);
+              // Si se cierra el alumno, ocultar también las materias
+              if (isOpen) {
+                const matId = tr.getAttribute('data-matid');
+                tbody.querySelectorAll(`.tr-materias[data-matid="${matId}"]`).forEach(m => m.classList.remove('visible'));
+              }
+            });
+          });
+        });
+
+        // Eventos de expansión de materias por cuatrimestre
+        tbody.querySelectorAll('.tr-cuatrimestre[data-matid]').forEach(trCuat => {
+          trCuat.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const matId = trCuat.getAttribute('data-matid');
+            tbody.querySelectorAll(`.tr-materias[data-matid="${matId}"]`).forEach(tr => {
+              tr.classList.toggle('visible');
+            });
+          });
+        });
+
+        document.getElementById('pagination-info').textContent =
+          `Mostrando ${total === 0 ? 0 : inicio + 1}-${fin} de ${total} alumnos`;
+
+        // Paginación botones
+        let navHtml = `<button class="page-btn" ${pageActual === 1 ? 'disabled' : ''} id="btn-prev-page">◄ Prev</button>`;
+        for (let i = 1; i <= totalPaginas; i++) {
+          if (i === 1 || i === totalPaginas || (i >= pageActual - 2 && i <= pageActual + 2)) {
+            navHtml += `<button class="page-btn ${pageActual === i ? 'active' : ''}" data-page="${i}">${i}</button>`;
+          } else if (i === pageActual - 3 || i === pageActual + 3) {
+            navHtml += `<span style="padding:0 4px;align-self:flex-end;">...</span>`;
+          }
+        }
+        navHtml += `<button class="page-btn" ${pageActual === totalPaginas ? 'disabled' : ''} id="btn-next-page">Sig ►</button>`;
+
+        const navContainer = document.getElementById('pagination-nav');
+        navContainer.innerHTML = navHtml;
+        document.getElementById('btn-prev-page').addEventListener('click', () => { pageActual--; renderTable(); });
+        document.getElementById('btn-next-page').addEventListener('click', () => { pageActual++; renderTable(); });
+        navContainer.querySelectorAll('.page-btn[data-page]').forEach(btn => {
+          btn.addEventListener('click', () => { pageActual = parseInt(btn.getAttribute('data-page')); renderTable(); });
+        });
+      }
+
+      // Exportación de datos a CSV
+      function exportarCSV(listado, filename) {
+        if (listado.length === 0) return;
+
+        let csvContent = "\uFEFF"; // BOM para compatibilidad en Excel
+        csvContent += "DNI;Alumno;Cuatrimestre;Fecha Snapshot;Aprobadas;Alargamiento\n";
+
+        listado.forEach(r => {
+          const dni    = getVal(r, ['id_alumno', 'dni', 'documento']) || '';
+          const nombre = getVal(r, ['alumno', 'nombre', 'estudiante']) || '';
+          const cuat   = getVal(r, ['cuatrimestre']) || '';
+          const fecha  = getVal(r, ['fecha_snapshot', 'fecha']) || '';
+          const apr    = getVal(r, ['aprobadas', 'materias_aprobadas']) || '0';
+          const alarg  = getVal(r, ['ralentizacion', 'alargamiento']) || '100';
+          const nomEsc = `"${nombre.replace(/"/g, '""')}"`;
+          csvContent += `${dni};${nomEsc};${cuat};${fecha};${apr};${alarg}\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `${filename}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+    })();
+  </script>
+</p>
