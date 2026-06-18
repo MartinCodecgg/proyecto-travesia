@@ -2123,8 +2123,13 @@
             if (!esPendiente) return;
 
             hayPendientes = true;
+            let tutorFirstName = "";
+            if (studentObj && studentObj.ultimoTutor) {
+              const firstPart = studentObj.ultimoTutor.trim().split(/\s+/)[0];
+              tutorFirstName = firstPart.charAt(0).toUpperCase() + firstPart.slice(1).toLowerCase();
+            }
             const asistTooltip = studentObj && studentObj.ultimaAsistencia 
-              ? `${studentObj.ultimaAsistencia} (Por: ${studentObj.ultimoTutor})`.replace(/"/g, '&quot;')
+              ? `${studentObj.ultimaAsistencia} (Por: ${tutorFirstName})`.replace(/"/g, '&quot;')
               : "";
             const lastAsistText = studentObj && studentObj.ultimaAsistencia 
               ? `<div class="text-ellipsis" title="${asistTooltip}">${studentObj.ultimaAsistencia}</div>` 
@@ -3225,9 +3230,4 @@
           btnSave.disabled = false;
           btnCancel.disabled = false;
           hideLoading();
-        }
-      });
-
-    })();
-  </script>
-</p>
+    

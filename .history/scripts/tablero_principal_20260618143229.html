@@ -2123,13 +2123,10 @@
             if (!esPendiente) return;
 
             hayPendientes = true;
-            const asistTooltip = studentObj && studentObj.ultimaAsistencia 
-              ? `${studentObj.ultimaAsistencia} (Por: ${studentObj.ultimoTutor})`.replace(/"/g, '&quot;')
-              : "";
             const lastAsistText = studentObj && studentObj.ultimaAsistencia 
-              ? `<div class="text-ellipsis" title="${asistTooltip}">${studentObj.ultimaAsistencia}</div>` 
+              ? `<span title="Por ${studentObj.ultimoTutor}">${studentObj.ultimaAsistencia.substring(0, 16)}</span>` 
               : "—";
-
+ (Por: ${tutorFirstName})
             reqTbody.innerHTML += `
               <tr>
                 <td>${req.avatarHtml}</td>
