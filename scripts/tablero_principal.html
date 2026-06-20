@@ -98,6 +98,7 @@
       <button type="button" class="tab-btn" data-tab="tab-historial">📋 Historial de Asistencias</button>
       <button type="button" class="tab-btn" data-tab="tab-cohortes">🎓 Indicadores por Cohorte</button>
       <button type="button" class="tab-btn" data-tab="tab-peso-preguntas">📈 Peso de Preguntas</button>
+      <button type="button" class="tab-btn" data-tab="tab-estado-encuestas">📝 Estado Encuesta Cuatrimestral</button>
     </div>
 
     <!-- Tab 1: Listado de Alumnos -->
@@ -301,6 +302,67 @@
         </div>
       </div>
     </div>
+      <!-- Tab 5: Estado Encuesta Cuatrimestral -->
+  <div id="tab-estado-encuestas" class="tab-content">
+    <div class="section-card">
+      <h3 style="margin-top: 0; margin-bottom: 16px; color: hsl(168, 60%, 25%);">
+        📝 Estado de Encuesta Cuatrimestral
+      </h3>
+
+
+      <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
+        <button type="button" id="btn-encuesta-cuat-si" class="btn-action">
+          Hicieron la encuesta
+        </button>
+
+        <button type="button" id="btn-encuesta-cuat-no" class="btn-action btn-secondary-action">
+          No hicieron la encuesta
+        </button>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-bottom: 16px; align-items: flex-end; flex-wrap: wrap;">
+        <div style="display: flex; flex-direction: column; min-width: 260px;">
+          <label for="filter-estado-encuesta-cuat" style="font-size: 13px; font-weight: 600; color: #555; margin-bottom: 4px;">
+            Filtrar por nombre, DNI o correo
+          </label>
+          <input
+            type="text"
+            id="filter-estado-encuesta-cuat"
+            class="filter-input"
+            placeholder="Ej. Juan, 40123456 o alumno@mail.com"
+          />
+        </div>
+
+        <button type="button" id="btn-clear-filter-estado-encuesta-cuat" class="btn-action btn-secondary-action">
+          Limpiar filtro
+        </button>
+      </div>
+
+    <div class="table-responsive">
+      <table class="table-dashboard" id="table-estado-encuesta-cuat">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>DNI</th>
+            <th>Correo</th>
+          </tr>
+        </thead>
+        <tbody id="estado-encuesta-cuat-tbody">
+          <tr>
+            <td colspan="3" style="text-align: center; padding: 32px; color: #666;">
+              Elegí una opción para cargar la lista desde Moodle.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top: 16px; padding: 14px 18px; border-radius: 8px; background: #e8f8f0; border: 1px solid #b7e4c7; color: #145a32; font-weight: 700; display: inline-block;">
+      Total en lista: <span id="total-estado-encuesta-cuat">0</span>
+    </div>
+  </div>
+     </div>
+
 
   </div>
 </div>
@@ -1234,6 +1296,259 @@
             headers.map((h, idx) => [h, (r[idx] ?? "").trim()])
           ));
       }
+
+      
+// Encabezados esperados del CSV exportado por Moodle.
+const COL_NOMBRE_ESTADO_ENCUESTA = "Nombre completo del usuario";
+const COL_EMAIL_ESTADO_ENCUESTA = "Dirección de correo";
+const COL_DNI_ESTADO_ENCUESTA = "DNI";
+
+
+// Normaliza texto para comparar y filtrar.
+
+function normalizarTextoEstadoEncuesta(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+
+// Escapa caracteres especiales antes de meter texto en HTML.
+
+function escapeHtmlEstadoEncuesta(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+// Obtiene el correo desde una fila del CSV.
+function getEmailEstadoEncuesta(row) {
+  return row?.[COL_EMAIL_ESTADO_ENCUESTA] || "";
+}
+
+function getNombreEstadoEncuesta(row) {
+  return row?.[COL_NOMBRE_ESTADO_ENCUESTA] || "";
+}
+
+function getDniEstadoEncuesta(row) {
+  return String(row?.[COL_DNI_ESTADO_ENCUESTA] || "").replace(/[^\d]/g, "");
+}
+
+
+async function cargarListaEstadoEncuestaCuatrimestral(completaron) {
+  const tbody = document.getElementById("estado-encuesta-cuat-tbody");
+  const totalEl = document.getElementById("total-estado-encuesta-cuat");
+  const btnSi = document.getElementById("btn-encuesta-cuat-si");
+  const btnNo = document.getElementById("btn-encuesta-cuat-no");
+  const inputFiltro = document.getElementById("filter-estado-encuesta-cuat");
+
+  if (!tbody || !totalEl) return;
+
+  // Muestra estado de carga en la tabla.
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="3" style="text-align: center; padding: 32px; color: #666;">
+        ⏳ Cargando encuestas desde Moodle...
+      </td>
+    </tr>
+  `;
+
+  totalEl.textContent = "0";
+
+  // Limpia el filtro cada vez que se carga una nueva lista.
+  if (inputFiltro) inputFiltro.value = "";
+
+  // Deshabilita botones mientras carga para evitar doble click.
+  if (btnSi) btnSi.disabled = true;
+  if (btnNo) btnNo.disabled = true;
+
+  try {
+    const urlInicial =
+      `${window.location.origin}/mod/feedback/show_entries.php?sesskey=${sesskey}&download=csv&id=${systemConfig.urls.cmids.encuesta_inicial}`;
+
+    // URL de exportación CSV de la encuesta cuatrimestral.
+    const urlCuat =
+      `${window.location.origin}/mod/feedback/show_entries.php?sesskey=${sesskey}&download=csv&id=${systemConfig.urls.cmids.encuesta_cuatrimestral}`;
+
+    // Pide ambas encuestas en paralelo.
+    const [resInicial, resCuat] = await Promise.all([
+      fetch(urlInicial).then((r) => r.text()),
+      fetch(urlCuat).then((r) => r.text())
+    ]);
+
+    // Convierte los CSV a arrays de objetos.
+    const csvInicial = parseCSV(resInicial);
+    const csvCuat = parseCSV(resCuat);
+
+    // Guarda todos los correos que aparecen en la encuesta cuatrimestral.
+    const emailsCuat = new Set();
+
+    csvCuat.forEach((row) => {
+      const email = getEmailEstadoEncuesta(row).trim().toLowerCase();
+      if (email) emailsCuat.add(email);
+    });
+
+    // Lista final que se va a mostrar en pantalla.
+    const lista = [];
+
+    csvInicial.forEach((rowInic) => {
+      const email = getEmailEstadoEncuesta(rowInic).trim();
+
+      if (!email) return;
+
+      const emailKey = email.toLowerCase();
+
+      // Si el correo de la inicial también aparece en la cuatrimestral
+      const hizoCuat = emailsCuat.has(emailKey);
+
+      // Si el botón elegido fue "Hicieron", descartamos los que no hicieron.
+      if (completaron && !hizoCuat) return;
+
+      // Si el botón elegido fue "No hicieron", descartamos los que sí hicieron.
+      if (!completaron && hizoCuat) return;
+
+      lista.push({
+        nombre: getNombreEstadoEncuesta(rowInic),
+        dni: getDniEstadoEncuesta(rowInic),
+        email: email
+      });
+    });
+
+    // Renderiza la tabla con la lista ya separada.
+    renderListaEstadoEncuestaCuatrimestral(lista);
+  } catch (error) {
+    console.error("Error al cargar estado de encuesta cuatrimestral:", error);
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="3" style="text-align: center; padding: 32px; color: #c0392b;">
+          Error al cargar datos desde Moodle: ${escapeHtmlEstadoEncuesta(error.message)}
+        </td>
+      </tr>
+    `;
+
+    totalEl.textContent = "0";
+  } finally {
+    // Reactiva los botones al terminar, haya salido bien o mal.
+    if (btnSi) btnSi.disabled = false;
+    if (btnNo) btnNo.disabled = false;
+  }
+}
+
+// Renderiza en la tabla la lista recibida.
+function renderListaEstadoEncuestaCuatrimestral(lista) {
+  const tbody = document.getElementById("estado-encuesta-cuat-tbody");
+  const totalEl = document.getElementById("total-estado-encuesta-cuat");
+
+  if (!tbody || !totalEl) return;
+
+  totalEl.textContent = lista.length;
+
+  if (!lista || lista.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="3" style="text-align: center; padding: 32px; color: #666;">
+          No hay alumnos para mostrar en esta categoría.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = lista.map((alumno) => {
+    const nombre = escapeHtmlEstadoEncuesta(alumno.nombre || "—");
+    const dni = escapeHtmlEstadoEncuesta(alumno.dni || "—");
+    const email = escapeHtmlEstadoEncuesta(alumno.email || "—");
+
+    // Texto interno usado por el filtro.
+    // Incluye nombre, DNI y correo.
+    const textoFiltro = normalizarTextoEstadoEncuesta(
+      `${alumno.nombre || ""} ${alumno.dni || ""} ${alumno.email || ""}`
+    );
+
+    return `
+      <tr data-filter-text="${escapeHtmlEstadoEncuesta(textoFiltro)}">
+        <td>${nombre}</td>
+        <td>${dni}</td>
+        <td>${email}</td>
+      </tr>
+    `;
+  }).join("");
+
+  // Aplica el filtro actual, si hubiera algo escrito.
+  filtrarTablaEstadoEncuestaDesdeDOM();
+}
+
+// Filtra la tabla ya renderizada.
+function filtrarTablaEstadoEncuestaDesdeDOM() {
+  const input = document.getElementById("filter-estado-encuesta-cuat");
+  const totalEl = document.getElementById("total-estado-encuesta-cuat");
+  const tbody = document.getElementById("estado-encuesta-cuat-tbody");
+
+  if (!input || !totalEl || !tbody) return;
+
+  const filtro = normalizarTextoEstadoEncuesta(input.value);
+  const rows = Array.from(tbody.querySelectorAll("tr[data-filter-text]"));
+
+  let visibles = 0;
+
+  rows.forEach((row) => {
+    const text = row.getAttribute("data-filter-text") || "";
+    const coincide = !filtro || text.includes(filtro);
+
+    row.style.display = coincide ? "" : "none";
+
+    if (coincide) visibles++;
+  });
+
+  // Si hay filas reales, el total muestra la cantidad visible.
+  if (rows.length > 0) {
+    totalEl.textContent = visibles;
+  }
+}
+
+
+// Conecta los botones de la pestaña con las funciones.
+// Estos listeners no guardan nada: solo cargan y muestran datos.
+const btnEncuestaCuatSi = document.getElementById("btn-encuesta-cuat-si");
+const btnEncuestaCuatNo = document.getElementById("btn-encuesta-cuat-no");
+const inputFiltroEncuestaCuat = document.getElementById("filter-estado-encuesta-cuat");
+const btnClearFiltroEncuestaCuat = document.getElementById("btn-clear-filter-estado-encuesta-cuat");
+
+// Botón: mostrar quienes hicieron la encuesta cuatrimestral.
+if (btnEncuestaCuatSi) {
+  btnEncuestaCuatSi.addEventListener("click", function () {
+    cargarListaEstadoEncuestaCuatrimestral(true);
+  });
+}
+
+// Botón: mostrar quienes NO hicieron la encuesta cuatrimestral.
+if (btnEncuestaCuatNo) {
+  btnEncuestaCuatNo.addEventListener("click", function () {
+    cargarListaEstadoEncuestaCuatrimestral(false);
+  });
+}
+
+// Input: filtra la tabla ya cargada.
+if (inputFiltroEncuestaCuat) {
+  inputFiltroEncuestaCuat.addEventListener("input", function () {
+    filtrarTablaEstadoEncuestaDesdeDOM();
+  });
+}
+
+// Botón: limpia el filtro y vuelve a mostrar todas las filas cargadas.
+if (btnClearFiltroEncuestaCuat && inputFiltroEncuestaCuat) {
+  btnClearFiltroEncuestaCuat.addEventListener("click", function () {
+    inputFiltroEncuestaCuat.value = "";
+    filtrarTablaEstadoEncuestaDesdeDOM();
+  });
+}
 
       // Muestra/Oculta overlay de carga
       function showLoading(text) {
