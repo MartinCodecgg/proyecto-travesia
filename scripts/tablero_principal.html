@@ -1042,10 +1042,8 @@
       // ==========================================================
       // === CONFIGURACION GENERAL DE MOODLE (BASE DE DATOS CONFIG) ===
       // ==========================================================
-      const CONFIG_DB_CMID = 54785;  // CMID de la base de datos "Db Config"
       const CONFIG_DB_ID = 17;       // DATAID de la base de datos "Db Config"
-      const CURSO_ID = 1732;         // ID del aula / curso de Moodle
-      
+
       // Constante para pruebas de guardado histórico (ej. "2025-1" o "2025-2"). Si es null, se calcula automáticamente.
       const TEST_PERIODO_OVERRIDE = null;
 
@@ -1053,7 +1051,7 @@
       let systemConfig = {
         urls: {
           base: window.location.origin,
-          curso_id: CURSO_ID,
+          curso_id: null,
           cmids: {},
           dataids: {}
         },
@@ -1335,7 +1333,7 @@
         systemConfig = {
           urls: {
             base: window.location.origin,
-            curso_id: CURSO_ID,
+            curso_id: null,
             cmids: {},
             dataids: {}
           },
@@ -1381,7 +1379,7 @@
         const idsVistos = new Set();
         
         while (true) {
-          const url = `${window.location.origin}/user/index.php?id=${CURSO_ID}&page=${page}&perpage=5000&group=0`;
+          const url = `${window.location.origin}/user/index.php?id=${systemConfig.urls.curso_id}&page=${page}&perpage=5000&group=0`;
           const response = await fetch(url);
           if (!response.ok) break;
           
@@ -2081,7 +2079,7 @@
             reqTbody.innerHTML += `
               <tr>
                 <td>${req.avatarHtml}</td>
-                <td><a href="${window.location.origin}/user/view.php?id=${req.idAlumno}&course=${CURSO_ID}" target="_blank" class="user-link">${req.nombre}</a></td>
+                <td><a href="${window.location.origin}/user/view.php?id=${req.idAlumno}&course=${systemConfig.urls.curso_id}" target="_blank" class="user-link">${req.nombre}</a></td>
                 <td>${formatDateToDMY(req.fechaText)}</td>
                 <td>${lastAsistText}</td>
                 <td style="font-style: italic;">"${req.descripcion || 'Sin mensaje adicional'}"</td>
@@ -2126,7 +2124,7 @@
             histTbody.innerHTML += `
               <tr>
                 <td>${log.avatarHtml}</td>
-                <td><a href="${window.location.origin}/user/view.php?id=${log.idAlumno}&course=${CURSO_ID}" target="_blank" class="user-link">${log.nombre}</a></td>
+                <td><a href="${window.location.origin}/user/view.php?id=${log.idAlumno}&course=${systemConfig.urls.curso_id}" target="_blank" class="user-link">${log.nombre}</a></td>
                 <td>${formatDateToDMY(log.fechaText)}</td>
                 <td>${log.tutor}</td>
                 <td>${log.origen}</td>
@@ -2313,7 +2311,7 @@
             tbody.innerHTML += `
               <tr class="${rowClass}">
                 <td>${alumno.avatarHtml}</td>
-                <td><a href="${window.location.origin}/user/view.php?id=${alumno.id}&course=${CURSO_ID}" target="_blank" class="user-link">${alumno.nombre}</a></td>
+                <td><a href="${window.location.origin}/user/view.php?id=${alumno.id}&course=${systemConfig.urls.curso_id}" target="_blank" class="user-link">${alumno.nombre}</a></td>
                 <td>${irdBadge}</td>
                 <td>${ralentText}</td>
                 <td style="text-align: center;">${percibeRiesgoText}</td>
