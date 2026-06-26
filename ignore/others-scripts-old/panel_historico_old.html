@@ -5,82 +5,68 @@
       document.currentScript.parentElement.style.margin = "0";
     }
     
-    // Ocultar el título, pestañas secundarias y reducir márgenes top de Moodle lo más rápido posible
+    // Ocultar el título de la página de Moodle lo más rápido posible
     (function () {
       var style = document.createElement("style");
-      style.id = "moodle-toggle-style";
       style.textContent = `
-         body.hide-moodle-navigation h2:first-of-type, 
-         body.hide-moodle-navigation .page-header-headings, 
-         body.hide-moodle-navigation .activity-header, 
-         body.hide-moodle-navigation .secondary-navigation {
+         h2:first-of-type, .page-header-headings, .activity-header {
            display: none !important;
-         }
-         body.hide-moodle-navigation #page-header {
-           margin-bottom: 0 !important;
-           padding-bottom: 0 !important;
-         }
-         body.hide-moodle-navigation #region-main-box {
-           padding-top: 0 !important;
-         }
-         body.hide-moodle-navigation #region-main {
-           padding-top: 8px !important;
          }
       `;
       document.head.appendChild(style);
-
-      // Apply the class to hide navigation by default
-      if (document.body) {
-        document.body.classList.add("hide-moodle-navigation");
-      } else {
-        document.addEventListener("DOMContentLoaded", function () {
-          document.body.classList.add("hide-moodle-navigation");
-        });
-      }
     })();
   </script>
 </p>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Pantalla Falsa (Seguridad por Oscuridad) -->
+<div id="pantalla-falsa">
+  <p style="font-size: 15px; color: #444; line-height: 1.8;"><strong>Página de pruebaa Moodle</strong></p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est, et nunc <span id="btn-oculto" style="cursor: text;">accumsan</span> vehicula nisi. Mauris placerat eleifend leo, quisque sit amet est et sapien ullamcorper pharetra.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis molestie dictum semper, quam quam congue erat, vitae sodales nisi metus a nunc. Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod sodales, sollicitudin vel, wisi.</p>
+</div>
 
-<div>
+<!-- Tablero Real -->
+<div id="tablero" style="display: none;">
   <div id="panel-historico-container">
     
+    <!-- Encabezado de la página -->
     <div class="panel-header-wrapper">
       <div class="header-title-box">
-        <h3 class="panel-title">📂 Panel Histórico</h3>
+        <h3 class="panel-title">📂 Panel Histórico General - Seguimiento y Evolución</h3>
       </div>
       <div class="header-actions">
         <span id="txt-last-update" class="last-update-text">Última actualización: —</span>
         <button type="button" id="btn-refresh" class="btn-action">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
           Actualizar datos
-        </button>
-        <button type="button" id="btn-toggle-moodle-nav" class="btn-action btn-secondary-action">
-          Mostrar Configuración de Actividad
         </button>
       </div>
     </div>
 
+    <!-- Indicador de Carga -->
     <div id="loading-overlay" class="loading-overlay">
       <div class="spinner"></div>
       <div id="loading-text" class="loading-text">Cargando base de datos...</div>
     </div>
 
+    <!-- Pestañas Principales -->
     <div class="tabs-navigation">
       <button type="button" class="tab-btn active" data-tab="tab-alumnos">👥 Historial por Alumnos</button>
       <button type="button" class="tab-btn" data-tab="tab-cuatrimestres">📅 Historial por Cuatrimestres</button>
-      <button type="button" class="tab-btn" data-tab="tab-materias-aprobadas">🎓 Rendimiento de Materias</button>
-      <button type="button" class="tab-btn" data-tab="tab-dashboard">📈 Análisis Visual</button>
     </div>
 
+    <!-- PESTAÑA 1: HISTORIAL POR ALUMNOS -->
     <div id="tab-alumnos" class="tab-content active">
       <div class="section-card">
         
+        <!-- Sección de Filtros de Alumnos -->
         <div class="filters-header" id="filters-toggle-btn-al">
           <span style="font-weight: 500; color: hsl(168, 60%, 25%);">🔍 Filtros de Búsqueda</span>
           <span id="filters-arrow-icon-al">▼</span>
         </div>
         
+        <!-- Fila de Filtros de Alumnos -->
         <div class="filters-row" id="filters-container-al" style="display: none;">
           <div class="filter-item" style="flex: 2; min-width: 200px;">
             <label for="search-alumno">Buscar por Alumno o Email</label>
@@ -147,6 +133,7 @@
           </div>
         </div>
 
+        <!-- Acciones de Exportación -->
         <div class="actions-row">
           <button type="button" id="btn-export-al-all" class="btn-action btn-secondary-action">
             📥 Exportar Todo (CSV)
@@ -156,6 +143,7 @@
           </button>
         </div>
 
+        <!-- Tabla de Alumnos -->
         <div class="table-responsive">
           <table class="table-historical" id="table-alumnos-list">
             <thead>
@@ -177,6 +165,7 @@
           </table>
         </div>
 
+        <!-- Paginación Alumnos -->
         <div class="pagination-row">
           <div class="pagination-info" id="pagination-info-al">Mostrando 0 de 0 alumnos</div>
           <div class="pagination-buttons" id="pagination-nav-al"></div>
@@ -185,14 +174,17 @@
       </div>
     </div>
 
+    <!-- PESTAÑA 2: HISTORIAL POR CUATRIMESTRES -->
     <div id="tab-cuatrimestres" class="tab-content">
       <div class="section-card">
         
+        <!-- Sección de Filtros de Cuatrimestres -->
         <div class="filters-header" id="filters-toggle-btn-cuat">
           <span style="font-weight: 500; color: hsl(168, 60%, 25%);">🔍 Filtros de Búsqueda</span>
           <span id="filters-arrow-icon-cuat">▼</span>
         </div>
         
+        <!-- Fila de Filtros de Cuatrimestres -->
         <div class="filters-row" id="filters-container-cuat" style="display: none;">
           <div class="filter-item" style="flex: 1; min-width: 150px;">
             <label for="search-cuatrimestre">Filtrar por Cuatrimestre</label>
@@ -214,6 +206,7 @@
           </div>
         </div>
 
+        <!-- Acciones de Exportación -->
         <div class="actions-row">
           <button type="button" id="btn-export-cuat-all" class="btn-action btn-secondary-action">
             📥 Exportar Todo (CSV)
@@ -223,6 +216,7 @@
           </button>
         </div>
 
+        <!-- Tabla de Cuatrimestres -->
         <div class="table-responsive">
           <table class="table-historical" id="table-cuatrimestres-list">
             <thead>
@@ -245,6 +239,7 @@
           </table>
         </div>
 
+        <!-- Paginación Cuatrimestres -->
         <div class="pagination-row">
           <div class="pagination-info" id="pagination-info-cuat">Mostrando 0 de 0 cuatrimestres</div>
           <div class="pagination-buttons" id="pagination-nav-cuat"></div>
@@ -253,78 +248,6 @@
       </div>
     </div>
 
-    <div id="tab-materias-aprobadas" class="tab-content">
-      <div class="section-card">
-        <h3 style="margin-top: 0; margin-bottom: 16px; color: hsl(168, 60%, 25%); display: flex; align-items: center; gap: 8px;">
-          <span>🎓</span> Rendimiento Histórico de Materias
-        </h3>
-        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">
-          Muestra las estadísticas de rendimiento de cada materia a lo largo del tiempo, calculadas a partir de la trayectoria de los estudiantes en los históricos guardados. Ordenadas de mayor a menor tasa de aprobación. No se consideran materias de primer año.
-        </p>
-        <div class="filters-row" style="margin-bottom: 20px; align-items: center; justify-content: flex-start; display: flex; gap: 12px; padding: 12px; background: #f8f9fa;">
-          <div class="filter-item" style="min-width: 200px;">
-            <label for="filter-mat-cuat" style="font-weight: bold; color: hsl(168, 60%, 25%);">📅 Filtrar por Cuatrimestre</label>
-            <select id="filter-mat-cuat" class="filter-input">
-              <option value="">Todos los tiempos</option>
-            </select>
-          </div>
-        </div>
-        <div class="table-responsive">
-          <table class="table-historical" id="table-materias-performance">
-            <thead>
-              <tr>
-                <th style="width: 50px; text-align: center;">N°</th>
-                <th>Materia</th>
-                <th style="text-align: center; width: 140px;">Alumnos Evaluados</th>
-                <th style="text-align: center; width: 120px;">Aprobados</th>
-                <th style="text-align: center; width: 120px;">Desaprobados</th>
-                <th style="text-align: right; width: 180px;">Tasa de Aprobación ↓</th>
-              </tr>
-            </thead>
-            <tbody id="materias-performance-tbody">
-              <tr>
-                <td colspan="6" style="text-align: center; padding: 32px; color: #666;">
-                  No hay información de rendimiento de materias disponible.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div id="tab-dashboard" class="tab-content">
-      <div class="section-card">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px;">
-          
-          <div style="background: #fff; padding: 16px; border: 1px solid #eaecf4; border-radius: 6px;">
-            <canvas id="chart-riesgo-actual" height="280"></canvas>
-          </div>
-
-          <div style="background: #fff; padding: 16px; border: 1px solid #eaecf4; border-radius: 6px;">
-            <canvas id="chart-riesgo-historico" height="280"></canvas>
-          </div>
-
-          <div style="background: #fff; padding: 16px; border: 1px solid #eaecf4; border-radius: 6px;">
-            <canvas id="chart-dispersion" height="300"></canvas>
-          </div>
-
-          <div style="background: #fff; padding: 16px; border: 1px solid #eaecf4; border-radius: 6px;">
-            <canvas id="chart-cohortes" height="300"></canvas>
-          </div>
-
-          <!-- New subject failure ranking chart (spanning full width) -->
-          <div style="background: #fff; padding: 16px; border: 1px solid #eaecf4; border-radius: 6px; grid-column: 1 / -1;">
-            <div style="height: 450px; position: relative; width: 100%;">
-              <canvas id="chart-materias-desaprobadas"></canvas>
-            </div>
-            <p style="font-size: 12px; color: #cc5a00; font-style: italic; margin-top: 12px; margin-bottom: 0; text-align: center;">
-              * Nota: No se consideran materias de primer año.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -360,7 +283,9 @@
           
           .panel-title {
             color: hsl(168, 60%, 35%) !important;
+            font-weight: 700;
             margin: 0 !important;
+            font-size: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -400,13 +325,13 @@
             opacity: 0.7 !important;
           }
           
-          .btn-action.btn-secondary-action {
+          .btn-secondary-action {
             background: #f8f9fa !important;
             color: #495057 !important;
             border: 1px solid #d1d3e2 !important;
           }
           
-          .btn-action.btn-secondary-action:hover:not(:disabled) {
+          .btn-secondary-action:hover:not(:disabled) {
             background: #e9ecef !important;
           }
 
@@ -828,38 +753,16 @@
             color: #555;
             font-weight: 700;
           }
-
-          .materias-lista {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            padding: 6px 0;
-          }
-
-          .materia-chip {
-            background: #e8f8f2;
-            border: 1px solid #b2dfce;
-            border-radius: 12px;
-            padding: 3px 10px;
-            font-size: 11px;
-            color: #1a5c42;
-            display: inline-block;
-          }
-
-          .materia-chip.aprobada {
-            background: #d4efdf;
-            border-color: #82c9a4;
-            color: #145a32;
-          }
-
-          .materia-chip.reprobada {
-            background: #fadbd8;
-            border-color: #f1948a;
-            color: #78281f;
-          }
         `;
         document.head.appendChild(style);
       })();
+
+      // Control del botón oculto para revelar el tablero real
+      document.getElementById("btn-oculto").addEventListener("click", function () {
+        document.getElementById("pantalla-falsa").style.display = "none";
+        document.getElementById("tablero").style.display = "block";
+        initPanel();
+      });
 
       // ==========================================================
       // ★ CONFIGURACIÓN DEL SISTEMA Y ESTADO EN MEMORIA ★
@@ -867,39 +770,20 @@
       const CONFIG_DB_CMID = 54785; // CMID de la DB de Configuración
       const CONFIG_DB_ID = 17;      // DATAID de la DB de Configuración
       
-      // First year subjects to exclude
-      const MATERIAS_1ER_ANIO = [
-        "Análisis Matemático I",
-        "Álgebra I-B",
-        "Fundamentos de Química",
-        "Análisis Matemático II",
-        "Álgebra II",
-        "Física A",
-        "Fundamentos de la Programación"
-      ];
-
-      // Flexible check to see if a subject is from the first year
-      function esMateria1erAnio(nombreMateria) {
-        if (!nombreMateria) return false;
-        const nombreLimpio = nombreMateria.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        return MATERIAS_1ER_ANIO.some(m => {
-          const mLimpio = m.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          return nombreLimpio === mLimpio || 
-                 nombreLimpio.startsWith(mLimpio + " ") || 
-                 nombreLimpio.startsWith(mLimpio + ":") ||
-                 nombreLimpio.includes(mLimpio);
-        });
-      }
-
       let systemConfig = {
         urls: {
           base: window.location.origin,
-          cmids: {},
-          dataids: {}
+          cmids: {
+            db_historico: 54788,
+            db_historico_general: 54862
+          },
+          dataids: {
+            db_historico: 18,
+            db_historico_general: 21
+          }
         },
         umbrales: {
           threshold_ird: 40,
-          threshold_ird_red: 80,
           cooldown_actualizar_seg: 30,
           page_size_paneles: 30
         }
@@ -942,9 +826,6 @@
       let lastUpdateDate = null;
       let isRefreshCooldown = false;
       const sesskey = window.M?.cfg?.sesskey || "";
-      
-      // Variables de Chart.js
-      let dashboardCharts = {};
 
       // Muestra/Oculta overlay de carga
       function showLoading(text) {
@@ -1136,8 +1017,8 @@
       async function updateData() {
         showLoading("Descargando datos históricos de Moodle...");
         try {
-          const dataidAlumnos = systemConfig.urls.dataids.db_historico;
-          const dataidCuatrimestres = systemConfig.urls.dataids.db_historico_general;
+          const dataidAlumnos = systemConfig.urls.dataids.db_historico || 18;
+          const dataidCuatrimestres = systemConfig.urls.dataids.db_historico_general || 21;
 
           console.log("Cargando DB histórica alumnos d=" + dataidAlumnos + " y DB cuatrimestral d=" + dataidCuatrimestres);
 
@@ -1211,18 +1092,15 @@
 
           // Cargar combos de cuatrimestres dinámicamente
           populateCuatrimestresCombo();
-          populateMateriasCombo();
 
           // Render
           renderAlumnos();
           renderCuatrimestres();
-          renderMateriasPerformance();
-          renderDashboard(); // Se agregan los gráficos del nuevo panel analítico
 
           // Última actualización
           lastUpdateDate = new Date();
           const formatDigits = (n) => n < 10 ? "0" + n : n;
-          document.getElementById("txt-last-update").textContent = `Última actualización: ${formatDigits(lastUpdateDate.getHours())}:${formatDigits(lastUpdateDate.getMinutes())}`;
+          document.getElementById("txt-last-update").textContent = `Última actualización: ${formatDigits(lastUpdateDate.getDate())}/${formatDigits(lastUpdateDate.getMonth()+1)}/${lastUpdateDate.getFullYear()} ${formatDigits(lastUpdateDate.getHours())}:${formatDigits(lastUpdateDate.getMinutes())}`;
 
           hideLoading();
         } catch (e) {
@@ -1271,94 +1149,6 @@
           opt.textContent = p;
           select.appendChild(opt);
         });
-      }
-
-      // Load cuatrimestres list in subjects performance filter
-      function populateMateriasCombo() {
-        const select = document.getElementById("filter-mat-cuat");
-        if (!select) return;
-        select.innerHTML = '<option value="">Todos los tiempos</option>';
-        
-        const periodos = new Set();
-        listAlumnos.forEach(al => {
-          al.cuatrimestres.forEach(c => {
-            if (c.periodo) periodos.add(c.periodo);
-          });
-        });
-        
-        const sorted = Array.from(periodos).sort((a, b) => b.localeCompare(a));
-        sorted.forEach(p => {
-          const opt = document.createElement("option");
-          opt.value = p;
-          opt.textContent = p;
-          select.appendChild(opt);
-        });
-      }
-
-      // Render subjects performance table filtering by selected semester
-      function renderMateriasPerformance() {
-        const select = document.getElementById("filter-mat-cuat");
-        const filterVal = select ? select.value : "";
-
-        // Calculate performance stats
-        const statsMaterias = {};
-        listAlumnos.forEach(al => {
-          al.cuatrimestres.forEach(c => {
-            if (filterVal && c.periodo !== filterVal) return;
-
-            const mats = c.materias || [];
-            mats.forEach(m => {
-              // Discard 1st year subjects
-              if (esMateria1erAnio(m.materia)) return;
-
-              if (!statsMaterias[m.materia]) {
-                statsMaterias[m.materia] = { aprobadas: 0, desaprobadas: 0 };
-              }
-              if (m.estado === 'aprobada') {
-                statsMaterias[m.materia].aprobadas++;
-              } else if (m.estado === 'desaprobada') {
-                statsMaterias[m.materia].desaprobadas++;
-              }
-            });
-          });
-        });
-
-        const listStatsMaterias = Object.keys(statsMaterias).map(name => {
-          const s = statsMaterias[name];
-          const total = s.aprobadas + s.desaprobadas;
-          const tasa = total > 0 ? parseFloat(((s.aprobadas / total) * 100).toFixed(1)) : 0;
-          return {
-            materia: name,
-            aprobadas: s.aprobadas,
-            desaprobadas: s.desaprobadas,
-            total: total,
-            tasa: tasa
-          };
-        }).sort((a, b) => b.tasa - a.tasa || b.aprobadas - a.aprobadas);
-
-        // Render subjects performance table rows
-        const matPerfTbody = document.getElementById("materias-performance-tbody");
-        if (matPerfTbody) {
-          matPerfTbody.innerHTML = "";
-          if (listStatsMaterias.length === 0) {
-            matPerfTbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #666;">No hay datos de rendimiento disponibles aún para el cuatrimestre seleccionado.</td></tr>`;
-          } else {
-            listStatsMaterias.forEach((m, idx) => {
-              matPerfTbody.innerHTML += `
-                <tr>
-                  <td style="text-align: center; font-weight: 700; color: #666;">${idx + 1}</td>
-                  <td><strong>${m.materia}</strong></td>
-                  <td style="text-align: center; color: #555;">${m.total}</td>
-                  <td style="text-align: center; color: #16a085; font-weight: 600;">${m.aprobadas}</td>
-                  <td style="text-align: center; color: #c0392b; font-weight: 600;">${m.desaprobadas}</td>
-                  <td style="text-align: right; font-weight: 700; color: hsl(168, 60%, 25%);">
-                    ${m.tasa}%
-                    <div style="font-size: 10px; font-weight: normal; color: #777;">(${m.aprobadas}/${m.total} aprobados)</div>
-                  </td>
-                </tr>`;
-            });
-          }
-        }
       }
 
       // ==========================================================
@@ -1445,9 +1235,7 @@
           
           let irdBadge = "—";
           if (irdVal !== null) {
-            const threshRed = systemConfig.umbrales.threshold_ird_red || 80;
-            const threshYellow = systemConfig.umbrales.threshold_ird || 40;
-            const cls = irdVal >= threshRed ? 'badge-sem-red' : irdVal >= threshYellow ? 'badge-sem-yellow' : 'badge-sem-green';
+            const cls = irdVal >= 80 ? 'badge-sem-red' : irdVal >= systemConfig.umbrales.threshold_ird ? 'badge-sem-yellow' : 'badge-sem-green';
             irdBadge = `<span class="badge-sem ${cls}">${irdVal}%</span>`;
           }
 
@@ -1493,7 +1281,6 @@
                         <th style="text-align: center;">Ralentización</th>
                         <th style="text-align: center;">¿Se percibe en riesgo?</th>
                         <th style="text-align: center;">¿Fue asistido?</th>
-                        <th style="text-align: center;">Materias</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1501,10 +1288,8 @@
                         const ird = c.ird !== undefined ? parseFloat(c.ird) : null;
                         const ralent = c.ralentizacion !== undefined ? parseFloat(c.ralentizacion) : null;
 
-                        const threshRed = systemConfig.umbrales.threshold_ird_red || 80;
-                        const threshYellow = systemConfig.umbrales.threshold_ird || 40;
                         const irdBadgeC = ird !== null 
-                          ? `<span class="badge-sem ${ird >= threshRed ? 'badge-sem-red' : ird >= threshYellow ? 'badge-sem-yellow' : 'badge-sem-green'}">${ird}%</span>`
+                          ? `<span class="badge-sem ${ird >= 80 ? 'badge-sem-red' : ird >= systemConfig.umbrales.threshold_ird ? 'badge-sem-yellow' : 'badge-sem-green'}">${ird}%</span>`
                           : '—';
 
                         const ralentBadgeC = ralent !== null
@@ -1514,39 +1299,16 @@
                         const riesgoC = c.percepcion_riesgo ? '<span style="color:#c0392b; font-weight:600;">Sí</span>' : 'No';
                         const asistidoC = c.asistido ? '<span style="color:#16a085; font-weight:600;">Sí</span>' : 'No';
 
-                        const mats = c.materias || [];
-                        const hasMats = mats.length > 0;
-                        const subMatId = `${uid}-submat-${c.periodo.replace('-', '_')}`;
-
-                        let trCuatHtml = `
-                          <tr class="${hasMats ? 'subtr-cuatrimestre' : ''}" data-submatid="${subMatId}" style="cursor: ${hasMats ? 'pointer' : 'default'}">
+                        return `
+                          <tr>
                             <td><strong>${c.periodo}</strong></td>
                             <td>${c.fecha}</td>
                             <td style="text-align: center;">${irdBadgeC}</td>
                             <td style="text-align: center;">${ralentBadgeC}</td>
                             <td style="text-align: center;">${riesgoC}</td>
                             <td style="text-align: center;">${asistidoC}</td>
-                            <td style="text-align: center;">${hasMats ? '📋 ' + mats.length + ' materia(s)' : '—'}</td>
                           </tr>
                         `;
-
-                        if (hasMats) {
-                          const chipsHTML = mats.map(m => {
-                            const cls = m.estado === 'aprobada' ? 'materia-chip aprobada' : 'materia-chip reprobada';
-                            const notaText = m.nota !== null ? `: <strong>${m.nota}</strong>` : '';
-                            return `<span class="${cls}">${m.materia}${notaText}</span>`;
-                          }).join('');
-
-                          trCuatHtml += `
-                            <tr class="subtr-materias" data-submatid="${subMatId}" style="display: none; background-color: #fafafa;">
-                              <td colspan="7">
-                                <div class="materias-lista" style="padding-left: 20px;">${chipsHTML}</div>
-                              </td>
-                            </tr>
-                          `;
-                        }
-
-                        return trCuatHtml;
                       }).join('')}
                     </tbody>
                   </table>
@@ -1568,19 +1330,6 @@
             
             tr.classList.toggle("open", !isOpen);
             if (det) det.classList.toggle("visible", !isOpen);
-          });
-        });
-
-        // Registrar eventos de sub-expansión de materias por cuatrimestre
-        tbody.querySelectorAll(".subtr-cuatrimestre").forEach(tr => {
-          tr.addEventListener("click", function (e) {
-            e.stopPropagation(); // Evitar expandir/colapsar el alumno principal
-            const submatId = tr.getAttribute("data-submatid");
-            const subtrMats = tbody.querySelector(`.subtr-materias[data-submatid="${submatId}"]`);
-            if (subtrMats) {
-              const isVisible = subtrMats.style.display !== "none";
-              subtrMats.style.display = isVisible ? "none" : "table-row";
-            }
           });
         });
 
@@ -1692,6 +1441,7 @@
               <td colspan="8">
                 <div style="background: #ffffff; padding: 16px; border-radius: 6px; border: 1px solid #eaecf4;">
                   
+                  <!-- KPIs del cuatrimestre -->
                   <div class="det-grid-kpis">
                     <div class="det-kpi-card" style="border-left: 3px solid #e74c3c;">
                       <div class="det-kpi-val color-red" style="color: #c0392b;">${c.kpis.alto_riesgo}</div>
@@ -1715,11 +1465,13 @@
                     </div>
                   </div>
 
+                  <!-- Sub-pestañas de detalle -->
                   <div class="det-subtabs-nav" data-cuatuid="${uid}">
                     <button type="button" class="det-subtab-btn active" data-subtab="sub-cohortes-${uid}">🎓 Cohortes</button>
                     <button type="button" class="det-subtab-btn" data-subtab="sub-pesos-${uid}">📈 Pesos de Preguntas</button>
                   </div>
 
+                  <!-- Detalle de Cohortes -->
                   <div id="sub-cohortes-${uid}" class="det-subtab-content active">
                     <table class="det-sub-table">
                       <thead>
@@ -1745,6 +1497,7 @@
                     </table>
                   </div>
 
+                  <!-- Detalle de Pesos de Preguntas -->
                   <div id="sub-pesos-${uid}" class="det-subtab-content">
                     <table class="det-sub-table">
                       <thead>
@@ -1919,236 +1672,6 @@
       }
 
       // ==========================================================
-      // ★ RENDER DASHBOARD ANALÍTICO (PESTAÑA 3) ★
-      // ==========================================================
-      function renderDashboard() {
-        if (listCuatrimestres.length === 0) return;
-
-        // Ordenamos cronológicamente (antiguos primero) para el eje X histórico
-        const cuats = [...listCuatrimestres].sort((a, b) => a.periodo.localeCompare(b.periodo));
-        const labelsHistorico = cuats.map(c => c.periodo);
-        const ultimoCuat = cuats[cuats.length - 1]; // Tomamos el más reciente para las "fotos de hoy"
-
-        // Destruir gráficos previos si existen (para el refresh)
-        if (dashboardCharts.riesgoActual) dashboardCharts.riesgoActual.destroy();
-        if (dashboardCharts.riesgoHistorico) dashboardCharts.riesgoHistorico.destroy();
-        if (dashboardCharts.dispersion) dashboardCharts.dispersion.destroy();
-        if (dashboardCharts.cohortes) dashboardCharts.cohortes.destroy();
-        if (dashboardCharts.materiasDesaprobadas) dashboardCharts.materiasDesaprobadas.destroy();
-
-        // --- Gráfico 1: Radiografía del Último Cuatrimestre (Doughnut) ---
-        const ctxRiesgoActual = document.getElementById('chart-riesgo-actual').getContext('2d');
-        dashboardCharts.riesgoActual = new Chart(ctxRiesgoActual, {
-          type: 'doughnut',
-          data: {
-            labels: ['Riesgo Alto', 'Riesgo Medio', 'Riesgo Bajo'],
-            datasets: [{
-              data: [ultimoCuat.kpis.alto_riesgo, ultimoCuat.kpis.medio_riesgo, ultimoCuat.kpis.bajo_riesgo],
-              backgroundColor: ['#e74c3c', '#f39c12', '#2ecc71'],
-              borderWidth: 2
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { 
-              title: { display: true, text: `Población Actual (${ultimoCuat.periodo})`, font: { size: 14 } },
-              legend: { position: 'bottom' }
-            }
-          }
-        });
-
-        // --- Gráfico 2: Evolución del Riesgo Histórico (Barras Apiladas) ---
-        const ctxRiesgoHist = document.getElementById('chart-riesgo-historico').getContext('2d');
-        dashboardCharts.riesgoHistorico = new Chart(ctxRiesgoHist, {
-          type: 'bar',
-          data: {
-            labels: labelsHistorico,
-            datasets: [
-              { label: 'Riesgo Alto', data: cuats.map(c => c.kpis.alto_riesgo), backgroundColor: '#e74c3c' },
-              { label: 'Riesgo Medio', data: cuats.map(c => c.kpis.medio_riesgo), backgroundColor: '#f39c12' },
-              { label: 'Riesgo Bajo', data: cuats.map(c => c.kpis.bajo_riesgo), backgroundColor: '#2ecc71' }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { 
-              x: { stacked: true, title: { display: true, text: 'Periodo (Cuatrimestre)' } }, 
-              y: { stacked: true, title: { display: true, text: 'Cantidad de Alumnos' } } 
-            },
-            plugins: { 
-              title: { display: true, text: 'Evolución Histórica por Nivel de Riesgo', font: { size: 14 } },
-              legend: { position: 'bottom' }
-            }
-          }
-        });
-
-        // --- Gráfico 3: Dispersión IRD vs Ralentización (Scatter) ---
-        const ctxDispersion = document.getElementById('chart-dispersion').getContext('2d');
-        
-        // Armar datos de dispersión tomando el último estado de cada alumno
-        const scatterData = [];
-        listAlumnos.forEach(al => {
-          if (al.cuatrimestres) {
-            al.cuatrimestres.forEach(c => {
-              if (c.ird !== undefined && c.ralentizacion !== undefined) {
-                const xVal = parseFloat(c.ralentizacion);
-                const yVal = parseFloat(c.ird);
-                
-                // Asignar color dependiendo del IRD para que se lea mejor
-                let color = 'rgba(46, 204, 113, 0.7)'; // Verde
-                const threshRed = systemConfig.umbrales.threshold_ird_red || 80;
-                const threshYellow = systemConfig.umbrales.threshold_ird || 40;
-                if (yVal >= threshRed) color = 'rgba(231, 76, 60, 0.7)'; // Rojo
-                else if (yVal >= threshYellow) color = 'rgba(243, 156, 18, 0.7)'; // Amarillo
-
-                scatterData.push({ 
-                  x: xVal, 
-                  y: yVal, 
-                  backgroundColor: color, 
-                  alumnoNombre: `${al.nombre} (${c.periodo})` 
-                });
-              }
-            });
-          }
-        });
-
-        dashboardCharts.dispersion = new Chart(ctxDispersion, {
-          type: 'scatter',
-          data: {
-            datasets: [{
-              label: 'Alumnos (Último estado)',
-              data: scatterData,
-              pointBackgroundColor: scatterData.map(d => d.backgroundColor),
-              pointBorderColor: '#fff',
-              pointRadius: 5,
-              pointHoverRadius: 7
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              x: { title: { display: true, text: 'Ralentización (%)' }, min: 0, max: 100 },
-              y: { title: { display: true, text: 'Índice de Riesgo (IRD %)' }, min: 0, max: 100 }
-            },
-            plugins: {
-              title: { display: true, text: 'Correlación: Atraso vs Riesgo Históricos', font: { size: 14 } },
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: function(ctx) {
-                    const d = ctx.raw;
-                    return `${d.alumnoNombre} - Ralent: ${d.x}%, IRD: ${d.y}%`;
-                  }
-                }
-              }
-            }
-          }
-        });
-
-        // --- Gráfico 4: Estado de Cohortes Actual (Barras Horizontales Apiladas al 100%) ---
-        const ctxCohortes = document.getElementById('chart-cohortes').getContext('2d');
-        const ultCohortes = ultimoCuat.cohortes || [];
-        
-        const labelsCohortes = ultCohortes.map(c => c.cohorte);
-        const dataActivos = ultCohortes.map(c => parseFloat(c.activosPorc) || 0);
-        const dataEgresados = ultCohortes.map(c => parseFloat(c.egresadosPorc) || 0);
-        const dataDesertados = ultCohortes.map(c => parseFloat(c.desertadosPorc) || 0);
-
-        dashboardCharts.cohortes = new Chart(ctxCohortes, {
-          type: 'bar',
-          data: {
-            labels: labelsCohortes,
-            datasets: [
-              { label: '% Activos', data: dataActivos, backgroundColor: '#3498db' },
-              { label: '% Egresados', data: dataEgresados, backgroundColor: '#9b59b6' },
-              { label: '% Desertados', data: dataDesertados, backgroundColor: '#95a5a6' }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              x: { stacked: true, title: { display: true, text: 'Cohorte (Año de Ingreso)' } },
-              y: { stacked: true, max: 100, title: { display: true, text: 'Porcentaje (%)' } }
-            },
-            plugins: {
-              title: { display: true, text: `Estado de Cohortes (${ultimoCuat.periodo})`, font: { size: 14 } },
-              legend: { position: 'bottom' },
-              tooltip: {
-                callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw}%` }
-              }
-            }
-          }
-        });
-
-        // --- Gráfico 5: Ranking de Materias con Mayor Cantidad de Desaprobados ---
-        // --- Se consideran todas las materias de 2do en año en adelante
-        const desaprobadasPorMateria = {};
-        listAlumnos.forEach(al => {
-          al.cuatrimestres.forEach(c => {
-            const mats = c.materias || [];
-            mats.forEach(m => {
-              // Discard 1st year subjects
-              if (esMateria1erAnio(m.materia)) return;
-
-              if (m.estado === 'desaprobada') {
-                desaprobadasPorMateria[m.materia] = (desaprobadasPorMateria[m.materia] || 0) + 1;
-              }
-            });
-          });
-        });
-
-        // Obtener todas las materias ordenadas de mayor a menor desaprobación
-        const rankingMaterias = Object.keys(desaprobadasPorMateria).map(name => {
-          return { materia: name, cantidad: desaprobadasPorMateria[name] };
-        }).sort((a, b) => b.cantidad - a.cantidad);
-
-        const ctxMaterias = document.getElementById('chart-materias-desaprobadas').getContext('2d');
-        const labelsMaterias = rankingMaterias.map(r => r.materia.length > 30 ? r.materia.substring(0, 30) + '...' : r.materia);
-        const dataMaterias = rankingMaterias.map(r => r.cantidad);
-
-        dashboardCharts.materiasDesaprobadas = new Chart(ctxMaterias, {
-          type: 'bar',
-          data: {
-            labels: labelsMaterias,
-            datasets: [{
-              label: 'Cantidad de Desaprobados',
-              data: dataMaterias,
-              backgroundColor: 'rgba(231, 76, 60, 0.85)',
-              borderColor: '#c0392b',
-              borderWidth: 1.5
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              x: { 
-                title: { display: true, text: 'Materia' },
-                ticks: {
-                  maxRotation: 45,
-                  minRotation: 45
-                }
-              },
-              y: { 
-                beginAtZero: true, 
-                ticks: { precision: 0 }, 
-                title: { display: true, text: 'Cantidad de Alumnos' } 
-              }
-            },
-            plugins: {
-              title: { display: true, text: 'Análisis Histórico de Desaprobaciones por Materia', font: { size: 14, weight: 'bold' } },
-              legend: { display: false }
-            }
-          }
-        });
-
-      }
-
-      // ==========================================================
       // ★ MANEJO DE EVENTOS DE INTERFAZ ★
       // ==========================================================
       function setupEvents() {
@@ -2163,21 +1686,6 @@
             document.getElementById(tabId).classList.add("active");
           });
         });
-
-        // Toggle Moodle navigation visibility
-        const btnToggleMoodle = document.getElementById("btn-toggle-moodle-nav");
-        if (btnToggleMoodle) {
-          btnToggleMoodle.addEventListener("click", () => {
-            const isHidden = document.body.classList.contains("hide-moodle-navigation");
-            if (isHidden) {
-              document.body.classList.remove("hide-moodle-navigation");
-              btnToggleMoodle.textContent = "Ocultar Configuración de Actividad";
-            } else {
-              document.body.classList.add("hide-moodle-navigation");
-              btnToggleMoodle.textContent = "Mostrar Configuración de Actividad";
-            }
-          });
-        }
 
         // Evento Actualizar datos
         document.getElementById("btn-refresh").addEventListener("click", async () => {
@@ -2197,6 +1705,7 @@
               btn.disabled = false;
               isRefreshCooldown = false;
               btn.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                 Actualizar datos
               `;
             } else {
@@ -2268,14 +1777,6 @@
           document.getElementById(id).addEventListener("input", applyFiltersCuat);
         });
 
-        // Subjects performance cuatrimestre filter change listener
-        const filterMatCuat = document.getElementById("filter-mat-cuat");
-        if (filterMatCuat) {
-          filterMatCuat.addEventListener("change", () => {
-            renderMateriasPerformance();
-          });
-        }
-
         // Botón limpiar filtros cuatrimestres
         document.getElementById("btn-clear-filters-cuat").addEventListener("click", () => {
           inputsCuat.forEach(id => {
@@ -2329,9 +1830,6 @@
           });
         }
       }
-
-      // Initialize the panel directly on load
-      initPanel();
 
     })();
   </script>

@@ -5,87 +5,86 @@
       document.currentScript.parentElement.style.margin = "0";
     }
 
-    // Ocultar el título de la página de Moodle lo más rápido posible
+    // Ocultar el título, pestañas secundarias y reducir márgenes top de Moodle lo más rápido posible
     (function () {
       var style = document.createElement("style");
+      style.id = "moodle-toggle-style";
       style.textContent = `
-         h2:first-of-type, .page-header-headings, .activity-header {
+         body.hide-moodle-navigation h2:first-of-type, 
+         body.hide-moodle-navigation .page-header-headings, 
+         body.hide-moodle-navigation .activity-header, 
+         body.hide-moodle-navigation .secondary-navigation {
            display: none !important;
+         }
+         body.hide-moodle-navigation #page-header {
+           margin-bottom: 0 !important;
+           padding-bottom: 0 !important;
+         }
+         body.hide-moodle-navigation #region-main-box {
+           padding-top: 0 !important;
+         }
+         body.hide-moodle-navigation #region-main {
+           padding-top: 8px !important;
          }
       `;
       document.head.appendChild(style);
+
+      // Apply the class to hide navigation by default
+      if (document.body) {
+        document.body.classList.add("hide-moodle-navigation");
+      } else {
+        document.addEventListener("DOMContentLoaded", function () {
+          document.body.classList.add("hide-moodle-navigation");
+        });
+      }
     })();
   </script>
 </p>
 
-<!-- Pantalla Falsa (Seguridad por Oscuridad) -->
-<div id="pantalla-falsa">
-  <p style="font-size: 15px; color: #444; line-height: 1.8">
-    <strong>Página de pruebaa Moodle</strong>
-  </p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-    cillum dolore eu fugiat nulla pariatur.
-  </p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8">
-    Pellentesque habitant morbi tristique senectus et netus et malesuada fames
-    ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget,
-    tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean
-    ultricies mi vitae est, et nunc
-    <span id="btn-oculto" style="cursor: text">accumsan</span> vehicula nisi.
-    Mauris placerat eleifend leo, quisque sit amet est et sapien ullamcorper
-    pharetra.
-  </p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8">
-    Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius,
-    turpis molestie dictum semper, quam quam congue erat, vitae sodales nisi
-    metus a nunc. Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod
-    sodales, sollicitudin vel, wisi.
-  </p>
-</div>
-
 <!-- Tablero Real -->
-<div id="tablero" style="display: none">
+<div id="tablero">
   <!-- Estilos del Tablero (removidos de aquí e inyectados dinámicamente mediante JS para evitar la sanitización de Moodle) -->
 
   <div id="panel-1er-anio-container">
     <div class="panel-header" style="display: flex !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; border-bottom: 2px solid hsl(168, 60%, 90%) !important; padding-bottom: 10px !important; margin-bottom: 24px !important;">
       <h3 style="color: hsl(168, 60%, 35%) !important; margin-top: 0 !important; margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important;">
-        📖 Panel de 1er Año - Gestión de Alumnos Ingresantes
+        📖 Panel de Primer Año
       </h3>
-      <div style="position: relative; display: inline-block;">
-        <button type="button" id="btn-config-popover" title="Configuración" style="background: none; border: none; padding: 0; margin: 0; cursor: pointer; font-size: 18px; line-height: 1; opacity: 0.7;">
-          ⚙️
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <button type="button" id="btn-toggle-moodle-nav" class="btn-action btn-secondary-action" style="padding: 4px 10px; font-size: 12px; height: 32px;">
+          Mostrar Configuración de Actividad
         </button>
-        <!-- Popover de Configuración Temporal -->
-        <div id="config-popover" style="display: none; position: absolute; right: 0; top: 36px; background: white; border: 1px solid #e3e6f0; border-radius: 8px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; width: 280px; text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 400;">
-          <h4 style="margin-top: 0; margin-bottom: 12px; font-size: 14px; color: hsl(168, 60%, 25%); font-weight: 700; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #eee; padding-bottom: 6px;">
-            ⚙️ Configuración Temporal
-          </h4>
-          <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #333;">
-            <div style="display: flex; flex-direction: column; gap: 4px;">
-              <label for="cfg-cooldown" style="font-weight: 600; color: #555;">Cooldown histórico (seg):</label>
-              <input type="number" id="cfg-cooldown" min="0" value="30" style="padding: 6px; border: 1px solid #d1d3e2; border-radius: 4px; font-size: 13px; color: #333;" />
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 4px;">
-              <label for="cfg-delay-peticiones" style="font-weight: 600; color: #555;">Delay de peticiones (ms):</label>
-              <input type="number" id="cfg-delay-peticiones" min="150" value="500" style="padding: 6px; border: 1px solid #d1d3e2; border-radius: 4px; font-size: 13px; color: #333;" />
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 4px;">
-              <label for="cfg-page-size" style="font-weight: 600; color: #555;">Alumnos por página:</label>
-              <select id="cfg-page-size" style="padding: 6px; border: 1px solid #d1d3e2; border-radius: 4px; font-size: 13px; color: #333; background: white;">
-                <option value="15" selected>15</option>
-                <option value="100">100</option>
-                <option value="500">500</option>
-                <option value="1000">1000</option>
-              </select>
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px;">
-              <button type="button" id="btn-config-cancel" class="btn-action btn-secondary-action" style="padding: 4px 10px; font-size: 12px;">Cancelar</button>
-              <button type="button" id="btn-config-apply" class="btn-action" style="padding: 4px 10px; font-size: 12px;">Aplicar</button>
+        <div style="position: relative; display: inline-block;">
+          <button type="button" id="btn-config-popover" title="Configuración" style="background: none; border: none; padding: 0; margin: 0; cursor: pointer; font-size: 18px; line-height: 1; opacity: 0.7;">
+            ⚙️
+          </button>
+          <!-- Popover de Configuración Temporal -->
+          <div id="config-popover" style="display: none; position: absolute; right: 0; top: 36px; background: white; border: 1px solid #e3e6f0; border-radius: 8px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; width: 280px; text-align: left; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 400;">
+            <h4 style="margin-top: 0; margin-bottom: 12px; font-size: 14px; color: hsl(168, 60%, 25%); font-weight: 700; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+              ⚙️ Configuración Temporal
+            </h4>
+            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #333;">
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="cfg-cooldown" style="font-weight: 600; color: #555;">Cooldown histórico (seg):</label>
+                <input type="number" id="cfg-cooldown" min="0" value="30" style="padding: 6px; border: 1px solid #d1d3e2; border-radius: 4px; font-size: 13px; color: #333;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="cfg-delay-peticiones" style="font-weight: 600; color: #555;">Delay de peticiones (ms):</label>
+                <input type="number" id="cfg-delay-peticiones" min="150" value="500" style="padding: 6px; border: 1px solid #d1d3e2; border-radius: 4px; font-size: 13px; color: #333;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="cfg-page-size" style="font-weight: 600; color: #555;">Alumnos por página:</label>
+                <select id="cfg-page-size" style="padding: 6px; border: 1px solid #d1d3e2; border-radius: 4px; font-size: 13px; color: #333; background: white;">
+                  <option value="15" selected>15</option>
+                  <option value="100">100</option>
+                  <option value="500">500</option>
+                  <option value="1000">1000</option>
+                </select>
+              </div>
+              <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px;">
+                <button type="button" id="btn-config-cancel" class="btn-action btn-secondary-action" style="padding: 4px 10px; font-size: 12px;">Cancelar</button>
+                <button type="button" id="btn-config-apply" class="btn-action" style="padding: 4px 10px; font-size: 12px;">Aplicar</button>
+              </div>
             </div>
           </div>
         </div>
@@ -95,7 +94,7 @@
     <div class="grid-controles">
       <!-- Carga de Alumnos (CSV A) -->
       <div class="card-control">
-        <h4>Cargar Alumnos (CSV A)</h4>
+        <h4>Cargar Alumnos (CSV de Alta)</h4>
         <div
           style="
             display: flex;
@@ -144,7 +143,7 @@
 
       <!-- Carga de Notas (CSV B) -->
       <div class="card-control">
-        <h4>Cargar Notas (CSV B)</h4>
+        <h4>Cargar Notas (CSV de Notas)</h4>
         <div class="input-file-wrapper">
           <div
             style="
@@ -251,7 +250,7 @@
           />
         </div>
         <div class="filter-item">
-          <label for="filter-alargamiento-min">Alargamiento Mínimo (%)</label>
+          <label for="filter-alargamiento-min">Ralentización Mínima (%)</label>
           <input
             type="number"
             id="filter-alargamiento-min"
@@ -262,7 +261,7 @@
           />
         </div>
         <div class="filter-item">
-          <label for="filter-alargamiento-max">Alargamiento Máximo (%)</label>
+          <label for="filter-alargamiento-max">Ralentización Máxima (%)</label>
           <input
             type="number"
             id="filter-alargamiento-max"
@@ -271,6 +270,17 @@
             min="0"
             max="100"
           />
+        </div>
+        <div class="filter-item" style="display: flex; flex-direction: row; align-items: center; gap: 8px; height: 38px; margin-top: auto; margin-bottom: 4px;">
+          <input
+            type="checkbox"
+            id="filter-exclude-2nd-year"
+            style="width: 18px; height: 18px; cursor: pointer;"
+            checked
+          />
+          <label for="filter-exclude-2nd-year" style="cursor: pointer; margin-bottom: 0; font-size: 13px; font-weight: 600; color: #555; user-select: none;">
+            Ocultar alumnos de segundo año
+          </label>
         </div>
       </div>
 
@@ -282,7 +292,7 @@
               <th data-sort="alumno">Nombre ↕</th>
               <th>Materias</th>
               <th data-sort="aprobadas">Aprobadas ↕</th>
-              <th data-sort="ralentizacion">Alargamiento ↕</th>
+              <th data-sort="ralentizacion">Ralentización ↕</th>
             </tr>
           </thead>
           <tbody id="students-tbody">
@@ -339,8 +349,7 @@
           }
           
           #panel-1er-anio-container h3 {
-            color: hsl(168, 60%, 35%);
-            font-weight: 700;
+            color: hsl(168, 60%, 35%) !important;
             margin-top: 0;
             margin-bottom: 0;
             border: none;
@@ -442,14 +451,14 @@
             cursor: not-allowed;
           }
           
-          .btn-secondary-action {
-            background: #f8f9fa;
-            color: #333;
-            border: 1px solid #ccc;
+          .btn-action.btn-secondary-action {
+            background: #f8f9fa !important;
+            color: #333 !important;
+            border: 1px solid #ccc !important;
           }
           
-          .btn-secondary-action:hover:not(:disabled) {
-            background: #e9ecef;
+          .btn-action.btn-secondary-action:hover:not(:disabled) {
+            background: #e9ecef !important;
           }
           
           /* Previsualización del CSV */
@@ -656,20 +665,14 @@
         document.head.appendChild(style);
       })();
 
-      // Revelado del tablero con click en accumsan
-      document
-        .getElementById("btn-oculto")
-        .addEventListener("click", function () {
-          document.getElementById("pantalla-falsa").style.display = "none";
-          document.getElementById("tablero").style.display = "block";
-          initPanel(); // Inicializar el panel al revelar
-        });
-
       // Configuración de Moodle
       const MOODLE_BASE_URL = window.location.origin;
       const DATAID_DB_1ER_ANIO = 19; // DB 1er Año
       const DATAID_DB_HIST_1ER_ANIO = 20; // DB Histórico 1er Año
       const MATERIAS_ESPERADAS_1ER_ANIO = 7;
+
+      // Constante para pruebas de guardado histórico (ej. "2025-1" o "2025-2"). Si es null, se calcula automáticamente.
+      const TEST_PERIODO_OVERRIDE = null;
 
       // Configuración temporal en memoria (editable)
       let config = {
@@ -688,6 +691,7 @@
       let filterText = "";
       let filterMinAlarg = null;
       let filterMaxAlarg = null;
+      let filterExclude2ndYear = true;
       let colOrden = "alumno";
       let dirOrden = "asc"; // asc o desc
 
@@ -1057,8 +1061,9 @@
         return mapping;
       }
 
-      // Calcula cuatrimestre actual
+      // Calcula cuatrimestre actual o utiliza el periodo de prueba override
       function getCuatrimestreActual() {
+        if (TEST_PERIODO_OVERRIDE) return TEST_PERIODO_OVERRIDE;
         const date = new Date();
         const year = date.getFullYear();
         const month = date.getMonth(); // 0 a 11
@@ -1859,6 +1864,21 @@
           activarCooldownSnapshot();
         });
 
+        // Toggle Moodle navigation visibility
+        const btnToggleMoodle = document.getElementById("btn-toggle-moodle-nav");
+        if (btnToggleMoodle) {
+          btnToggleMoodle.addEventListener("click", () => {
+            const isHidden = document.body.classList.contains("hide-moodle-navigation");
+            if (isHidden) {
+              document.body.classList.remove("hide-moodle-navigation");
+              btnToggleMoodle.textContent = "Ocultar Configuración de Actividad";
+            } else {
+              document.body.classList.add("hide-moodle-navigation");
+              btnToggleMoodle.textContent = "Mostrar Configuración de Actividad";
+            }
+          });
+        }
+
         // Filtros e inputs de búsqueda
         const searchInput = document.getElementById("search-student");
         searchInput.addEventListener("input", function (e) {
@@ -1886,6 +1906,17 @@
           pageActual = 1;
           renderTable();
         });
+
+        const exclude2ndYearInput = document.getElementById(
+          "filter-exclude-2nd-year",
+        );
+        if (exclude2ndYearInput) {
+          exclude2ndYearInput.addEventListener("change", function (e) {
+            filterExclude2ndYear = e.target.checked;
+            pageActual = 1;
+            renderTable();
+          });
+        }
 
         // Botón Exportar CSV removido
 
@@ -2068,10 +2099,17 @@
             : false;
           if (filterText && !nombreMatch && !dniMatch) return false;
 
-          // Alargamiento (ralentización)
+          // Ralentización
           const alarg = ralentizacionVal ? parseFloat(ralentizacionVal) : 0;
           if (filterMinAlarg !== null && alarg < filterMinAlarg) return false;
           if (filterMaxAlarg !== null && alarg > filterMaxAlarg) return false;
+
+          // Excluir alumnos de 2do año (aprobadas === 7)
+          if (filterExclude2ndYear) {
+            const aprobadasVal = getRecordValueByKeyword(al, ["aprobadas", "materias_aprobadas"]) || "0";
+            const aprobadas = parseInt(aprobadasVal);
+            if (aprobadas >= MATERIAS_ESPERADAS_1ER_ANIO) return false;
+          }
 
           return true;
         });
@@ -2258,7 +2296,7 @@
         });
       }
 
-      // Función exportarListadoActual removida
+      initPanel();
     })();
   </script>
 </p>

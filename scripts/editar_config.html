@@ -5,82 +5,136 @@
       document.currentScript.parentElement.style.margin = "0";
     }
 
-    // Ocultar el título de la página de Moodle lo más rápido posible
+    // Ocultar el título, pestañas secundarias y reducir márgenes top de Moodle lo más rápido posible
     (function () {
       var style = document.createElement("style");
+      style.id = "moodle-toggle-style";
       style.textContent = `
-         h2:first-of-type, .page-header-headings, .activity-header {
+         body.hide-moodle-navigation h2:first-of-type, 
+         body.hide-moodle-navigation .page-header-headings, 
+         body.hide-moodle-navigation .activity-header, 
+         body.hide-moodle-navigation .secondary-navigation {
            display: none !important;
+         }
+         body.hide-moodle-navigation #page-header {
+           margin-bottom: 0 !important;
+           padding-bottom: 0 !important;
+         }
+         body.hide-moodle-navigation #region-main-box {
+           padding-top: 0 !important;
+         }
+         body.hide-moodle-navigation #region-main {
+           padding-top: 8px !important;
          }
       `;
       document.head.appendChild(style);
+
+      // Apply the class to hide navigation by default
+      if (document.body) {
+        document.body.classList.add("hide-moodle-navigation");
+      } else {
+        document.addEventListener("DOMContentLoaded", function () {
+          document.body.classList.add("hide-moodle-navigation");
+        });
+      }
     })();
   </script>
 </p>
 
-<!-- Pantalla Falsa (Seguridad por Oscuridad) -->
-<div id="pantalla-falsa">
-  <p style="font-size: 15px; color: #444; line-height: 1.8;">
-    <strong>Página de pruebaa Moodle</strong>
-  </p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8;">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-    cillum dolore eu fugiat nulla pariatur.
-  </p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8;">
-    Pellentesque habitant morbi tristique senectus et netus et malesuada fames
-    ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget,
-    tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean
-    ultricies mi vitae est, et nunc
-    <span id="btn-oculto" style="cursor: text;">accumsan</span> vehicula nisi.
-    Mauris placerat eleifend leo, quisque sit amet est et sapien ullamcorper
-    pharetra.
-  </p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8;">
-    Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius,
-    turpis molestie dictum semper, quam quam congue erat, vitae sodales nisi
-    metus a nunc. Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod
-    sodales, sollicitudin vel, wisi.
-  </p>
-</div>
-
 <!-- Tablero Real de Configuración -->
-<div id="tablero" style="display: none;">
+<div id="tablero">
   <div id="panel-config-container">
-    
     <!-- Contenedor del Encabezado (Evita anidar divs dentro de h3) -->
     <div class="panel-header-wrapper">
-      <h3 class="panel-title">⚙️ Editor de Configuración del Sistema (IRD)</h3>
+      <h3 class="panel-title">⚙️ Editor de Configuración del Sistema</h3>
+      <button type="button" id="btn-toggle-moodle-nav" class="btn-action btn-secondary-action">
+        Mostrar Configuración de Actividad
+      </button>
     </div>
 
     <!-- Barra de Estado Dinámica -->
-    <div id="status-bar" class="status-bar-info" style="display: none;"></div>
+    <div id="status-bar" class="status-bar-info" style="display: none"></div>
 
     <!-- Navegación por Pestañas -->
     <div class="tabs-nav">
-      <button type="button" class="tab-btn active" data-tab="tab-general">⚙️ General y Umbrales</button>
-      <button type="button" class="tab-btn" data-tab="tab-encuesta-inicial">📋 Encuesta &zwnj;Inicial</button>
-      <button type="button" class="tab-btn" data-tab="tab-encuesta-cuatrimestral">📊 Encuesta &zwnj;Cuatrimestral</button>
-      <button type="button" class="tab-btn" data-tab="tab-especiales">🎯 Anclas Especiales</button>
+      <button type="button" class="tab-btn active" data-tab="tab-general">
+        ⚙️ General y Umbrales
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-encuesta-inicial">
+        📋 Encuesta &zwnj;Inicial
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        data-tab="tab-encuesta-cuatrimestral"
+      >
+        📊 Encuesta &zwnj;Cuatrimestral
+      </button>
+      <button type="button" class="tab-btn" data-tab="tab-especiales">
+        🎯 Anclas Especiales
+      </button>
     </div>
 
     <!-- Formulario Principal -->
     <form id="config-form" novalidate>
-      
       <!-- Pestaña 1: General y Umbrales -->
       <div id="tab-general" class="tab-content active">
-        
         <!-- Explicación de CMID y DATAID -->
-        <div class="card-section" style="background-color: hsl(168, 60%, 98%); border-left: 4px solid hsl(168, 60%, 35%); margin-bottom: 20px;">
-          <h5 style="margin-top: 0; margin-bottom: 8px; color: hsl(168, 60%, 25%); font-weight: 700;">💡 ¿Cómo identificar el CMID y DATAID en Moodle?</h5>
-          <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #555;">
-            • <strong>CMID (Course Module ID):</strong> Identificador de la actividad en el curso. Búscalo en la barra de direcciones de la actividad en Moodle, tras el parámetro <code>id=</code>.<br>
-            &nbsp;&nbsp;Ejemplo: <code>https://campus.mdp.edu.ar/mod/data/view.php?id=<span style="background-color: #ffeaa7; padding: 2px 5px; border-radius: 4px; font-weight: bold; color: #b7791f; font-family: monospace;">54785</span></code> &nbsp;➔&nbsp; El CMID es <strong>54785</strong>.<br>
-            • <strong>DATAID (Database ID):</strong> Identificador de la Base de Datos. Búscalo al configurar campos o plantillas, tras el parámetro <code>d=</code>.<br>
-            &nbsp;&nbsp;Ejemplo: <code>https://campus.mdp.edu.ar/mod/data/view.php?d=<span style="background-color: #fab1a0; padding: 2px 5px; border-radius: 4px; font-weight: bold; color: #c0392b; font-family: monospace;">17</span></code> &nbsp;➔&nbsp; El DATAID es <strong>17</strong>.
+        <div
+          class="card-section"
+          style="
+            background-color: hsl(168, 60%, 98%);
+            border-left: 4px solid hsl(168, 60%, 35%);
+            margin-bottom: 20px;
+          "
+        >
+          <h5
+            style="
+              margin-top: 0;
+              margin-bottom: 8px;
+              color: hsl(168, 60%, 25%);
+              font-weight: 700;
+            "
+          >
+            💡 ¿Cómo identificar el CMID y DATAID en Moodle?
+          </h5>
+          <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #555">
+            • <strong>CMID (Course Module ID):</strong> Identificador de la
+            actividad en el curso. Búscalo en la barra de direcciones de la
+            actividad en Moodle, tras el parámetro <code>id=</code>.<br />
+            &nbsp;&nbsp;Ejemplo:
+            <code
+              >https://campus.mdp.edu.ar/mod/data/view.php?id=<span
+                style="
+                  background-color: #ffeaa7;
+                  padding: 2px 5px;
+                  border-radius: 4px;
+                  font-weight: bold;
+                  color: #b7791f;
+                  font-family: monospace;
+                "
+                >54785</span
+              ></code
+            >
+            &nbsp;➔&nbsp; El CMID es <strong>54785</strong>.<br />
+            • <strong>DATAID (Database ID):</strong> Identificador de la Base de
+            Datos. Búscalo al configurar campos o plantillas, tras el parámetro
+            <code>d=</code>.<br />
+            &nbsp;&nbsp;Ejemplo:
+            <code
+              >https://campus.mdp.edu.ar/mod/data/view.php?d=<span
+                style="
+                  background-color: #fab1a0;
+                  padding: 2px 5px;
+                  border-radius: 4px;
+                  font-weight: bold;
+                  color: #c0392b;
+                  font-family: monospace;
+                "
+                >17</span
+              ></code
+            >
+            &nbsp;➔&nbsp; El DATAID es <strong>17</strong>.
           </p>
         </div>
 
@@ -89,11 +143,22 @@
           <div class="form-grid">
             <div class="form-group">
               <label for="url-base">URL Base del Campus Moodle</label>
-              <input type="url" id="url-base" required placeholder="Ej. campus.mdp.edu.ar" />
+              <input
+                type="url"
+                id="url-base"
+                required
+                placeholder="Ej. campus.mdp.edu.ar"
+              />
             </div>
             <div class="form-group">
               <label for="curso-id">ID del Curso Moodle</label>
-              <input type="number" id="curso-id" required min="1" placeholder="1732" />
+              <input
+                type="number"
+                id="curso-id"
+                required
+                min="1"
+                placeholder="1732"
+              />
             </div>
           </div>
         </div>
@@ -106,7 +171,9 @@
               <input type="number" id="cmid-inicial" required min="1" />
             </div>
             <div class="form-group">
-              <label for="cmid-cuatrimestral">Feedback Encuesta Cuatrimestral</label>
+              <label for="cmid-cuatrimestral"
+                >Feedback Encuesta Cuatrimestral</label
+              >
               <input type="number" id="cmid-cuatrimestral" required min="1" />
             </div>
             <div class="form-group">
@@ -126,12 +193,36 @@
               <input type="number" id="cmid-1er-anio" required min="1" />
             </div>
             <div class="form-group">
-              <label for="cmid-hist-1er-anio">Base de Datos Histórico 1er Año</label>
+              <label for="cmid-hist-1er-anio"
+                >Base de Datos Histórico 1er Año</label
+              >
               <input type="number" id="cmid-hist-1er-anio" required min="1" />
             </div>
             <div class="form-group">
-              <label for="cmid-hist-general">Base de Datos Histórico General</label>
+              <label for="cmid-hist-general"
+                >Base de Datos Histórico General</label
+              >
               <input type="number" id="cmid-hist-general" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="cmid-historial-asistencias"
+                >Base de Datos Historial Asistencias-Alumno</label
+              >
+              <input type="number" id="cmid-historial-asistencias" required min="1" />
+            </div>
+
+            <div class="form-group">
+              <label for="cmid-control-encuestas"
+                >Base de Datos Control Encuestas</label
+              >
+              <input type="number" id="cmid-control-encuestas" required min="1" />
+            </div>
+
+            <div class="form-group">
+              <label for="cmid-encuestas-tutor"
+                >Base de Datos Encuestas Tutor</label
+              >
+              <input type="number" id="cmid-encuestas-tutor" required min="1" />
             </div>
           </div>
         </div>
@@ -156,12 +247,36 @@
               <input type="number" id="dataid-1er-anio" required min="1" />
             </div>
             <div class="form-group">
-              <label for="dataid-hist-1er-anio">DB Histórico 1er Año (d=X)</label>
+              <label for="dataid-hist-1er-anio"
+                >DB Histórico 1er Año (d=X)</label
+              >
               <input type="number" id="dataid-hist-1er-anio" required min="1" />
             </div>
             <div class="form-group">
-              <label for="dataid-hist-general">DB Histórico General (d=X)</label>
+              <label for="dataid-hist-general"
+                >DB Histórico General (d=X)</label
+              >
               <input type="number" id="dataid-hist-general" required min="1" />
+            </div>
+            <div class="form-group">
+              <label for="dataid-historial-asistencias"
+                >DB Historial Asistencias-Alumno (d=X)</label
+              >
+              <input type="number" id="dataid-historial-asistencias" required min="1" />
+            </div>
+
+            <div class="form-group">
+              <label for="dataid-control-encuestas"
+                >DB Control Encuestas (d=X)</label
+              >
+              <input type="number" id="dataid-control-encuestas" required min="1" />
+            </div>
+
+            <div class="form-group">
+              <label for="dataid-encuestas-tutor"
+                >DB Encuestas Tutor (d=X)</label
+              >
+              <input type="number" id="dataid-encuestas-tutor" required min="1" />
             </div>
           </div>
         </div>
@@ -170,32 +285,59 @@
           <h4>📈 Umbrales y Tiempos de Espera</h4>
           <div class="form-grid">
             <div class="form-group">
-              <label for="threshold-ird">Umbral IRD de Alerta (Rojo/Amarillo)</label>
-              <input type="number" id="threshold-ird" required min="0" max="100" />
+              <label for="threshold-ird">Umbral IRD Verde a Amarillo</label>
+              <input
+                type="number"
+                id="threshold-ird"
+                required
+                min="0"
+                max="100"
+              />
             </div>
             <div class="form-group">
-              <label for="cooldown-actualizar">Cooldown botón Actualizar (segundos)</label>
+              <label for="threshold-ird-red">Umbral IRD Amarillo a Rojo</label>
+              <input
+                type="number"
+                id="threshold-ird-red"
+                required
+                min="0"
+                max="100"
+              />
+            </div>
+            <div class="form-group">
+              <label for="cooldown-actualizar"
+                >Cooldown botón Actualizar (segundos)</label
+              >
               <input type="number" id="cooldown-actualizar" required min="0" />
             </div>
+
             <div class="form-group">
-              <label for="warning-days">Días para Alerta de Encuesta Desactualizada</label>
-              <input type="number" id="warning-days" required min="0" />
-            </div>
-            <div class="form-group">
-              <label for="cuatrimestres-desercion">Cuatrimestres sin Encuesta para considerar Deserción</label>
-              <input type="number" id="cuatrimestres-desercion" required min="1" />
+              <label for="cuatrimestres-desercion"
+                >Cuatrimestres sin Encuesta para considerar Deserción</label
+              >
+              <input
+                type="number"
+                id="cuatrimestres-desercion"
+                required
+                min="1"
+              />
             </div>
             <div class="form-group">
               <label for="delay-ms">Delay de escritura Histórica (ms)</label>
               <input type="number" id="delay-ms" required min="0" step="50" />
             </div>
+
             <div class="form-group">
-              <label for="moodle-page-size">Tamaño de página Scraping Moodle (feedback/db)</label>
-              <input type="number" id="moodle-page-size" required min="1" />
+              <label for="panel-page-size"
+                >Tamaño de página visualización Tableros</label
+              >
+              <input type="number" id="panel-page-size" required min="1" />
             </div>
             <div class="form-group">
-              <label for="panel-page-size">Tamaño de página visualización Tableros</label>
-              <input type="number" id="panel-page-size" required min="1" />
+              <label for="cooldown-control-encuestas"
+                >Días de Cooldown Control Encuestas</label
+              >
+              <input type="number" id="cooldown-control-encuestas" required min="0" />
             </div>
           </div>
         </div>
@@ -205,7 +347,13 @@
       <div id="tab-encuesta-inicial" class="tab-content">
         <div class="section-actions-top">
           <h5>Lista de Preguntas que contribuyen al Cálculo del IRD</h5>
-          <button type="button" id="btn-add-pregunta-inicial" class="btn-action">➕ Añadir Pregunta</button>
+          <button
+            type="button"
+            id="btn-add-pregunta-inicial"
+            class="btn-action"
+          >
+            ➕ Añadir Pregunta
+          </button>
         </div>
         <div id="preguntas-inicial-container" class="preguntas-list"></div>
       </div>
@@ -214,9 +362,18 @@
       <div id="tab-encuesta-cuatrimestral" class="tab-content">
         <div class="section-actions-top">
           <h5>Lista de Preguntas que contribuyen al Cálculo del IRD</h5>
-          <button type="button" id="btn-add-pregunta-cuatrimestral" class="btn-action">➕ Añadir Pregunta</button>
+          <button
+            type="button"
+            id="btn-add-pregunta-cuatrimestral"
+            class="btn-action"
+          >
+            ➕ Añadir Pregunta
+          </button>
         </div>
-        <div id="preguntas-cuatrimestral-container" class="preguntas-list"></div>
+        <div
+          id="preguntas-cuatrimestral-container"
+          class="preguntas-list"
+        ></div>
       </div>
 
       <!-- Pestaña 4: Anclas Especiales -->
@@ -224,21 +381,52 @@
         <div class="card-section">
           <h4>🎯 Preguntas de Anclaje de Estado o Lógica Especial</h4>
           <p class="section-desc">
-            Estas preguntas son requeridas por el sistema para procesos lógicos especiales. 
-            El valor asignado debe ser el **encabezado exacto de columna del CSV** en Moodle.
+            Estas preguntas son requeridas por el sistema para procesos lógicos
+            especiales. El valor asignado debe ser el **encabezado exacto de
+            columna del CSV** en Moodle.
           </p>
           <div class="form-grid">
             <div class="form-group">
-              <label for="id-percepcion-riesgo">Pregunta de Autopercepción de Riesgo de Abandono</label>
-              <input type="text" id="id-percepcion-riesgo" required placeholder="Ej. (ABANDONAR_CARRERA) ¿Crees que estás en riesgo...?" />
+              <label for="id-percepcion-riesgo"
+                >Pregunta de Autopercepción de Riesgo de Abandono</label
+              >
+              <input
+                type="text"
+                id="id-percepcion-riesgo"
+                required
+                placeholder="Ej. (ABANDONAR_CARRERA) ¿Crees que estás en riesgo...?"
+              />
             </div>
             <div class="form-group">
-              <label for="id-anio-ingreso">Pregunta de Año de Ingreso (Cohorte)</label>
-              <input type="text" id="id-anio-ingreso" required placeholder="Ej. ¿En qué año ingresaste a la carrera...?" />
+              <label for="id-anio-ingreso"
+                >Pregunta de Año de Ingreso (Cohorte)</label
+              >
+              <input
+                type="text"
+                id="id-anio-ingreso"
+                required
+                placeholder="Ej. ¿En qué año ingresaste a la carrera...?"
+              />
+            </div>
+            <div class="form-group">
+              <label for="id-cuat-ingreso"
+                >Pregunta de Cuatrimestre de Ingreso</label
+              >
+              <input
+                type="text"
+                id="id-cuat-ingreso"
+                required
+                placeholder="Ej. ¿En qué cuatrimestre?"
+              />
             </div>
             <div class="form-group">
               <label for="id-egreso">Pregunta de Estado de Egreso</label>
-              <input type="text" id="id-egreso" required placeholder="Ej. (EGRESO) ¿Ha egresado?" />
+              <input
+                type="text"
+                id="id-egreso"
+                required
+                placeholder="Ej. (EGRESO) ¿Ha egresado?"
+              />
             </div>
           </div>
         </div>
@@ -246,9 +434,14 @@
 
       <!-- Botón de Guardado General -->
       <div class="form-submit-container">
-        <button type="button" id="btn-submit-config" class="btn-action btn-submit-large">💾 Guardar Configuración</button>
+        <button
+          type="button"
+          id="btn-submit-config"
+          class="btn-action btn-submit-large"
+        >
+          💾 Guardar Configuración
+        </button>
       </div>
-
     </form>
   </div>
 </div>
@@ -259,8 +452,8 @@
       // ==========================================================
       // ★ CONSTANTES DE CONFIGURACIÓN MOODLE (EDITAR AQUÍ SI CAMBIA DE AULA) ★
       // ==========================================================
-      const CONFIG_DB_CMID = 54785;  // CMID de la actividad "Db Config"
-      const CONFIG_DB_ID = 17;       // DATAID de la base de datos "Db Config" (parámetro d=17)
+      const CONFIG_DB_CMID = 54785; // CMID de la actividad "Db Config"
+      const CONFIG_DB_ID = 17; // DATAID de la base de datos "Db Config" (parámetro d=17)
       const MOODLE_BASE_URL = window.location.origin;
 
       // Inyectar estilos CSS específicos de la UI de configuración dinámica para evitar la sanitización de Moodle
@@ -279,16 +472,29 @@
           }
           
           .panel-header-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             border-bottom: 2px solid hsl(168, 60%, 90%);
             padding-bottom: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+          }
+          
+          .btn-action.btn-secondary-action {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+            border: 1px solid #d1d3e2 !important;
+          }
+          
+          .btn-action.btn-secondary-action:hover:not(:disabled) {
+            background: #e9ecef !important;
           }
           
           .panel-title {
             color: hsl(168, 60%, 35%) !important;
-            font-weight: 700;
             margin: 0 !important;
-            font-size: 20px;
           }
           
           .section-desc {
@@ -615,267 +821,271 @@
 
       // Fallback de configuración por defecto
       const DEFAULT_CONFIG = {
-        "_INFO": {
-          "version": "1.0",
-          "ultima_revision": "2026-06-13",
-          "descripcion": "Configuracion del sistema de Indice de Riesgo de Desercion (IRD). Solo incluye preguntas que aportan al calculo (beta/X) o que el sistema necesita como anclas especiales.",
-          "IMPORTANTE_IDS": "El campo 'id' de cada pregunta es el encabezado de columna EXACTO del CSV exportado por Moodle."
+        _INFO: {
+          version: "1.0",
+          ultima_actualización: "2026-06-13",
+          descripcion:
+            "Configuracion del sistema de Indice de Riesgo de Desercion (IRD). Solo incluye preguntas que aportan al calculo (beta/X) o que el sistema necesita como anclas especiales.",
+          IMPORTANTE_IDS:
+            "El campo 'id' de cada pregunta es el encabezado de columna EXACTO del CSV exportado por Moodle.",
         },
-        "urls": {
-          "base": "https" + "://ingenieria.campus.mdp.edu.ar",
-          "curso_id": 1732,
-          "cmids": {
-            "encuesta_inicial": 54062,
-            "encuesta_cuatrimestral": 54284,
-            "db_solicitudes": 54783,
-            "db_logs": 54784,
-            "db_historico": 54788,
-            "db_1er_anio": 54789,
-            "db_historico_1er_anio": 54791,
-            "db_historico_general": 54862
+        urls: {
+          base: "",
+          curso_id: 0,
+          cmids: {
+            encuesta_inicial: 0,
+            encuesta_cuatrimestral: 0,
+            db_solicitudes: 0,
+            db_logs: 0,
+            db_historico: 0,
+            db_1er_anio: 0,
+            db_historico_1er_anio: 0,
+            db_historico_general: 0,
+            db_historial_asistencias: 0,
+            db_control_encuestas: 0,
+            db_encuestas_tutor: 0,
           },
-          "dataids": {
-            "db_solicitudes": 15,
-            "db_logs": 16,
-            "db_historico": 18,
-            "db_1er_anio": 19,
-            "db_historico_1er_anio": 20,
-            "db_historico_general": 21
-          }
+          dataids: {
+            db_solicitudes: 0,
+            db_logs: 0,
+            db_historico: 0,
+            db_1er_anio: 0,
+            db_historico_1er_anio: 0,
+            db_historico_general: 0,
+            db_historial_asistencias: 0,
+            db_control_encuestas: 0,
+            db_encuestas_tutor: 0,
+          },
         },
-        "umbrales": {
-          "threshold_ird": 40,
-          "cooldown_actualizar_seg": 30,
-          "quarterly_warning_days": 90,
-          "cuatrimestres_desercion": 2,
-          "historico_delay_ms": 500,
-          "results_per_page_moodle": 10,
-          "page_size_paneles": 30
+        umbrales: {
+          threshold_ird: 40,
+          threshold_ird_red: 80,
+          cooldown_actualizar_seg: 30,
+          cuatrimestres_desercion: 2,
+          historico_delay_ms: 500,
+          page_size_paneles: 30,
+          cooldown_control_encuestas_dias: 7,
         },
-        "encuesta_inicial": {
-          "cmid": 54062,
-          "preguntas": [
+        encuesta_inicial: {
+          cmid: 54062,
+          preguntas: [
             {
-              "id": "Orientación de tu colegio secundario",
-              "tipo": "seleccion_unica",
-              "beta": 0.5,
-              "max_value": 0.2,
-              "respuestas": {
-                "Técnico": 0,
-                "Bachiller": 0.2
-              }
+              id: "Orientación de tu colegio secundario",
+              tipo: "seleccion_unica",
+              beta: 0.5,
+              max_value: 0.2,
+              respuestas: {
+                Técnico: 0,
+                Bachiller: 0.2,
+              },
             },
             {
-              "id": "¿Cual es el máximo nivel académico alcanzado por alguno de tus Padres/Tutores?",
-              "tipo": "seleccion_unica",
-              "beta": 1,
-              "max_value": 0.8,
-              "respuestas": {
+              id: "¿Cual es el máximo nivel académico alcanzado por alguno de tus Padres/Tutores?",
+              tipo: "seleccion_unica",
+              beta: 1,
+              max_value: 0.8,
+              respuestas: {
                 "No posee": 0.8,
                 "Primario completo": 0.6,
                 "Secundario completo": 0.3,
-                "Terciario - Universitario completo": 0.1
-              }
-            },
-            {
-              "id": "(CARRERA) ¿Es tu primera carrera universitaria dentro de la facultad?",
-              "tipo": "si_no",
-              "beta": 0.5,
-              "max_value": 0.3,
-              "respuestas": {
-                "Si": 0.3,
-                "No": 0
-              }
-            },
-            {
-              "id": "¿Cuántas personas tenes a cargo?",
-              "tipo": "numerico",
-              "beta": 2,
-              "max_value": null,
-              "respuestas": null
-            },
-            {
-              "id": "(TRABAJO) ¿Trabaja actualmente?",
-              "tipo": "si_no",
-              "beta": 1.5,
-              "max_value": 0.45,
-              "respuestas": {
-                "No": 0,
-                "Sí": "calculado en código según subpregunta"
+                "Terciario - Universitario completo": 0.1,
               },
-              "subpreguntas": [
+            },
+            {
+              id: "(CARRERA) ¿Es tu primera carrera universitaria dentro de la facultad?",
+              tipo: "si_no",
+              beta: 0.5,
+              max_value: 0.3,
+              respuestas: {
+                Si: 0.3,
+                No: 0,
+              },
+            },
+            {
+              id: "¿Cuántas personas tenes a cargo?",
+              tipo: "numerico",
+              beta: 2,
+              max_value: null,
+              respuestas: null,
+            },
+            {
+              id: "(TRABAJO) ¿Trabaja actualmente?",
+              tipo: "si_no",
+              beta: 1.5,
+              max_value: 0.45,
+              respuestas: {
+                No: 0,
+                Sí: "calculado en código según subpregunta",
+              },
+              subpreguntas: [
                 {
-                  "id": "¿Cuántas horas semanales trabajas?",
-                  "tipo": "seleccion_unica",
-                  "condicion": "Sí",
-                  "respuestas": {
+                  id: "¿Cuántas horas semanales trabajas?",
+                  tipo: "seleccion_unica",
+                  condicion: "Sí",
+                  respuestas: {
                     "Menos de 5hs": 0.0,
                     "Entre 6hs y 20hs": 0.1,
                     "Entre 21hs y 40hs": 0.25,
-                    "Más de 40hs": 0.45
-                  }
-                }
-              ]
+                    "Más de 40hs": 0.45,
+                  },
+                },
+              ],
             },
             {
-              "id": "Situación económica",
-              "tipo": "seleccion_unica",
-              "beta": 2,
-              "max_value": 1,
-              "respuestas": {
+              id: "Situación económica",
+              tipo: "seleccion_unica",
+              beta: 2,
+              max_value: 1,
+              respuestas: {
                 "1 - Muy mala": 1,
                 "2 - Mala": 0.5,
                 "3 - Regular": 0.2,
                 "4 - Buena": -0.2,
-                "5 - Muy buena": -0.5
-              }
+                "5 - Muy buena": -0.5,
+              },
             },
             {
-              "id": "¿Con cuánta disponibilidad de tiempo posees para estudiar?",
-              "tipo": "seleccion_unica",
-              "beta": 2.5,
-              "max_value": 0.9,
-              "respuestas": {
+              id: "¿Con cuánta disponibilidad de tiempo posees para estudiar?",
+              tipo: "seleccion_unica",
+              beta: 2.5,
+              max_value: 0.9,
+              respuestas: {
                 "1 - Muy poco tiempo": 0.9,
                 "2 - Poco tiempo": 0.7,
                 "3 - Tiempo regular": 0.0,
                 "4 - Tiempo suficiente": -0.2,
-                "5 - Mucho tiempo": -0.5
-              }
+                "5 - Mucho tiempo": -0.5,
+              },
             },
             {
-              "id": "¿Cuánto tiempo tardas en llegar a la facultad? ",
-              "tipo": "seleccion_unica",
-              "beta": 1,
-              "max_value": 0.25,
-              "respuestas": {
+              id: "¿Cuánto tiempo tardas en llegar a la facultad? ",
+              tipo: "seleccion_unica",
+              beta: 1,
+              max_value: 0.25,
+              respuestas: {
                 "Menos de 20 minutos": 0,
                 "Entre 20 y 40 minutos": 0.08,
                 "Entre 41 y 60 minutos": 0.156,
-                "Más de 60 minutos": 0.25
-              }
+                "Más de 60 minutos": 0.25,
+              },
             },
             {
-              "id": "¿Cómo financiás económicamente tus estudios?",
-              "tipo": "seleccion_unica",
-              "beta": 1.8,
-              "max_value": 1,
-              "respuestas": {
+              id: "¿Cómo financiás económicamente tus estudios?",
+              tipo: "seleccion_unica",
+              beta: 1.8,
+              max_value: 1,
+              respuestas: {
                 "Beca Estudiantil": -1,
                 "Financiamiento Familiar": 0,
                 "Financiamiento Propio": 0.5,
-                "Otros": null
-              }
+                Otros: null,
+              },
             },
             {
-              "id": "¿Por qué eligió la carrera?",
-              "tipo": "seleccion_unica",
-              "beta": 0.5,
-              "max_value": 0.6,
-              "respuestas": {
-                "Vocación": 0.2,
+              id: "¿Por qué eligió la carrera?",
+              tipo: "seleccion_unica",
+              beta: 0.5,
+              max_value: 0.6,
+              respuestas: {
+                Vocación: 0.2,
                 "Salida Laboral": 0.6,
-                "Recomendación": 0.4,
-                "Otro": null
-              }
-            }
-          ]
+                Recomendación: 0.4,
+                Otro: null,
+              },
+            },
+          ],
         },
-        "encuesta_cuatrimestral": {
-          "cmid": 54284,
-          "preguntas": [
+        encuesta_cuatrimestral: {
+          cmid: 54284,
+          preguntas: [
             {
-              "id": "(ABANDONAR_MATERIAS) En este cuatrimestre ¿Abandonó alguna materia?",
-              "tipo": "si_no",
-              "beta": 2,
-              "max_value": null,
-              "respuestas": {
-                "No": 0,
-                "Si": "calculado en código según cantidad de materias abandonadas"
-              }
+              id: "(ABANDONAR_MATERIAS) En este cuatrimestre ¿Abandonó alguna materia?",
+              tipo: "si_no",
+              beta: 2,
+              max_value: null,
+              respuestas: {
+                No: 0,
+                Si: "calculado en código según cantidad de materias abandonadas",
+              },
             },
             {
-              "id": "Satisfacción con respecto al cuatrimestre cursado",
-              "tipo": "seleccion_unica",
-              "beta": 1,
-              "max_value": 1,
-              "respuestas": {
+              id: "Satisfacción con respecto al cuatrimestre cursado",
+              tipo: "seleccion_unica",
+              beta: 1,
+              max_value: 1,
+              respuestas: {
                 "1 - No satisfactorio": 1,
                 "2 - Poco satisfactorio": 0.5,
                 "3 - Regular": 0,
                 "4 - Satisfactorio": -0.5,
-                "5 - Muy satisfactorio": -1
-              }
+                "5 - Muy satisfactorio": -1,
+              },
             },
             {
-              "id": "Nivel de estrés que sufrió durante el cuatrimestre",
-              "tipo": "seleccion_unica",
-              "beta": 1.5,
-              "max_value": 0.7,
-              "respuestas": {
+              id: "Nivel de estrés que sufrió durante el cuatrimestre",
+              tipo: "seleccion_unica",
+              beta: 1.5,
+              max_value: 0.7,
+              respuestas: {
                 "1 - Sin estrés": 0,
                 "2 - Estrés bajo": 0.2,
                 "3 - Estrés moderado": 0.35,
                 "4 - Estrés medio": 0.5,
-                "5 - Estrés elevado": 0.7
-              }
+                "5 - Estrés elevado": 0.7,
+              },
             },
             {
-              "id": "¿Qué tan motivado está a continuar la carrera?",
-              "tipo": "seleccion_unica",
-              "beta": 2.5,
-              "max_value": 1,
-              "respuestas": {
+              id: "¿Qué tan motivado está a continuar la carrera?",
+              tipo: "seleccion_unica",
+              beta: 2.5,
+              max_value: 1,
+              respuestas: {
                 "1 - No estoy motivado": 1,
                 "2 - Motivación baja": 0.5,
                 "3 - Motivación moderada": 0,
                 "4 - Motivación alta": -0.5,
-                "5 - Muy motivado": -1
-              }
+                "5 - Muy motivado": -1,
+              },
             },
             {
-              "id": "¿Qué tan al día estás con el plan de estudios?",
-              "tipo": "seleccion_unica",
-              "beta": 1.5,
-              "max_value": 0.8,
-              "respuestas": {
+              id: "¿Qué tan al día estás con el plan de estudios?",
+              tipo: "seleccion_unica",
+              beta: 1.5,
+              max_value: 0.8,
+              respuestas: {
                 "1 - Adelantado": -1,
                 "2 - Al día": 0,
                 "3 - Atrasado un cuatrimestre": 0.25,
                 "4 - Atrasado un año": 0.5,
-                "5 - Atrasado más de un año": 0.8
-              }
+                "5 - Atrasado más de un año": 0.8,
+              },
             },
             {
-              "id": "¿Tenés grupo de estudio/compañeros con los que estudiar?",
-              "tipo": "si_no",
-              "beta": 1,
-              "max_value": 0.4,
-              "respuestas": {
-                "Sí": -0.1,
-                "No": 0.4
-              }
-            }
-          ]
+              id: "¿Tenés grupo de estudio/compañeros con los que estudiar?",
+              tipo: "si_no",
+              beta: 1,
+              max_value: 0.4,
+              respuestas: {
+                Sí: -0.1,
+                No: 0.4,
+              },
+            },
+          ],
         },
-        "preguntas_especiales": {
-          "id_percepcion_riesgo": "(ABANDONAR_CARRERA) ¿Crees que estás en riesgo de abandonar la carrera?",
-          "id_anio_ingreso": "¿En qué año ingresaste a la carrera? (Primer cuatrimestre cursado)",
-          "id_egreso": "(EGRESO) ¿Ha egresado?"
-        }
+        preguntas_especiales: {
+          id_percepcion_riesgo:
+            "(ABANDONAR_CARRERA) ¿Crees que estás en riesgo de abandonar la carrera?",
+          id_anio_ingreso:
+            "¿En qué año ingresaste a la carrera? (Primer cuatrimestre cursado)",
+          id_cuat_ingreso: "¿En qué cuatrimestre?",
+          id_egreso: "(EGRESO) ¿Ha egresado?",
+        },
       };
 
       // Estado en memoria
       let configData = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
       let currentRid = 0;
       let targetFieldName = ""; // Se resolverá dinámicamente
-
-      // Revelado del tablero con clic en accumsan
-      document.getElementById("btn-oculto").addEventListener("click", function () {
-        document.getElementById("pantalla-falsa").style.display = "none";
-        document.getElementById("tablero").style.display = "block";
-        initPanel();
-      });
 
       // Muestra un mensaje en la barra de estado
       function showStatus(text, type = "info") {
@@ -910,12 +1120,13 @@
         if (!rawText) return null;
         let clean = rawText.replace(/<br\s*\/?>/gi, "\n");
         clean = clean.replace(/<[^>]*>/g, "");
-        clean = clean.replace(/&nbsp;/g, " ")
-                     .replace(/\u00a0/g, " ")
-                     .replace(/&quot;/g, '"')
-                     .replace(/&lt;/g, '<')
-                     .replace(/&gt;/g, '>')
-                     .replace(/&amp;/g, '&');
+        clean = clean
+          .replace(/&nbsp;/g, " ")
+          .replace(/\u00a0/g, " ")
+          .replace(/&quot;/g, '"')
+          .replace(/&lt;/g, "<")
+          .replace(/&gt;/g, ">")
+          .replace(/&amp;/g, "&");
         try {
           return JSON.parse(clean);
         } catch (e) {
@@ -928,10 +1139,12 @@
       function parseViewHTML(html) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
-        
+
         // Extraer rid de los enlaces de edición de la entrada
         let rid = 0;
-        const editLinks = doc.querySelectorAll('a[href*="edit.php"][href*="rid="]');
+        const editLinks = doc.querySelectorAll(
+          'a[href*="edit.php"][href*="rid="]',
+        );
         for (let link of editLinks) {
           const match = link.href.match(/rid=(\d+)/);
           if (match) {
@@ -942,7 +1155,9 @@
 
         // Buscar el contenido del campo json_config
         let jsonText = "";
-        const htmlFields = doc.querySelectorAll(".data-field-html, .col-8, .col-lg-9");
+        const htmlFields = doc.querySelectorAll(
+          ".data-field-html, .col-8, .col-lg-9",
+        );
         for (let field of htmlFields) {
           const text = field.textContent.trim();
           if (text.startsWith("{") && text.endsWith("}")) {
@@ -984,7 +1199,9 @@
           for (let bold of boldLabels) {
             if (bold.textContent.toLowerCase().includes("json_config")) {
               const formGroup = bold.closest("div, td, tr");
-              const area = formGroup?.querySelector('textarea[name^="field_"], input[name^="field_"]');
+              const area = formGroup?.querySelector(
+                'textarea[name^="field_"], input[name^="field_"]',
+              );
               if (area) {
                 const match = area.name.match(/field_(\d+)/);
                 if (match) return `field_${match[1]}`;
@@ -992,7 +1209,10 @@
             }
           }
         } catch (e) {
-          console.error("Error al obtener el mapeo dinámico del campo Moodle:", e);
+          console.error(
+            "Error al obtener el mapeo dinámico del campo Moodle:",
+            e,
+          );
         }
         return null;
       }
@@ -1004,7 +1224,7 @@
           const viewUrl = `${MOODLE_BASE_URL}/mod/data/view.php?d=${CONFIG_DB_ID}`;
           const res = await fetch(viewUrl);
           const html = await res.text();
-          
+
           const parsed = parseViewHTML(html);
           currentRid = parsed.rid;
 
@@ -1015,16 +1235,25 @@
               showStatus("✅ Configuración cargada correctamente.", "success");
               setTimeout(hideStatus, 3000);
             } else {
-              showStatus("⚠️ La base de datos tiene datos corruptos. Se cargó la configuración por defecto.", "info");
+              showStatus(
+                "⚠️ La base de datos tiene datos corruptos. Se cargó la configuración por defecto.",
+                "info",
+              );
             }
           } else {
-            showStatus("ℹ️ No se encontró configuración previa en Moodle. Se inicializa con valores por defecto.", "info");
+            showStatus(
+              "ℹ️ No se encontró configuración previa en Moodle. Se inicializa con valores por defecto.",
+              "info",
+            );
           }
 
           // Obtener el mapeo de campos dinámico
           targetFieldName = await resolveFieldMapping();
           if (!targetFieldName) {
-            showStatus("❌ Error: No se pudo mapear dinámicamente el campo 'json_config' en la base de datos de Moodle.", "error");
+            showStatus(
+              "❌ Error: No se pudo mapear dinámicamente el campo 'json_config' en la base de datos de Moodle.",
+              "error",
+            );
           }
 
           // Rellenar la UI y configurar listeners
@@ -1034,11 +1263,17 @@
           renderPreguntasList("cuatrimestral");
           setupTabEvents();
           setupDynamicEvents();
-
         } catch (e) {
           console.error("Error en inicialización del panel:", e);
-          showStatus("⚠️ Error al conectar con Moodle. Se muestran datos por defecto.", "error");
+          showStatus(
+            "❌ Error crítico: No se pudo conectar con Moodle para obtener la configuración.",
+            "error",
+          );
           targetFieldName = null;
+          // Deshabilitar botón de guardar
+          const btnSubmit = document.getElementById("btn-submit-config");
+          if (btnSubmit) btnSubmit.disabled = true;
+          
           fillGeneralTab();
           fillEspecialesTab();
           renderPreguntasList("inicial");
@@ -1051,12 +1286,14 @@
       // Control de la navegación de pestañas
       function setupTabEvents() {
         const tabBtns = document.querySelectorAll(".tab-btn");
-        tabBtns.forEach(btn => {
+        tabBtns.forEach((btn) => {
           btn.addEventListener("click", function () {
             // Quitar clase activa
-            tabBtns.forEach(b => b.classList.remove("active"));
-            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-            
+            tabBtns.forEach((b) => b.classList.remove("active"));
+            document
+              .querySelectorAll(".tab-content")
+              .forEach((c) => c.classList.remove("active"));
+
             // Añadir activa al clickeado
             btn.classList.add("active");
             const targetTab = btn.getAttribute("data-tab");
@@ -1068,46 +1305,89 @@
       // Rellena la pestaña general a partir de configData
       function fillGeneralTab() {
         document.getElementById("url-base").value = configData.urls.base || "";
-        document.getElementById("curso-id").value = configData.urls.curso_id || "";
+        document.getElementById("curso-id").value =
+          configData.urls.curso_id || "";
 
         // CMIDs
-        document.getElementById("cmid-inicial").value = configData.urls.cmids.encuesta_inicial || "";
-        document.getElementById("cmid-cuatrimestral").value = configData.urls.cmids.encuesta_cuatrimestral || "";
-        document.getElementById("cmid-solicitudes").value = configData.urls.cmids.db_solicitudes || "";
-        document.getElementById("cmid-logs").value = configData.urls.cmids.db_logs || "";
-        document.getElementById("cmid-historico").value = configData.urls.cmids.db_historico || "";
-        document.getElementById("cmid-1er-anio").value = configData.urls.cmids.db_1er_anio || "";
-        document.getElementById("cmid-hist-1er-anio").value = configData.urls.cmids.db_historico_1er_anio || "";
-        document.getElementById("cmid-hist-general").value = configData.urls.cmids.db_historico_general || "";
+        document.getElementById("cmid-inicial").value =
+          configData.urls.cmids.encuesta_inicial || "";
+        document.getElementById("cmid-cuatrimestral").value =
+          configData.urls.cmids.encuesta_cuatrimestral || "";
+        document.getElementById("cmid-solicitudes").value =
+          configData.urls.cmids.db_solicitudes || "";
+        document.getElementById("cmid-logs").value =
+          configData.urls.cmids.db_logs || "";
+        document.getElementById("cmid-historico").value =
+          configData.urls.cmids.db_historico || "";
+        document.getElementById("cmid-1er-anio").value =
+          configData.urls.cmids.db_1er_anio || "";
+        document.getElementById("cmid-hist-1er-anio").value =
+          configData.urls.cmids.db_historico_1er_anio || "";
+        document.getElementById("cmid-hist-general").value =
+          configData.urls.cmids.db_historico_general || "";
+        document.getElementById("cmid-historial-asistencias").value =
+          configData.urls.cmids.db_historial_asistencias || "";
+        document.getElementById("cmid-control-encuestas").value =
+          configData.urls.cmids.db_control_encuestas || "";
+        document.getElementById("cmid-encuestas-tutor").value =
+          configData.urls.cmids.db_encuestas_tutor || "";
 
         // DATAIDs
-        document.getElementById("dataid-solicitudes").value = configData.urls.dataids.db_solicitudes || "";
-        document.getElementById("dataid-logs").value = configData.urls.dataids.db_logs || "";
-        document.getElementById("dataid-historico").value = configData.urls.dataids.db_historico || "";
-        document.getElementById("dataid-1er-anio").value = configData.urls.dataids.db_1er_anio || "";
-        document.getElementById("dataid-hist-1er-anio").value = configData.urls.dataids.db_historico_1er_anio || "";
-        document.getElementById("dataid-hist-general").value = configData.urls.dataids.db_historico_general || "";
+        document.getElementById("dataid-solicitudes").value =
+          configData.urls.dataids.db_solicitudes || "";
+        document.getElementById("dataid-logs").value =
+          configData.urls.dataids.db_logs || "";
+        document.getElementById("dataid-historico").value =
+          configData.urls.dataids.db_historico || "";
+        document.getElementById("dataid-1er-anio").value =
+          configData.urls.dataids.db_1er_anio || "";
+        document.getElementById("dataid-hist-1er-anio").value =
+          configData.urls.dataids.db_historico_1er_anio || "";
+        document.getElementById("dataid-hist-general").value =
+          configData.urls.dataids.db_historico_general || "";
+        document.getElementById("dataid-historial-asistencias").value =
+          configData.urls.dataids.db_historial_asistencias || "";
+        document.getElementById("dataid-control-encuestas").value =
+          configData.urls.dataids.db_control_encuestas || "";
+        document.getElementById("dataid-encuestas-tutor").value =
+          configData.urls.dataids.db_encuestas_tutor || "";
 
         // Umbrales
-        document.getElementById("threshold-ird").value = configData.umbrales.threshold_ird || 0;
-        document.getElementById("cooldown-actualizar").value = configData.umbrales.cooldown_actualizar_seg || 0;
-        document.getElementById("warning-days").value = configData.umbrales.quarterly_warning_days || 0;
-        document.getElementById("cuatrimestres-desercion").value = configData.umbrales.cuatrimestres_desercion || 2;
-        document.getElementById("delay-ms").value = configData.umbrales.historico_delay_ms || 500;
-        document.getElementById("moodle-page-size").value = configData.umbrales.results_per_page_moodle || 10;
-        document.getElementById("panel-page-size").value = configData.umbrales.page_size_paneles || 30;
+        document.getElementById("threshold-ird").value =
+          configData.umbrales.threshold_ird || 0;
+        document.getElementById("threshold-ird-red").value =
+          configData.umbrales.threshold_ird_red || 80;
+        document.getElementById("cooldown-actualizar").value =
+          configData.umbrales.cooldown_actualizar_seg || 0;
+        document.getElementById("cuatrimestres-desercion").value =
+          configData.umbrales.cuatrimestres_desercion || 2;
+        document.getElementById("delay-ms").value =
+          configData.umbrales.historico_delay_ms || 500;
+        document.getElementById("panel-page-size").value =
+          configData.umbrales.page_size_paneles || 30;
+        document.getElementById("cooldown-control-encuestas").value =
+          configData.umbrales.cooldown_control_encuestas_dias !== undefined
+            ? configData.umbrales.cooldown_control_encuestas_dias
+            : 7;
       }
 
       // Rellena la pestaña de anclas especiales
       function fillEspecialesTab() {
-        document.getElementById("id-percepcion-riesgo").value = configData.preguntas_especiales.id_percepcion_riesgo || "";
-        document.getElementById("id-anio-ingreso").value = configData.preguntas_especiales.id_anio_ingreso || "";
-        document.getElementById("id-egreso").value = configData.preguntas_especiales.id_egreso || "";
+        document.getElementById("id-percepcion-riesgo").value =
+          configData.preguntas_especiales.id_percepcion_riesgo || "";
+        document.getElementById("id-anio-ingreso").value =
+          configData.preguntas_especiales.id_anio_ingreso || "";
+        document.getElementById("id-cuat-ingreso").value =
+          configData.preguntas_especiales.id_cuat_ingreso || "";
+        document.getElementById("id-egreso").value =
+          configData.preguntas_especiales.id_egreso || "";
       }
 
       // Renderiza el listado de preguntas de una encuesta determinada (inicial/cuatrimestral)
       function renderPreguntasList(tipoEncuesta) {
-        const container = document.getElementById(`preguntas-${tipoEncuesta}-container`);
+        const container = document.getElementById(
+          `preguntas-${tipoEncuesta}-container`,
+        );
         container.innerHTML = "";
 
         const encuestaKey = `encuesta_${tipoEncuesta}`;
@@ -1132,7 +1412,7 @@
               <div class="respuestas-section">
                 <h6>
                   <span>Opciones de Respuesta Mapeadas (Texto y Valor X)</span>
-                  ${esSiNo ? '' : `<button type="button" class="btn-action btn-add-small btn-add-respuesta" data-index="${idx}" data-encuesta="${tipoEncuesta}">➕ Opción</button>`}
+                  ${esSiNo ? "" : `<button type="button" class="btn-action btn-add-small btn-add-respuesta" data-index="${idx}" data-encuesta="${tipoEncuesta}">➕ Opción</button>`}
                 </h6>
                 <div class="respuestas-grid" data-index="${idx}" data-encuesta="${tipoEncuesta}">
             `;
@@ -1141,9 +1421,9 @@
                 const isSpecial = typeof valor === "string";
                 respuestasHTML += `
                   <div class="respuesta-row">
-                    <input type="text" class="input-opcion-text" placeholder="Texto exacto..." value="${texto.replace(/"/g, '&quot;')}" ${esSiNo ? 'disabled style="background-color: #f8f9fa;"' : ''} />
-                    <input type="${isSpecial ? 'text' : 'number'}" class="input-opcion-value" step="any" placeholder="Valor X..." value="${valor !== null ? valor : ''}" ${isSpecial ? 'disabled style="border-color: #f39c12; background-color: #fef9e7; color: #7f8c8d; cursor: not-allowed;" title="Este valor se calcula dinámicamente en el código y no es editable."' : ''} />
-                    ${esSiNo ? '' : `<button type="button" class="btn-delete-item btn-del-respuesta">❌</button>`}
+                    <input type="text" class="input-opcion-text" placeholder="Texto exacto..." value="${texto.replace(/"/g, "&quot;")}" ${esSiNo ? 'disabled style="background-color: #f8f9fa;"' : ""} />
+                    <input type="${isSpecial ? "text" : "number"}" class="input-opcion-value" step="any" placeholder="Valor X..." value="${valor !== null ? valor : ""}" ${isSpecial ? 'disabled style="border-color: #f39c12; background-color: #fef9e7; color: #7f8c8d; cursor: not-allowed;" title="Este valor se calcula dinámicamente en el código y no es editable."' : ""} />
+                    ${esSiNo ? "" : `<button type="button" class="btn-delete-item btn-del-respuesta">❌</button>`}
                   </div>
                 `;
               });
@@ -1163,9 +1443,11 @@
             `;
             pregunta.subpreguntas.forEach((sub, sidx) => {
               // Obtener las opciones de la pregunta padre para la condición gatillo
-              const opcionesPadre = pregunta.respuestas ? Object.keys(pregunta.respuestas) : ["Sí", "No"];
+              const opcionesPadre = pregunta.respuestas
+                ? Object.keys(pregunta.respuestas)
+                : ["Sí", "No"];
               let selectGatilloHTML = `<select class="select-sub-condicion" data-index="${idx}" data-subindex="${sidx}" data-encuesta="${tipoEncuesta}">`;
-              opcionesPadre.forEach(opcion => {
+              opcionesPadre.forEach((opcion) => {
                 const selected = opcion === sub.condicion ? "selected" : "";
                 selectGatilloHTML += `<option value="${opcion}" ${selected}>${opcion}</option>`;
               });
@@ -1178,7 +1460,7 @@
                   <div class="respuestas-section" style="background-color: #fff;">
                     <h6>
                       <span>Respuestas de Subpregunta</span>
-                      ${esSubSiNo ? '' : `<button type="button" class="btn-action btn-add-small btn-add-sub-respuesta" data-index="${idx}" data-subindex="${sidx}" data-encuesta="${tipoEncuesta}">➕ Opción</button>`}
+                      ${esSubSiNo ? "" : `<button type="button" class="btn-action btn-add-small btn-add-sub-respuesta" data-index="${idx}" data-subindex="${sidx}" data-encuesta="${tipoEncuesta}">➕ Opción</button>`}
                     </h6>
                     <div class="sub-respuestas-grid">
                 `;
@@ -1186,9 +1468,9 @@
                   Object.entries(sub.respuestas).forEach(([stext, sval]) => {
                     respuestasSubHTML += `
                       <div class="respuesta-row">
-                        <input type="text" class="input-sub-opcion-text" placeholder="Texto..." value="${stext.replace(/"/g, '&quot;')}" ${esSubSiNo ? 'disabled style="background-color: #f8f9fa;"' : ''} />
-                        <input type="number" class="input-sub-opcion-value" step="any" placeholder="Valor X..." value="${sval !== null ? sval : ''}" />
-                        ${esSubSiNo ? '' : `<button type="button" class="btn-delete-item btn-del-sub-respuesta">❌</button>`}
+                        <input type="text" class="input-sub-opcion-text" placeholder="Texto..." value="${stext.replace(/"/g, "&quot;")}" ${esSubSiNo ? 'disabled style="background-color: #f8f9fa;"' : ""} />
+                        <input type="number" class="input-sub-opcion-value" step="any" placeholder="Valor X..." value="${sval !== null ? sval : ""}" />
+                        ${esSubSiNo ? "" : `<button type="button" class="btn-delete-item btn-del-sub-respuesta">❌</button>`}
                       </div>
                     `;
                   });
@@ -1205,7 +1487,7 @@
                     <div class="form-grid" style="width: 100%;">
                       <div class="form-group" style="grid-column: span 2;">
                         <label>DNI/ID Columna CSV (Subpregunta)</label>
-                        <input type="text" class="input-sub-id" value="${sub.id.replace(/"/g, '&quot;')}" required />
+                        <input type="text" class="input-sub-id" value="${sub.id.replace(/"/g, "&quot;")}" required />
                       </div>
                       <div class="form-group">
                         <label>Condición Gatillo</label>
@@ -1214,9 +1496,9 @@
                       <div class="form-group">
                         <label>Tipo</label>
                         <select class="select-sub-tipo">
-                          <option value="seleccion_unica" ${sub.tipo === 'seleccion_unica' ? 'selected' : ''}>Selección Única</option>
-                          <option value="si_no" ${sub.tipo === 'si_no' ? 'selected' : ''}>Sí / No</option>
-                          <option value="numerico" ${sub.tipo === 'numerico' ? 'selected' : ''}>Numérico</option>
+                          <option value="seleccion_unica" ${sub.tipo === "seleccion_unica" ? "selected" : ""}>Selección Única</option>
+                          <option value="si_no" ${sub.tipo === "si_no" ? "selected" : ""}>Sí / No</option>
+                          <option value="numerico" ${sub.tipo === "numerico" ? "selected" : ""}>Numérico</option>
                         </select>
                       </div>
                     </div>
@@ -1238,23 +1520,23 @@
               <div class="form-grid" style="width: 100%;">
                 <div class="form-group" style="grid-column: span 2;">
                   <label>DNI/ID Columna CSV (Identificador exacto)</label>
-                  <input type="text" class="input-pregunta-id" value="${pregunta.id.replace(/"/g, '&quot;')}" required />
+                  <input type="text" class="input-pregunta-id" value="${pregunta.id.replace(/"/g, "&quot;")}" required />
                 </div>
                 <div class="form-group">
                   <label>Tipo de Pregunta</label>
                   <select class="select-pregunta-tipo">
-                    <option value="seleccion_unica" ${pregunta.tipo === 'seleccion_unica' ? 'selected' : ''}>Selección Única</option>
-                    <option value="si_no" ${pregunta.tipo === 'si_no' ? 'selected' : ''}>Sí / No</option>
-                    <option value="numerico" ${pregunta.tipo === 'numerico' ? 'selected' : ''}>Numérico</option>
+                    <option value="seleccion_unica" ${pregunta.tipo === "seleccion_unica" ? "selected" : ""}>Selección Única</option>
+                    <option value="si_no" ${pregunta.tipo === "si_no" ? "selected" : ""}>Sí / No</option>
+                    <option value="numerico" ${pregunta.tipo === "numerico" ? "selected" : ""}>Numérico</option>
                   </select>
                 </div>
                 <div class="form-group">
                   <label>Peso Beta (β)</label>
-                  <input type="number" class="input-pregunta-beta" step="0.1" value="${pregunta.beta !== undefined ? pregunta.beta : ''}" required />
+                  <input type="number" class="input-pregunta-beta" step="0.1" value="${pregunta.beta !== undefined ? pregunta.beta : ""}" required />
                 </div>
                 <div class="form-group">
                   <label>Valor X Máximo Teórico</label>
-                  <input type="number" class="input-pregunta-max" step="0.1" value="${pregunta.max_value !== null && pregunta.max_value !== undefined ? pregunta.max_value : ''}" placeholder="Ej. 1.0 (Vacío = null)" />
+                  <input type="number" class="input-pregunta-max" step="0.1" value="${pregunta.max_value !== null && pregunta.max_value !== undefined ? pregunta.max_value : ""}" placeholder="Ej. 1.0 (Vacío = null)" />
                 </div>
               </div>
               <button type="button" class="btn-delete-item btn-del-pregunta" style="margin-top: 24px;">❌ Eliminar</button>
@@ -1263,11 +1545,15 @@
             ${respuestasHTML}
             ${subpreguntasHTML}
 
-            ${pregunta.tipo === 'si_no' ? `
+            ${
+              pregunta.tipo === "si_no" && (!pregunta.subpreguntas || pregunta.subpreguntas.length === 0)
+                ? `
               <div style="margin-top: 10px; display: flex; gap: 10px;">
                 <button type="button" class="btn-action btn-add-small btn-add-subpregunta" style="background-color: #34495e;">➕ Subpregunta Condicional</button>
               </div>
-            ` : ''}
+            `
+                : ""
+            }
           `;
 
           container.appendChild(card);
@@ -1277,47 +1563,65 @@
       // Eventos dinámicos en los listados de preguntas (botones añadir/quitar)
       function setupDynamicEvents() {
         // Añadir Pregunta Inicial (Registrado una sola vez al cargar)
-        document.getElementById("btn-add-pregunta-inicial").addEventListener("click", function () {
-          saveToState();
-          configData.encuesta_inicial.preguntas.push({
-            id: "NUEVA_PREGUNTA_INICIAL_" + Date.now().toString().slice(-4),
-            tipo: "seleccion_unica",
-            beta: 1.0,
-            max_value: 1.0,
-            respuestas: { "Opción 1": 0 }
+        document
+          .getElementById("btn-add-pregunta-inicial")
+          .addEventListener("click", function () {
+            saveToState();
+            configData.encuesta_inicial.preguntas.push({
+              id: "NUEVA_PREGUNTA_INICIAL_" + Date.now().toString().slice(-4),
+              tipo: "seleccion_unica",
+              beta: 1.0,
+              max_value: 1.0,
+              respuestas: { "Opción 1": 0 },
+            });
+            renderPreguntasList("inicial");
+
+            // Desplazar suavemente al final del listado
+            const container = document.getElementById(
+              "preguntas-inicial-container",
+            );
+            if (container.lastElementChild) {
+              container.lastElementChild.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+            }
           });
-          renderPreguntasList("inicial");
-          
-          // Desplazar suavemente al final del listado
-          const container = document.getElementById("preguntas-inicial-container");
-          if (container.lastElementChild) {
-            container.lastElementChild.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        });
 
         // Añadir Pregunta Cuatrimestral (Registrado una sola vez al cargar)
-        document.getElementById("btn-add-pregunta-cuatrimestral").addEventListener("click", function () {
-          saveToState();
-          configData.encuesta_cuatrimestral.preguntas.push({
-            id: "NUEVA_PREGUNTA_CUATRIMESTRAL_" + Date.now().toString().slice(-4),
-            tipo: "seleccion_unica",
-            beta: 1.0,
-            max_value: 1.0,
-            respuestas: { "Opción 1": 0 }
+        document
+          .getElementById("btn-add-pregunta-cuatrimestral")
+          .addEventListener("click", function () {
+            saveToState();
+            configData.encuesta_cuatrimestral.preguntas.push({
+              id:
+                "NUEVA_PREGUNTA_CUATRIMESTRAL_" +
+                Date.now().toString().slice(-4),
+              tipo: "seleccion_unica",
+              beta: 1.0,
+              max_value: 1.0,
+              respuestas: { "Opción 1": 0 },
+            });
+            renderPreguntasList("cuatrimestral");
+
+            // Desplazar suavemente al final del listado
+            const container = document.getElementById(
+              "preguntas-cuatrimestral-container",
+            );
+            if (container.lastElementChild) {
+              container.lastElementChild.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+            }
           });
-          renderPreguntasList("cuatrimestral");
-          
-          // Desplazar suavemente al final del listado
-          const container = document.getElementById("preguntas-cuatrimestral-container");
-          if (container.lastElementChild) {
-            container.lastElementChild.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        });
 
         // Clics delegados en contenedores de preguntas
-        ["inicial", "cuatrimestral"].forEach(tipo => {
-          const container = document.getElementById(`preguntas-${tipo}-container`);
-          
+        ["inicial", "cuatrimestral"].forEach((tipo) => {
+          const container = document.getElementById(
+            `preguntas-${tipo}-container`,
+          );
+
           container.addEventListener("click", function (e) {
             const target = e.target;
             const card = target.closest(".card-pregunta");
@@ -1339,8 +1643,12 @@
               if (!configData[encuestaKey].preguntas[pIdx].respuestas) {
                 configData[encuestaKey].preguntas[pIdx].respuestas = {};
               }
-              const optCount = Object.keys(configData[encuestaKey].preguntas[pIdx].respuestas).length + 1;
-              configData[encuestaKey].preguntas[pIdx].respuestas["Nueva Opción " + optCount] = 0;
+              const optCount =
+                Object.keys(configData[encuestaKey].preguntas[pIdx].respuestas)
+                  .length + 1;
+              configData[encuestaKey].preguntas[pIdx].respuestas[
+                "Nueva Opción " + optCount
+              ] = 0;
               renderPreguntasList(tipo);
               return;
             }
@@ -1348,10 +1656,14 @@
             // 3. Eliminar Respuesta Mapeada
             if (target.classList.contains("btn-del-respuesta")) {
               const row = target.closest(".respuesta-row");
-              const textKey = row.querySelector(".input-opcion-text").value.trim();
+              const textKey = row
+                .querySelector(".input-opcion-text")
+                .value.trim();
               saveToState();
               if (configData[encuestaKey].preguntas[pIdx].respuestas) {
-                delete configData[encuestaKey].preguntas[pIdx].respuestas[textKey];
+                delete configData[encuestaKey].preguntas[pIdx].respuestas[
+                  textKey
+                ];
               }
               renderPreguntasList(tipo);
               return;
@@ -1364,17 +1676,26 @@
               if (!pregunta.subpreguntas) {
                 pregunta.subpreguntas = [];
               }
+              if (pregunta.subpreguntas.length >= 1) {
+                alert("Solo se permite agregar una subpregunta condicional por pregunta.");
+                return;
+              }
               pregunta.subpreguntas.push({
                 id: "¿Subpregunta del trabajo?",
                 tipo: "seleccion_unica",
                 condicion: "Sí",
-                respuestas: { "Opción Sub 1": 0 }
+                respuestas: { "Opción Sub 1": 0 },
               });
 
               // Forzar el valor de la opción gatillo de la pregunta padre a "calculado en código..."
               if (pregunta.respuestas) {
-                const keyGatillo = pregunta.respuestas.hasOwnProperty("Sí") ? "Sí" : (pregunta.respuestas.hasOwnProperty("Si") ? "Si" : "Sí");
-                pregunta.respuestas[keyGatillo] = "calculado en código según subpregunta";
+                const keyGatillo = pregunta.respuestas.hasOwnProperty("Sí")
+                  ? "Sí"
+                  : pregunta.respuestas.hasOwnProperty("Si")
+                    ? "Si"
+                    : "Sí";
+                pregunta.respuestas[keyGatillo] =
+                  "calculado en código según subpregunta";
               }
 
               renderPreguntasList(tipo);
@@ -1392,7 +1713,11 @@
               // Si no quedan más subpreguntas, rehabilitar la opción de valor numérico en el padre
               if (pregunta.subpreguntas.length === 0) {
                 if (pregunta.respuestas) {
-                  const keyGatillo = pregunta.respuestas.hasOwnProperty("Sí") ? "Sí" : (pregunta.respuestas.hasOwnProperty("Si") ? "Si" : "Sí");
+                  const keyGatillo = pregunta.respuestas.hasOwnProperty("Sí")
+                    ? "Sí"
+                    : pregunta.respuestas.hasOwnProperty("Si")
+                      ? "Si"
+                      : "Sí";
                   pregunta.respuestas[keyGatillo] = 0.0;
                 }
               }
@@ -1406,11 +1731,22 @@
               const subcard = target.closest(".card-subpregunta");
               const sIdx = parseInt(subcard.dataset.subindex);
               saveToState();
-              if (!configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas) {
-                configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas = {};
+              if (
+                !configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx]
+                  .respuestas
+              ) {
+                configData[encuestaKey].preguntas[pIdx].subpreguntas[
+                  sIdx
+                ].respuestas = {};
               }
-              const optCount = Object.keys(configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas).length + 1;
-              configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas["Nueva Sub Opción " + optCount] = 0;
+              const optCount =
+                Object.keys(
+                  configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx]
+                    .respuestas,
+                ).length + 1;
+              configData[encuestaKey].preguntas[pIdx].subpreguntas[
+                sIdx
+              ].respuestas["Nueva Sub Opción " + optCount] = 0;
               renderPreguntasList(tipo);
               return;
             }
@@ -1420,10 +1756,17 @@
               const subcard = target.closest(".card-subpregunta");
               const sIdx = parseInt(subcard.dataset.subindex);
               const row = target.closest(".respuesta-row");
-              const textKey = row.querySelector(".input-sub-opcion-text").value.trim();
+              const textKey = row
+                .querySelector(".input-sub-opcion-text")
+                .value.trim();
               saveToState();
-              if (configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas) {
-                delete configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].respuestas[textKey];
+              if (
+                configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx]
+                  .respuestas
+              ) {
+                delete configData[encuestaKey].preguntas[pIdx].subpreguntas[
+                  sIdx
+                ].respuestas[textKey];
               }
               renderPreguntasList(tipo);
               return;
@@ -1446,7 +1789,7 @@
 
               // Inicializar estructura según nuevo tipo para evitar bugs
               if (nuevoTipo === "si_no") {
-                pregunta.respuestas = { "Sí": 0.0, "No": 0.0 };
+                pregunta.respuestas = { Sí: 0.0, No: 0.0 };
               } else if (nuevoTipo === "seleccion_unica") {
                 pregunta.respuestas = { "Opción 1": 0.0 };
               } else if (nuevoTipo === "numerico") {
@@ -1462,12 +1805,13 @@
               const sIdx = parseInt(subcard.dataset.subindex);
               saveToState();
               const nuevoTipo = target.value;
-              const sub = configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx];
+              const sub =
+                configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx];
               sub.tipo = nuevoTipo;
 
               // Inicializar sub-respuestas según nuevo tipo
               if (nuevoTipo === "si_no") {
-                sub.respuestas = { "Sí": 0.0, "No": 0.0 };
+                sub.respuestas = { Sí: 0.0, No: 0.0 };
               } else if (nuevoTipo === "seleccion_unica") {
                 sub.respuestas = { "Opción Sub 1": 0.0 };
               } else if (nuevoTipo === "numerico") {
@@ -1479,19 +1823,25 @@
             if (target.classList.contains("select-sub-condicion")) {
               const sIdx = parseInt(target.dataset.subindex);
               const encuestaKey = `encuesta_${tipo}`;
-              const viejaCondicion = configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx].condicion;
-              
+              const viejaCondicion =
+                configData[encuestaKey].preguntas[pIdx].subpreguntas[sIdx]
+                  .condicion;
+
               saveToState();
-              
+
               const preguntaNueva = configData[encuestaKey].preguntas[pIdx];
               const nuevaCondicion = preguntaNueva.subpreguntas[sIdx].condicion;
 
               // Actualizar el "calculado en código..." en las respuestas del padre
               if (preguntaNueva.respuestas) {
-                if (preguntaNueva.respuestas.hasOwnProperty(viejaCondicion) && typeof preguntaNueva.respuestas[viejaCondicion] === "string") {
+                if (
+                  preguntaNueva.respuestas.hasOwnProperty(viejaCondicion) &&
+                  typeof preguntaNueva.respuestas[viejaCondicion] === "string"
+                ) {
                   preguntaNueva.respuestas[viejaCondicion] = 0.0;
                 }
-                preguntaNueva.respuestas[nuevaCondicion] = "calculado en código según subpregunta";
+                preguntaNueva.respuestas[nuevaCondicion] =
+                  "calculado en código según subpregunta";
               }
               renderPreguntasList(tipo);
             }
@@ -1501,54 +1851,25 @@
 
       // Convierte los valores de los inputs del DOM de vuelta al objeto configData en memoria
       function saveToState() {
-        // Tab General
-        configData.urls.base = document.getElementById("url-base").value.trim();
-        configData.urls.curso_id = parseInt(document.getElementById("curso-id").value) || 0;
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+        const dd = String(hoy.getDate()).padStart(2, '0');
 
-        // CMIDs
-        configData.urls.cmids.encuesta_inicial = parseInt(document.getElementById("cmid-inicial").value) || 0;
-        configData.urls.cmids.encuesta_cuatrimestral = parseInt(document.getElementById("cmid-cuatrimestral").value) || 0;
-        configData.urls.cmids.db_solicitudes = parseInt(document.getElementById("cmid-solicitudes").value) || 0;
-        configData.urls.cmids.db_logs = parseInt(document.getElementById("cmid-logs").value) || 0;
-        configData.urls.cmids.db_historico = parseInt(document.getElementById("cmid-historico").value) || 0;
-        configData.urls.cmids.db_1er_anio = parseInt(document.getElementById("cmid-1er-anio").value) || 0;
-        configData.urls.cmids.db_historico_1er_anio = parseInt(document.getElementById("cmid-hist-1er-anio").value) || 0;
-        configData.urls.cmids.db_historico_general = parseInt(document.getElementById("cmid-hist-general").value) || 0;
-
-        // DATAIDs
-        configData.urls.dataids.db_solicitudes = parseInt(document.getElementById("dataid-solicitudes").value) || 0;
-        configData.urls.dataids.db_logs = parseInt(document.getElementById("dataid-logs").value) || 0;
-        configData.urls.dataids.db_historico = parseInt(document.getElementById("dataid-historico").value) || 0;
-        configData.urls.dataids.db_1er_anio = parseInt(document.getElementById("dataid-1er-anio").value) || 0;
-        configData.urls.dataids.db_historico_1er_anio = parseInt(document.getElementById("dataid-hist-1er-anio").value) || 0;
-        configData.urls.dataids.db_historico_general = parseInt(document.getElementById("dataid-hist-general").value) || 0;
-
-        // Umbrales
-        configData.umbrales.threshold_ird = parseFloat(document.getElementById("threshold-ird").value) || 0;
-        configData.umbrales.cooldown_actualizar_seg = parseInt(document.getElementById("cooldown-actualizar").value) || 0;
-        configData.umbrales.quarterly_warning_days = parseInt(document.getElementById("warning-days").value) || 0;
-        configData.umbrales.cuatrimestres_desercion = parseInt(document.getElementById("cuatrimestres-desercion").value) || 2;
-        configData.umbrales.historico_delay_ms = parseInt(document.getElementById("delay-ms").value) || 500;
-        configData.umbrales.results_per_page_moodle = parseInt(document.getElementById("moodle-page-size").value) || 10;
-        configData.umbrales.page_size_paneles = parseInt(document.getElementById("panel-page-size").value) || 30;
-
-        // Tab Especiales
-        configData.preguntas_especiales.id_percepcion_riesgo = document.getElementById("id-percepcion-riesgo").value.trim();
-        configData.preguntas_especiales.id_anio_ingreso = document.getElementById("id-anio-ingreso").value.trim();
-        configData.preguntas_especiales.id_egreso = document.getElementById("id-egreso").value.trim();
-
-        // Guardar Preguntas
-        ["inicial", "cuatrimestral"].forEach(tipo => {
+        // Construir listas de preguntas de encuestas
+        const encuestaPreguntas = {};
+        ["inicial", "cuatrimestral"].forEach((tipo) => {
           const container = document.getElementById(`preguntas-${tipo}-container`);
           const cards = container.querySelectorAll(".card-pregunta");
-          const encuestaKey = `encuesta_${tipo}`;
           const list = [];
 
-          cards.forEach(card => {
+          cards.forEach((card) => {
             const pId = card.querySelector(".input-pregunta-id").value.trim();
             const pTipo = card.querySelector(".select-pregunta-tipo").value;
             const pBeta = parseFloat(card.querySelector(".input-pregunta-beta").value) || 0;
-            const pMaxVal = card.querySelector(".input-pregunta-max").value !== "" ? parseFloat(card.querySelector(".input-pregunta-max").value) : null;
+            const pMaxVal = card.querySelector(".input-pregunta-max").value !== ""
+              ? parseFloat(card.querySelector(".input-pregunta-max").value)
+              : null;
 
             const pregunta = {
               id: pId,
@@ -1561,11 +1882,10 @@
             if (pTipo !== "numerico") {
               pregunta.respuestas = {};
               const rows = card.querySelectorAll(".respuestas-grid .respuesta-row");
-              rows.forEach(row => {
+              rows.forEach((row) => {
                 const optText = row.querySelector(".input-opcion-text").value.trim();
                 const optValRaw = row.querySelector(".input-opcion-value").value.trim();
                 if (optText) {
-                  // Manejar valores numéricos y texto especial
                   if (optValRaw === "" || isNaN(optValRaw)) {
                     pregunta.respuestas[optText] = optValRaw !== "" ? optValRaw : null;
                   } else {
@@ -1582,7 +1902,7 @@
               const subcards = card.querySelectorAll(".card-subpregunta");
               if (subcards.length > 0) {
                 pregunta.subpreguntas = [];
-                subcards.forEach(subcard => {
+                subcards.forEach((subcard) => {
                   const sId = subcard.querySelector(".input-sub-id").value.trim();
                   const sCond = subcard.querySelector(".select-sub-condicion").value;
                   const sTipo = subcard.querySelector(".select-sub-tipo").value;
@@ -1596,7 +1916,7 @@
                   if (sTipo !== "numerico") {
                     subpregunta.respuestas = {};
                     const srows = subcard.querySelectorAll(".sub-respuestas-grid .respuesta-row");
-                    srows.forEach(srow => {
+                    srows.forEach((srow) => {
                       const sOptText = srow.querySelector(".input-sub-opcion-text").value.trim();
                       const sOptValRaw = srow.querySelector(".input-sub-opcion-value").value.trim();
                       if (sOptText) {
@@ -1614,19 +1934,83 @@
             list.push(pregunta);
           });
 
-          configData[encuestaKey].preguntas = list;
-          // Actualizar CMID interno de las encuestas para consistencia
-          configData[encuestaKey].cmid = configData.urls.cmids[`encuesta_${tipo}`];
+          encuestaPreguntas[tipo] = list;
         });
+
+        // Obtener CMIDs del formulario
+        const cmidInicial = parseInt(document.getElementById("cmid-inicial").value) || 0;
+        const cmidCuatrimestral = parseInt(document.getElementById("cmid-cuatrimestral").value) || 0;
+
+        // Reconstrucción total de configData desde cero (evita arrastrar claves deprecadas de la base de datos de Moodle)
+        configData = {
+          _INFO: {
+            version: "1.0",
+            descripcion: "Configuracion del sistema de Indice de Riesgo de Desercion (IRD). Solo incluye preguntas que aportan al calculo (beta/X) o que el sistema necesita como anclas especiales.",
+            ultima_actualización: `${dd}/${mm}/${yyyy}`
+          },
+          urls: {
+            base: document.getElementById("url-base").value.trim(),
+            curso_id: parseInt(document.getElementById("curso-id").value) || 0,
+            cmids: {
+              encuesta_inicial: cmidInicial,
+              encuesta_cuatrimestral: cmidCuatrimestral,
+              db_solicitudes: parseInt(document.getElementById("cmid-solicitudes").value) || 0,
+              db_logs: parseInt(document.getElementById("cmid-logs").value) || 0,
+              db_historico: parseInt(document.getElementById("cmid-historico").value) || 0,
+              db_1er_anio: parseInt(document.getElementById("cmid-1er-anio").value) || 0,
+              db_historico_1er_anio: parseInt(document.getElementById("cmid-hist-1er-anio").value) || 0,
+              db_historico_general: parseInt(document.getElementById("cmid-hist-general").value) || 0,
+              db_historial_asistencias: parseInt(document.getElementById("cmid-historial-asistencias").value) || 0,
+              db_control_encuestas: parseInt(document.getElementById("cmid-control-encuestas").value) || 0,
+              db_encuestas_tutor: parseInt(document.getElementById("cmid-encuestas-tutor").value) || 0
+            },
+            dataids: {
+              db_solicitudes: parseInt(document.getElementById("dataid-solicitudes").value) || 0,
+              db_logs: parseInt(document.getElementById("dataid-logs").value) || 0,
+              db_historico: parseInt(document.getElementById("dataid-historico").value) || 0,
+              db_1er_anio: parseInt(document.getElementById("dataid-1er-anio").value) || 0,
+              db_historico_1er_anio: parseInt(document.getElementById("dataid-hist-1er-anio").value) || 0,
+              db_historico_general: parseInt(document.getElementById("dataid-hist-general").value) || 0,
+              db_historial_asistencias: parseInt(document.getElementById("dataid-historial-asistencias").value) || 0,
+              db_control_encuestas: parseInt(document.getElementById("dataid-control-encuestas").value) || 0,
+              db_encuestas_tutor: parseInt(document.getElementById("dataid-encuestas-tutor").value) || 0
+            }
+          },
+          umbrales: {
+            threshold_ird: parseFloat(document.getElementById("threshold-ird").value) || 0,
+            threshold_ird_red: parseFloat(document.getElementById("threshold-ird-red").value) || 80,
+            cooldown_actualizar_seg: parseInt(document.getElementById("cooldown-actualizar").value) || 0,
+            cuatrimestres_desercion: parseInt(document.getElementById("cuatrimestres-desercion").value) || 2,
+            historico_delay_ms: parseInt(document.getElementById("delay-ms").value) || 500,
+            page_size_paneles: parseInt(document.getElementById("panel-page-size").value) || 30,
+            cooldown_control_encuestas_dias: parseInt(document.getElementById("cooldown-control-encuestas").value) || 0
+          },
+          encuesta_inicial: {
+            cmid: cmidInicial,
+            preguntas: encuestaPreguntas["inicial"]
+          },
+          encuesta_cuatrimestral: {
+            cmid: cmidCuatrimestral,
+            preguntas: encuestaPreguntas["cuatrimestral"]
+          },
+          preguntas_especiales: {
+            id_percepcion_riesgo: document.getElementById("id-percepcion-riesgo").value.trim(),
+            id_anio_ingreso: document.getElementById("id-anio-ingreso").value.trim(),
+            id_cuat_ingreso: document.getElementById("id-cuat-ingreso").value.trim(),
+            id_egreso: document.getElementById("id-egreso").value.trim()
+          }
+        };
       }
 
       // Validador de formulario del frontend
       function validateForm() {
         let isValid = true;
-        
+
         // Limpiar errores previos
-        document.querySelectorAll(".input-invalid").forEach(el => el.classList.remove("input-invalid"));
-        document.querySelectorAll(".error-msg").forEach(el => el.remove());
+        document
+          .querySelectorAll(".input-invalid")
+          .forEach((el) => el.classList.remove("input-invalid"));
+        document.querySelectorAll(".error-msg").forEach((el) => el.remove());
 
         // Helper para inyectar un mensaje de error bajo un input
         function setError(element, message) {
@@ -1641,7 +2025,10 @@
         // 1. Validar Pestaña General
         const urlBase = document.getElementById("url-base");
         const baseVal = urlBase.value.trim();
-        if (!baseVal.startsWith("http" + "://") && !baseVal.startsWith("http" + "s://")) {
+        if (
+          !baseVal.startsWith("http" + "://") &&
+          !baseVal.startsWith("http" + "s://")
+        ) {
           setError(urlBase, "Debe introducir una URL válida.");
         }
 
@@ -1652,13 +2039,34 @@
 
         // Validar que todos los CMIDs y DATAIDs sean números positivos
         const ids = [
-          "cmid-inicial", "cmid-cuatrimestral", "cmid-solicitudes", "cmid-logs", "cmid-historico", "cmid-1er-anio", "cmid-hist-1er-anio", "cmid-hist-general",
-          "dataid-solicitudes", "dataid-logs", "dataid-historico", "dataid-1er-anio", "dataid-hist-1er-anio", "dataid-hist-general"
+          "cmid-inicial",
+          "cmid-cuatrimestral",
+          "cmid-solicitudes",
+          "cmid-logs",
+          "cmid-historico",
+          "cmid-1er-anio",
+          "cmid-hist-1er-anio",
+          "cmid-hist-general",
+          "cmid-historial-asistencias",
+          "cmid-control-encuestas",
+          "cmid-encuestas-tutor",
+          "dataid-solicitudes",
+          "dataid-logs",
+          "dataid-historico",
+          "dataid-1er-anio",
+          "dataid-hist-1er-anio",
+          "dataid-hist-general",
+          "dataid-historial-asistencias",
+          "dataid-control-encuestas",
+          "dataid-encuestas-tutor",
         ];
-        ids.forEach(id => {
+        ids.forEach((id) => {
           const el = document.getElementById(id);
           if (parseInt(el.value) <= 0 || isNaN(parseInt(el.value))) {
-            setError(el, "Este valor debe ser un ID de Moodle numérico positivo.");
+            setError(
+              el,
+              "Este valor debe ser un ID de Moodle numérico positivo.",
+            );
           }
         });
 
@@ -1666,22 +2074,49 @@
         const threshold = document.getElementById("threshold-ird");
         const valTh = parseFloat(threshold.value);
         if (isNaN(valTh) || valTh < 0 || valTh > 100) {
-          setError(threshold, "El umbral del IRD debe estar entre 0 y 100.");
+          setError(
+            threshold,
+            "El umbral del IRD Verde a Amarillo debe estar entre 0 y 100.",
+          );
+        }
+
+        const thresholdRed = document.getElementById("threshold-ird-red");
+        const valThRed = parseFloat(thresholdRed.value);
+        if (isNaN(valThRed) || valThRed < 0 || valThRed > 100) {
+          setError(
+            thresholdRed,
+            "El umbral del IRD Amarillo a Rojo debe estar entre 0 y 100.",
+          );
+        }
+
+        if (!isNaN(valTh) && !isNaN(valThRed) && valTh > valThRed) {
+          setError(
+            threshold,
+            "El umbral Verde a Amarillo no puede ser mayor que el umbral Amarillo a Rojo.",
+          );
         }
 
         // 2. Validar Preguntas
-        ["inicial", "cuatrimestral"].forEach(tipo => {
-          const container = document.getElementById(`preguntas-${tipo}-container`);
-          
+        ["inicial", "cuatrimestral"].forEach((tipo) => {
+          const container = document.getElementById(
+            `preguntas-${tipo}-container`,
+          );
+
           // Validar identificador único de columna
           const idInputs = container.querySelectorAll(".input-pregunta-id");
           const seenIds = new Set();
-          idInputs.forEach(input => {
+          idInputs.forEach((input) => {
             const val = input.value.trim();
             if (!val) {
-              setError(input, "El identificador de columna no puede estar vacío.");
+              setError(
+                input,
+                "El identificador de columna no puede estar vacío.",
+              );
             } else if (seenIds.has(val)) {
-              setError(input, "Este identificador está duplicado en esta encuesta.");
+              setError(
+                input,
+                "Este identificador está duplicado en esta encuesta.",
+              );
             } else {
               seenIds.add(val);
             }
@@ -1689,7 +2124,7 @@
 
           // Validar betas
           const betaInputs = container.querySelectorAll(".input-pregunta-beta");
-          betaInputs.forEach(input => {
+          betaInputs.forEach((input) => {
             const val = parseFloat(input.value);
             if (isNaN(val)) {
               setError(input, "El peso Beta (β) debe ser un número.");
@@ -1698,21 +2133,29 @@
 
           // Validar respuestas mapeadas
           const cards = container.querySelectorAll(".card-pregunta");
-          cards.forEach(card => {
+          cards.forEach((card) => {
             const pTipo = card.querySelector(".select-pregunta-tipo").value;
             if (pTipo !== "numerico") {
-              const optTextInputs = card.querySelectorAll(".respuestas-grid .input-opcion-text");
+              const optTextInputs = card.querySelectorAll(
+                ".respuestas-grid .input-opcion-text",
+              );
               const seenOpts = new Set();
-              
+
               if (optTextInputs.length === 0) {
                 const btnAdd = card.querySelector(".btn-add-respuesta");
-                setError(btnAdd || card, "Debe tener al menos una opción de respuesta.");
+                setError(
+                  btnAdd || card,
+                  "Debe tener al menos una opción de respuesta.",
+                );
               }
 
-              optTextInputs.forEach(input => {
+              optTextInputs.forEach((input) => {
                 const val = input.value.trim();
                 if (!val) {
-                  setError(input, "El texto de la opción no puede estar vacío.");
+                  setError(
+                    input,
+                    "El texto de la opción no puede estar vacío.",
+                  );
                 } else if (seenOpts.has(val)) {
                   setError(input, "Opción duplicada.");
                 } else {
@@ -1721,8 +2164,10 @@
               });
 
               // Validar que los valores X sean numéricos (excepto en casos especiales)
-              const optValInputs = card.querySelectorAll(".respuestas-grid .input-opcion-value");
-              optValInputs.forEach(input => {
+              const optValInputs = card.querySelectorAll(
+                ".respuestas-grid .input-opcion-value",
+              );
+              optValInputs.forEach((input) => {
                 const val = input.value.trim();
                 if (input.disabled) return; // Si está deshabilitado es un cálculo especial del código y no se valida
                 if (val !== "" && isNaN(val) && val !== "null") {
@@ -1733,7 +2178,7 @@
 
             // Validar subpreguntas
             const subcards = card.querySelectorAll(".card-subpregunta");
-            subcards.forEach(subcard => {
+            subcards.forEach((subcard) => {
               const sId = subcard.querySelector(".input-sub-id");
               if (!sId.value.trim()) {
                 setError(sId, "Identificador de columna requerido.");
@@ -1744,12 +2189,16 @@
               }
               const sType = subcard.querySelector(".select-sub-tipo").value;
               if (sType !== "numerico") {
-                const sOpts = subcard.querySelectorAll(".input-sub-opcion-text");
-                sOpts.forEach(input => {
+                const sOpts = subcard.querySelectorAll(
+                  ".input-sub-opcion-text",
+                );
+                sOpts.forEach((input) => {
                   if (!input.value.trim()) setError(input, "Texto requerido.");
                 });
-                const sVals = subcard.querySelectorAll(".input-sub-opcion-value");
-                sVals.forEach(input => {
+                const sVals = subcard.querySelectorAll(
+                  ".input-sub-opcion-value",
+                );
+                sVals.forEach((input) => {
                   if (input.value.trim() === "" || isNaN(input.value.trim())) {
                     setError(input, "Valor numérico requerido.");
                   }
@@ -1760,8 +2209,13 @@
         });
 
         // 3. Validar Especiales
-        const espIds = ["id-percepcion-riesgo", "id-anio-ingreso", "id-egreso"];
-        espIds.forEach(id => {
+        const espIds = [
+          "id-percepcion-riesgo",
+          "id-anio-ingreso",
+          "id-cuat-ingreso",
+          "id-egreso",
+        ];
+        espIds.forEach((id) => {
           const el = document.getElementById(id);
           if (!el.value.trim()) {
             setError(el, "Este campo es obligatorio.");
@@ -1772,90 +2226,133 @@
       }
 
       // Procesa el formulario, valida y realiza la solicitud de guardado a Moodle
-      document.getElementById("btn-submit-config").addEventListener("click", async function () {
-        hideStatus();
-        
-        // Ejecutar validaciones del frontend
-        if (!validateForm()) {
-          showStatus("⚠️ Hay errores en el formulario. Por favor, corrígelos antes de guardar.", "error");
-          
-          // Redirigir a la pestaña con el primer error visible
-          const firstErr = document.querySelector(".input-invalid");
-          if (firstErr) {
-            const pane = firstErr.closest(".tab-content");
-            if (pane) {
-              const tabId = pane.id;
-              const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-              if (btn) btn.click();
+      document
+        .getElementById("btn-submit-config")
+        .addEventListener("click", async function () {
+          hideStatus();
+
+          // Ejecutar validaciones del frontend
+          if (!validateForm()) {
+            showStatus(
+              "⚠️ Hay errores en el formulario. Por favor, corrígelos antes de guardar.",
+              "error",
+            );
+
+            // Redirigir a la pestaña con el primer error visible
+            const firstErr = document.querySelector(".input-invalid");
+            if (firstErr) {
+              const pane = firstErr.closest(".tab-content");
+              if (pane) {
+                const tabId = pane.id;
+                const btn = document.querySelector(
+                  `.tab-btn[data-tab="${tabId}"]`,
+                );
+                if (btn) btn.click();
+              }
+              firstErr.scrollIntoView({ behavior: "smooth", block: "center" });
+              firstErr.focus();
             }
-            firstErr.scrollIntoView({ behavior: "smooth", block: "center" });
-            firstErr.focus();
+            return;
           }
-          return;
-        }
 
-        // Salvar inputs al estado en memoria
-        saveToState();
+          // Salvar inputs al estado en memoria
+          saveToState();
 
-        if (!targetFieldName) {
-          showStatus("❌ Error: No se pudo determinar el campo 'json_config' en Moodle de forma dinámica. No se puede guardar.", "error");
-          return;
-        }
-
-        const sesskey = getSesskey();
-        if (!sesskey) {
-          showStatus("❌ Error: No se pudo obtener la clave de sesión Moodle (sesskey). Recarga la página.", "error");
-          return;
-        }
-
-        showStatus("⏳ Guardando configuración en Moodle...", "info");
-
-        // Serializar a JSON plano
-        const jsonString = JSON.stringify(configData, null, 2);
-
-        // Crear FormData para la petición POST
-        var formData = new FormData();
-        formData.append("d", CONFIG_DB_ID.toString());
-        formData.append("rid", currentRid.toString());
-        formData.append("sesskey", sesskey);
-        formData.append(targetFieldName, jsonString);
-        formData.append(targetFieldName + "_content1", "1"); // Modo editor por defecto
-        formData.append("saveandview", "Guardar");
-
-        const submitUrl = `${MOODLE_BASE_URL}/mod/data/edit.php?id=${CONFIG_DB_CMID}`;
-
-        try {
-          const res = await fetch(submitUrl, {
-            method: "POST",
-            body: formData,
-            credentials: "include",
-            redirect: "manual"
-          });
-
-          // En fetch, los redirects manuales son detectados por status 0, 303 o type opaqueredirect
-          if (res.status === 303 || res.status === 200 || res.type === "opaqueredirect") {
-            showStatus("✅ Configuración guardada correctamente en la base de datos de Moodle.", "success");
-            // Esperar 2 segundos y recargar para refrescar el estado de Moodle
-            setTimeout(() => {
-              window.location.reload();
-            }, 2000);
-          } else {
-            showStatus(`⚠️ Respuesta de servidor inesperada (HTTP ${res.status}). Verifica la configuración en la base de datos.`, "error");
+          if (!targetFieldName) {
+            showStatus(
+              "❌ Error: No se pudo determinar el campo 'json_config' en Moodle de forma dinámica. No se puede guardar.",
+              "error",
+            );
+            return;
           }
-        } catch (err) {
-          if (err.message && err.message.includes("opaque")) {
-            // El redirect fue bloqueado/controlado, pero se completó el POST exitosamente
-            showStatus("✅ Configuración guardada correctamente.", "success");
-            setTimeout(() => {
-              window.location.reload();
-            }, 2000);
-          } else {
-            console.error("Error al enviar configuración:", err);
-            showStatus(`❌ Error al conectar con Moodle: ${err.message}`, "error");
+
+          const sesskey = getSesskey();
+          if (!sesskey) {
+            showStatus(
+              "❌ Error: No se pudo obtener la clave de sesión Moodle (sesskey). Recarga la página.",
+              "error",
+            );
+            return;
           }
-        }
+
+          showStatus("⏳ Guardando configuración en Moodle...", "info");
+
+          // Serializar a JSON plano
+          const jsonString = JSON.stringify(configData, null, 2);
+
+          // Crear FormData para la petición POST
+          var formData = new FormData();
+          formData.append("d", CONFIG_DB_ID.toString());
+          formData.append("rid", currentRid.toString());
+          formData.append("sesskey", sesskey);
+          formData.append(targetFieldName, jsonString);
+          formData.append(targetFieldName + "_content1", "1"); // Modo editor por defecto
+          formData.append("saveandview", "Guardar");
+
+          const submitUrl = `${MOODLE_BASE_URL}/mod/data/edit.php?id=${CONFIG_DB_CMID}`;
+
+          try {
+            const res = await fetch(submitUrl, {
+              method: "POST",
+              body: formData,
+              credentials: "include",
+              redirect: "manual",
+            });
+
+            // En fetch, los redirects manuales son detectados por status 0, 303 o type opaqueredirect
+            if (
+              res.status === 303 ||
+              res.status === 200 ||
+              res.type === "opaqueredirect"
+            ) {
+              showStatus(
+                "✅ Configuración guardada correctamente en la base de datos de Moodle.",
+                "success",
+              );
+              // Esperar 2 segundos y recargar para refrescar el estado de Moodle
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
+            } else {
+              showStatus(
+                `⚠️ Respuesta de servidor inesperada (HTTP ${res.status}). Verifica la configuración en la base de datos.`,
+                "error",
+              );
+            }
+          } catch (err) {
+            if (err.message && err.message.includes("opaque")) {
+              // El redirect fue bloqueado/controlado, pero se completó el POST exitosamente
+              showStatus("✅ Configuración guardada correctamente.", "success");
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
+            } else {
+              console.error("Error al enviar configuración:", err);
+              showStatus(
+                `❌ Error al conectar con Moodle: ${err.message}`,
+                "error",
+              );
+            }
+          }
       });
 
+      // Toggle Moodle navigation visibility
+      const btnToggleMoodle = document.getElementById("btn-toggle-moodle-nav");
+      if (btnToggleMoodle) {
+        btnToggleMoodle.addEventListener("click", () => {
+          const isHidden = document.body.classList.contains("hide-moodle-navigation");
+          if (isHidden) {
+            document.body.classList.remove("hide-moodle-navigation");
+            btnToggleMoodle.textContent = "Ocultar Configuración de Actividad";
+          } else {
+            document.body.classList.add("hide-moodle-navigation");
+            btnToggleMoodle.textContent = "Mostrar Configuración de Actividad";
+          }
+        });
+      }
+
+      // Inicializar el panel automáticamente al cargar la página
+      initPanel();
     })();
   </script>
 </p>

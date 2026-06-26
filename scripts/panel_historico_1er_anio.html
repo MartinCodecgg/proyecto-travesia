@@ -5,35 +5,55 @@
       document.currentScript.parentElement.style.margin = "0";
     }
     
-    // Ocultar el título de la página de Moodle lo más rápido posible
-    (function() {
+    // Ocultar el título, pestañas secundarias y reducir márgenes top de Moodle lo más rápido posible
+    (function () {
       var style = document.createElement("style");
+      style.id = "moodle-toggle-style";
       style.textContent = `
-         h2:first-of-type, .page-header-headings, .activity-header {
+         body.hide-moodle-navigation h2:first-of-type, 
+         body.hide-moodle-navigation .page-header-headings, 
+         body.hide-moodle-navigation .activity-header, 
+         body.hide-moodle-navigation .secondary-navigation {
            display: none !important;
+         }
+         body.hide-moodle-navigation #page-header {
+           margin-bottom: 0 !important;
+           padding-bottom: 0 !important;
+         }
+         body.hide-moodle-navigation #region-main-box {
+           padding-top: 0 !important;
+         }
+         body.hide-moodle-navigation #region-main {
+           padding-top: 8px !important;
          }
       `;
       document.head.appendChild(style);
+
+      // Apply the class to hide navigation by default
+      if (document.body) {
+        document.body.classList.add("hide-moodle-navigation");
+      } else {
+        document.addEventListener("DOMContentLoaded", function () {
+          document.body.classList.add("hide-moodle-navigation");
+        });
+      }
     })();
   </script>
 </p>
 
-<!-- Pantalla Falsa (Seguridad por Oscuridad) -->
-<div id="pantalla-falsa">
-  <p style="font-size: 15px; color: #444; line-height: 1.8;"><strong>Página de pruebaa Moodle</strong></p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8;">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est, et nunc <span id="btn-oculto" style="cursor: text;">accumsan</span> vehicula nisi. Mauris placerat eleifend leo, quisque sit amet est et sapien ullamcorper pharetra.</p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8;">Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis molestie dictum semper, quam quam congue erat, vitae sodales nisi metus a nunc. Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod sodales, sollicitudin vel, wisi.</p>
-</div>
-
 <!-- Tablero Real -->
-<div id="tablero" style="display: none;">
+<div id="tablero">
   <!-- Estilos del Tablero (removidos de aquí e inyectados dinámicamente mediante JS para evitar la sanitización de Moodle) -->
 
   <div id="panel-historico-container">
-    <h3>
-      📅 Panel Histórico 1er Año - Evolución del Alargamiento
-    </h3>
+    <div class="panel-header-wrapper" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid hsl(168, 60%, 90%); padding-bottom: 10px; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+      <h3 style="color: hsl(168, 60%, 35%) !important; margin: 0 !important; display: flex; align-items: center; gap: 8px; border-bottom: none !important; padding-bottom: 0 !important;">
+        📅 Panel Histórico Primer Año
+      </h3>
+      <button type="button" id="btn-toggle-moodle-nav" class="btn-action btn-secondary-action">
+        Mostrar Configuración de Actividad
+      </button>
+    </div>
 
     <div class="section-tabla">
       <!-- Fila de Filtros -->
@@ -51,22 +71,22 @@
         </div>
 
         <div class="filter-item">
-          <label for="filter-fecha-desde">Desde (Fecha Snapshot)</label>
+          <label for="filter-fecha-desde">Desde</label>
           <input type="date" id="filter-fecha-desde" class="filter-input" />
         </div>
 
         <div class="filter-item">
-          <label for="filter-fecha-hasta">Hasta (Fecha Snapshot)</label>
+          <label for="filter-fecha-hasta">Hasta</label>
           <input type="date" id="filter-fecha-hasta" class="filter-input" />
         </div>
 
         <div class="filter-item">
-          <label for="filter-alarg-min">Alargamiento Mín (%)</label>
+          <label for="filter-alarg-min">Ralentización Mín (%)</label>
           <input type="number" id="filter-alarg-min" class="filter-input" style="width: 80px;" min="0" max="100" />
         </div>
 
         <div class="filter-item">
-          <label for="filter-alarg-max">Alargamiento Máx (%)</label>
+          <label for="filter-alarg-max">Ralentización Máx (%)</label>
           <input type="number" id="filter-alarg-max" class="filter-input" style="width: 80px;" min="0" max="100" />
         </div>
       </div>
@@ -89,8 +109,8 @@
               <th>DNI</th>
               <th>Alumno</th>
               <th style="text-align:center">Cuatrimestres</th>
-              <th style="text-align:center">Last Aprobadas</th>
-              <th style="text-align:center">Last Alargamiento</th>
+              <th style="text-align:center">Últ. Aprobadas</th>
+              <th style="text-align:center">Últ. Ralentización</th>
             </tr>
           </thead>
           <tbody id="historical-tbody">
@@ -129,12 +149,11 @@
           }
           
           #panel-historico-container h3 {
-            color: hsl(168, 60%, 35%);
-            font-weight: 700;
-            border-bottom: 2px solid hsl(168, 60%, 90%);
-            padding-bottom: 10px;
+            color: hsl(168, 60%, 35%) !important;
             margin-top: 0;
-            margin-bottom: 24px;
+            margin-bottom: 0;
+            border: none;
+            padding: 0;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -160,14 +179,14 @@
             background: hsl(168, 60%, 28%);
           }
           
-          .btn-secondary-action {
-            background: #f8f9fa;
-            color: #333;
-            border: 1px solid #ccc;
+          .btn-action.btn-secondary-action {
+            background: #f8f9fa !important;
+            color: #333 !important;
+            border: 1px solid #ccc !important;
           }
           
-          .btn-secondary-action:hover:not(:disabled) {
-            background: #e9ecef;
+          .btn-action.btn-secondary-action:hover:not(:disabled) {
+            background: #e9ecef !important;
           }
           
           /* Filtros y Tabla */
@@ -408,13 +427,6 @@
         document.head.appendChild(style);
       })();
 
-      // Revelado del tablero con click en accumsan
-      document.getElementById('btn-oculto').addEventListener('click', function() {
-        document.getElementById('pantalla-falsa').style.display = 'none';
-        document.getElementById('tablero').style.display = 'block';
-        initPanel(); // Inicializar panel al revelar
-      });
-
       const MOODLE_BASE_URL = window.location.origin;
       const DATAID_DB_HIST_1ER_ANIO = 20; // DB Histórico 1er Año
 
@@ -627,6 +639,21 @@
 
       // Configura eventos
       function setupEventListeners() {
+        // Toggle Moodle navigation visibility
+        const btnToggleMoodle = document.getElementById("btn-toggle-moodle-nav");
+        if (btnToggleMoodle) {
+          btnToggleMoodle.addEventListener("click", () => {
+            const isHidden = document.body.classList.contains("hide-moodle-navigation");
+            if (isHidden) {
+              document.body.classList.remove("hide-moodle-navigation");
+              btnToggleMoodle.textContent = "Ocultar Configuración de Actividad";
+            } else {
+              document.body.classList.add("hide-moodle-navigation");
+              btnToggleMoodle.textContent = "Mostrar Configuración de Actividad";
+            }
+          });
+        }
+
         document.getElementById('search-student').addEventListener('input', function(e) {
           filterText = e.target.value.toLowerCase().trim();
           pageActual = 1;
@@ -734,7 +761,7 @@
         const v = raw !== undefined && raw !== '' ? parseFloat(raw) : null;
         if (v === null) return '<span class="badge-alargamiento badge-neutral">Sin datos</span>';
         const cls = v >= 80 ? 'badge-red' : v >= 40 ? 'badge-yellow' : 'badge-green';
-        return `<span class="badge-alargamiento ${cls}">${v.toFixed(1)}%</span>`;
+        return `<span class="badge-alargamiento ${cls}">${v.toFixed(0)}%</span>`;
       }
 
       // Renderiza la tabla agrupada por alumno
@@ -781,7 +808,7 @@
             <td>${al.nombre}</td>
             <td style="text-align:center;color:#555;font-weight:400;">${al.cuatrimestres.length} cuatrimestre(s)</td>
             <td style="text-align:center;">${lastApr}</td>
-            <td>${badgeAlarg(lastAlarg)}</td>
+            <td style="text-align:center;">${badgeAlarg(lastAlarg)}</td>
           </tr>`;
 
           al.cuatrimestres.forEach((r, ci) => {
@@ -800,7 +827,7 @@
               <td style="font-size:13px;color:#555;">${fecha}</td>
               <td style="text-align:center;font-size:13px;">${mats.length ? '📋 ' + mats.length + ' materia(s)' : '-'}</td>
               <td style="text-align:center;">${apr}</td>
-              <td>${badgeAlarg(alarg)}</td>
+              <td style="text-align:center;">${badgeAlarg(alarg)}</td>
             </tr>`;
 
             // Sub-fila de materias (oculta, se expande desde cuatrimestre)
@@ -899,6 +926,7 @@
         document.body.removeChild(link);
       }
 
+      initPanel();
     })();
   </script>
 </p>

@@ -1,0 +1,1577 @@
+<p>
+  <script>
+    // Quitar margen del <p> que Moodle crea alrededor del script
+    if (document.currentScript?.parentElement?.tagName === "P") {
+      document.currentScript.parentElement.style.margin = "0";
+    }
+
+    // Ocultar rápidamente la navegación y títulos nativos de Moodle
+    (function () {
+      const estilo = document.createElement("style");
+      estilo.id = "estilo-toggle-moodle";
+      estilo.textContent = `
+         body.hide-moodle-navigation h2:first-of-type, 
+         body.hide-moodle-navigation .page-header-headings, 
+         body.hide-moodle-navigation .activity-header, 
+         body.hide-moodle-navigation .secondary-navigation {
+           display: none !important;
+         }
+         body.hide-moodle-navigation #page-header {
+           margin-bottom: 0 !important;
+           padding-bottom: 0 !important;
+         }
+         body.hide-moodle-navigation #region-main-box {
+           padding-top: 0 !important;
+         }
+         body.hide-moodle-navigation #region-main {
+           padding-top: 8px !important;
+         }
+      `;
+      document.head.appendChild(estilo);
+
+      if (document.body) {
+        document.body.classList.add("hide-moodle-navigation");
+      } else {
+        document.addEventListener("DOMContentLoaded", function () {
+          document.body.classList.add("hide-moodle-navigation");
+        });
+      }
+    })();
+  </script>
+</p>
+
+<!-- Tablero de Utilidades y Mantenimiento -->
+<div id="tablero">
+  <div id="mantenimiento-container">
+    <div class="mantenimiento-header-wrapper" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <h3 class="mantenimiento-title">🛠️ Herramientas del Sistema</h3>
+      <button type="button" id="btn-toggle-moodle-nav" class="btn-action btn-secondary-action">
+        Mostrar Configuración de Actividad
+      </button>
+    </div>
+
+    <!-- Barra de Estado Dinámica -->
+    <div id="status-bar" class="status-bar-info" style="display: none"></div>
+
+    <!-- Navegación por Pestañas -->
+    <div class="tabs-navigation">
+      <button type="button" class="tab-btn active" data-tab="tab-mantenimiento">
+        🧹 Mantenimiento General
+      </button>
+    </div>
+
+    <div id="tab-mantenimiento" class="tab-content active">
+      <!-- Panel de Filtros Globales Fijos -->
+      <div class="card-section filters-card">
+        <h4 style="margin-top: 0; color: hsl(168, 60%, 25%);">🔍 Filtros de Limpieza Globales</h4>
+        <p style="font-size: 13px; color: #666; margin-top: -8px; margin-bottom: 16px;">
+          Define los criterios para filtrar los registros que se van a eliminar de las actividades seleccionadas a continuación.
+        </p>
+        
+        <!-- Grid de Inputs (Fila 1) -->
+        <div class="filters-inputs-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 12px;">
+          <div class="filter-item">
+            <label for="filter-fecha">Eliminar registros anteriores a:</label>
+            <input type="text" id="filter-fecha" class="form-input" placeholder="dd/mm/aaaa" maxlength="10" required />
+          </div>
+          <div class="filter-item">
+            <label for="filter-autor">Nombre de la persona (autor):</label>
+            <input type="text" id="filter-autor" class="form-input" placeholder="Nombre completo como figura en el Campus" />
+          </div>
+        </div>
+
+        <!-- Grid de Checkboxes (Fila 2) -->
+        <div class="filters-checkboxes-grid" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="filter-fecha-opcional" style="cursor: pointer; width: 16px; height: 16px;" />
+            <span style="font-weight: 600; font-size: 13px; color: #333; user-select: none;">Hacer filtro de fecha opcional (Elimina todas las entradas sin límite de fecha)</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="filter-autor-opcional" style="cursor: pointer; width: 16px; height: 16px;" />
+            <span style="font-weight: 600; font-size: 13px; color: #333; user-select: none;">Hacer filtro de autor opcional (Elimina todas las entradas que cumplan los filtros sin importar el autor)</span>
+          </div>
+        </div>
+
+        <!-- Fila de Acciones e Indicadores (Fila 3) -->
+        <div class="action-row" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eaecf4; padding-top: 16px; flex-wrap: wrap; gap: 12px;">
+          <div id="selection-summary" style="font-size: 13px; font-weight: 600; color: #555;">
+            Actividades seleccionadas: <span id="selected-activities-badge" class="activity-badge" style="background: #e3e6f0; color: #2c3e50; font-size: 12px; font-weight: bold; padding: 3px 8px;">0</span>
+          </div>
+          <button type="button" id="btn-start-cleanup" class="btn-action btn-danger-action" disabled>
+            Abrir cuadro de confirmación
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Progreso Global del Lote -->
+      <div id="global-progress-card" class="card-section" style="display: none; background-color: #f8f9fa;">
+        <h5 id="progress-title" style="margin-top: 0; color: #333; font-weight: 700;">Progreso de la operación</h5>
+        <div class="progress-container">
+          <div id="progress-bar-fill" class="progress-bar"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 8px; color: #555;">
+          <span id="progress-status-text">Escaneando / procesando...</span>
+          <span id="progress-percent-text">0%</span>
+        </div>
+      </div>
+
+      <!-- Listado de Actividades Seleccionables -->
+      <div class="card-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h4 style="margin: 0; color: hsl(168, 60%, 25%);">📋 Actividades del Curso</h4>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" id="btn-deselect-all" class="btn-secondary-action">Desmarcar Todas</button>
+          </div>
+        </div>
+
+        <form id="activities-form">
+          <!-- Grupo 1: Bases de Datos Frecuentes -->
+          <div class="group-separator">🧹 Bases de Datos - Limpieza Frecuente</div>
+          <div id="group-db-frequent" class="activities-list">
+            <!-- Cargado dinámicamente -->
+            <div class="loading-placeholder">Cargando actividades frecuentes...</div>
+          </div>
+
+          <!-- Grupo 2: Bases de Datos No Frecuentes -->
+          <div class="group-separator">🗄️ Bases de Datos - Limpieza No Frecuente</div>
+          <div id="group-db-infrequent" class="activities-list">
+            <!-- Cargado dinámicamente -->
+            <div class="loading-placeholder">Cargando actividades no frecuentes...</div>
+          </div>
+
+          <!-- Grupo Opcional: Otras Bases de Datos no Clasificadas -->
+          <div id="separator-db-others" class="group-separator" style="display: none;">📂 Otras Actividades - No Clasificadas</div>
+          <div id="group-db-others" class="activities-list" style="display: none;"></div>
+
+          <!-- Grupo 3: Encuestas -->
+          <div class="group-separator">📋 Respuestas de Encuestas</div>
+          <div id="group-feedback" class="activities-list">
+            <!-- Cargado dinámicamente -->
+            <div class="loading-placeholder">Cargando encuestas...</div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación Detallada (Peligro / Danger) -->
+<div id="modal-confirm" class="modal-wrapper" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-header modal-header-danger">
+      <h3>⚠️ ¡ADVERTENCIA DE ELIMINACIÓN PERMANENTE!</h3>
+      <button type="button" id="btn-modal-close" class="modal-close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size: 14px; line-height: 1.5; color: #333;">
+        Esta acción es <strong>definitiva y no se puede deshacer</strong>. Se eliminarán permanentemente todos los registros que cumplen con los filtros seleccionados.
+      </p>
+      
+      <div class="alert-box-danger">
+        <strong>Resumen de elementos a eliminar:</strong>
+        <span id="confirm-summary-text" style="display: block; margin-top: 4px;">Total encontrados: 0 elementos en 0 actividades.</span>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <label style="font-weight: 700; font-size: 12px; color: #555; display: block; margin-bottom: 6px;">
+          Desglose detallado de elementos por actividad (máximo 250 mostrados en total):
+        </label>
+        <div id="confirm-accordion-container" style="max-height: 280px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 8px; background: #fdfdfd; display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+      <p style="font-size: 13px; color: #c0392b; margin-top: 12px; font-weight: 600;">
+        ¿Desea continuar con la eliminación de los registros indicados anteriormente?
+      </p>
+
+      <div class="modal-footer">
+        <button type="button" id="btn-modal-cancel" class="btn-secondary">Cancelar</button>
+        <button type="button" id="btn-modal-danger-confirm" class="btn-danger">Sí, Eliminar Permanentemente</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Carga / Overlay de Espera -->
+<div id="loading-overlay" class="loading-overlay" style="display: none;">
+  <div class="spinner"></div>
+  <div id="loading-text" class="loading-text">Procesando...</div>
+</div>
+
+<p>
+  <script>
+    (function () {
+      // ==========================================================
+      // ★ INYECCIÓN DE ESTILOS CSS PERSONALIZADOS (TRAVESÍA) ★
+      // ==========================================================
+      (function () {
+        const style = document.createElement("style");
+        style.textContent = `
+          #mantenimiento-container {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #333;
+            background-color: #fcfcfc;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05);
+          }
+
+          .mantenimiento-header-wrapper {
+            border-bottom: 2px solid hsl(168, 60%, 85%);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+          }
+
+          .mantenimiento-title {
+            color: hsl(168, 60%, 35%) !important;
+            margin: 0 !important;
+          }
+
+          .status-bar-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+          }
+
+          .status-bar-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+          }
+
+          /* Pestañas */
+          .tabs-navigation {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            gap: 4px;
+            overflow-x: auto;
+          }
+
+          .tab-btn {
+            background: #f8f9fa;
+            border: 1px solid #d1d3e2;
+            color: #495057 !important;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+          }
+
+          .tab-btn:hover {
+            background: #e9ecef;
+            color: #333 !important;
+          }
+
+          .tab-btn.active {
+            background: hsl(168, 60%, 35%) !important;
+            color: white !important;
+            border-color: hsl(168, 60%, 35%) !important;
+            border-bottom: 1px solid hsl(168, 60%, 35%) !important;
+            margin-bottom: 0;
+            z-index: 2;
+          }
+
+          /* Secciones / Tarjetas */
+          .card-section {
+            background: white;
+            border: 1px solid #e3e6f0;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+          }
+
+          .filters-card {
+            border-left: 4px solid hsl(168, 60%, 35%);
+          }
+
+          .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            align-items: flex-end;
+          }
+
+          .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+          }
+
+          .filter-item label {
+            font-weight: 700;
+            font-size: 12px;
+            color: #555;
+          }
+
+          .form-input {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            background-color: white;
+            color: #333;
+            width: 100%;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.15s ease;
+          }
+
+          .form-input:focus {
+            border-color: hsl(168, 60%, 35%);
+          }
+
+          .checkbox-item {
+            grid-column: span 2;
+            flex-direction: row;
+            align-items: center;
+          }
+
+          .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+          }
+
+          .checkbox-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+          }
+
+          /* Líneas Divisorias de Grupos */
+          .group-separator {
+            font-weight: 700;
+            font-size: 14px;
+            color: hsl(168, 60%, 25%);
+            background-color: hsl(168, 60%, 97%);
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            border-left: 3px solid hsl(168, 60%, 35%);
+          }
+
+          /* Lista de Actividades */
+          .activities-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+          }
+
+          .activity-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px !important;
+            background: white;
+            border: 1px solid #eaecf4;
+            border-radius: 6px;
+            transition: background-color 0.15s ease;
+            box-sizing: border-box !important;
+            width: 100%;
+          }
+
+          .activity-row:hover {
+            background-color: #f8f9fa;
+          }
+
+          .activity-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+          }
+
+          .activity-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+          }
+
+          .activity-badge {
+            font-size: 11px;
+            background: #e9ecef;
+            color: #495057;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+          }
+
+          .activity-status {
+            font-size: 12px;
+            color: #777;
+            font-weight: 500;
+            white-space: nowrap;
+            padding-right: 8px;
+            text-align: right;
+            flex-shrink: 0;
+          }
+
+          .activity-status.scanning { color: #d39e00; }
+          .activity-status.deleting { color: #c0392b; font-weight: 600; }
+          .activity-status.success { color: #27ae60; font-weight: 600; }
+          .activity-status.error { color: #c0392b; font-weight: 600; }
+
+          /* Botones */
+          .btn-action {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .btn-danger-action {
+            background-color: hsl(354, 64%, 42%) !important;
+            color: white !important;
+          }
+
+          .btn-danger-action:hover:not(:disabled) {
+            background-color: hsl(354, 64%, 35%) !important;
+          }
+
+          .btn-danger-action:disabled {
+            background-color: #e9ecef !important;
+            color: #495057 !important;
+            cursor: not-allowed !important;
+            opacity: 1 !important;
+          }
+
+          #btn-start-cleanup:disabled {
+            background-color: #e9ecef !important;
+            color: #495057 !important;
+            cursor: not-allowed !important;
+            opacity: 1 !important;
+          }
+
+          .btn-action.btn-secondary-action {
+            padding: 8px 14px !important;
+            background-color: #f8f9fa !important;
+            border: 1px solid #d1d3e2 !important;
+            border-radius: 6px !important;
+            cursor: pointer !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: #495057 !important;
+            transition: all 0.15s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 38px !important;
+          }
+
+          .btn-action.btn-secondary-action:hover {
+            background-color: #e9ecef !important;
+            color: #333 !important;
+            border-color: #adadad !important;
+          }
+
+          .btn-danger {
+            background: #c0392b;
+            color: white !important;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+          }
+
+          .btn-danger:hover {
+            background: #962d22;
+          }
+
+          /* Barras de progreso */
+          .progress-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            height: 12px;
+          }
+
+          .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: hsl(168, 60%, 35%);
+            transition: width 0.3s ease;
+            background-image: linear-gradient(
+              45deg,
+              rgba(255,255,255,0.15) 25%,
+              transparent 25%,
+              transparent 50%,
+              rgba(255,255,255,0.15) 50%,
+              rgba(255,255,255,0.15) 75%,
+              transparent 75%,
+              transparent
+            );
+            background-size: 1rem 1rem;
+            animation: progress-bar-stripes 1s linear infinite;
+          }
+
+          @keyframes progress-bar-stripes {
+            from { background-position: 1rem 0; }
+            to { background-position: 0 0; }
+          }
+
+          /* Modales */
+          .modal-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+          }
+
+          .modal-box {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.35);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .modal-header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          .modal-header-danger {
+            background-color: hsl(0, 75%, 45%);
+            color: white;
+          }
+
+          .modal-header h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: white !important;
+          }
+
+          .modal-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            opacity: 0.8;
+          }
+
+          .modal-close-btn:hover {
+            opacity: 1;
+          }
+
+          .modal-body {
+            padding: 20px;
+          }
+
+          .alert-box-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #f5c6cb;
+            padding: 12px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-top: 12px;
+          }
+
+          #confirm-textarea {
+            width: 100%;
+            height: 150px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 8px;
+            color: #333;
+            resize: none;
+            outline: none;
+          }
+
+          .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 16px;
+            border-top: 1px solid #eee;
+            padding-top: 16px;
+          }
+
+          /* Overlay de Carga */
+          .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            gap: 12px;
+          }
+
+          .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid hsl(168, 60%, 35%);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+
+          .loading-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: hsl(168, 60%, 25%);
+          }
+
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+
+          .loading-placeholder {
+            padding: 12px;
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+          }
+        `;
+        document.head.appendChild(style);
+      })();
+
+
+      // ==========================================================
+      // ★ CONFIGURACIÓN Y ESTADO DEL SISTEMA EN MEMORIA ★
+      // ==========================================================
+      // ===================================================================
+      // ★ ID DE LA BASE DE DATOS DE CONFIGURACIÓN DEL SISTEMA (DB CONFIG) ★
+      // ===================================================================
+      const CONFIG_DB_ID = 17;
+      const CURSO_ID = 1732;
+
+      let systemConfig = {
+        urls: {
+          base: window.location.origin,
+          curso_id: CURSO_ID,
+          cmids: {
+            encuesta_inicial: 54062,
+            encuesta_cuatrimestral: 54284
+          },
+          dataids: {}
+        },
+        umbrales: {
+          historico_delay_ms: 500
+        }
+      };
+
+      let selectedActivities = [];
+      let pendingDeleteList = []; // Elementos escaneados para eliminar
+      const MAX_DISPLAYED_ITEMS = 250;
+
+      // Clave de sesión de Moodle
+      const sesskey = window.M?.cfg?.sesskey || document.querySelector('input[name="sesskey"]')?.value || "";
+
+      // Muestra/Oculta overlay de carga
+      function showLoading(text) {
+        const overlay = document.getElementById("loading-overlay");
+        const loadingText = document.getElementById("loading-text");
+        loadingText.textContent = text;
+        overlay.style.display = "flex";
+      }
+
+      function hideLoading() {
+        document.getElementById("loading-overlay").style.display = "none";
+      }
+
+      function showStatusBar(text, isError = false) {
+        const bar = document.getElementById("status-bar");
+        bar.className = isError ? "status-bar-error" : "status-bar-info";
+        bar.textContent = text;
+        bar.style.display = "block";
+        setTimeout(() => {
+          bar.style.display = "none";
+        }, 8000);
+      }
+
+      // ==========================================================
+      // ★ PARSEADORES DE DATOS Y FECHAS ★
+      // ==========================================================
+      function parseCleanJSON(rawText) {
+        if (!rawText) return null;
+        let clean = rawText.replace(/<[^>]*>/g, "");
+        clean = clean.replace(/&nbsp;/g, " ").replace(/&quot;/g, '"');
+        clean = clean.replace(/\u00a0/g, " ");
+        clean = clean.replace(/\s+/g, " ").trim();
+        try {
+          return JSON.parse(clean);
+        } catch (e) {
+          console.error("Error al parsear JSON:", rawText, e);
+          return null;
+        }
+      }
+
+      // Parsea fechas de Moodle (en español) de forma robusta
+      function parseMoodleDate(str) {
+        if (!str) return 0;
+        try {
+          const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+          // Limpiar caracteres extraños y espaciados
+          let clean = str.replace(/de/g, "").replace(/,/g, "").replace(/\s+/g, " ").trim();
+          let parts = clean.split(" ");
+          
+          // Moodle a veces antepone el día de la semana (ej: "jueves 18 de junio...")
+          // Si el primer elemento no es un número (es el día), lo removemos
+          if (isNaN(parseInt(parts[0], 10))) {
+            parts.shift();
+          }
+          
+          const dia = parseInt(parts[0], 10);
+          const mesIndex = meses.indexOf(parts[1].toLowerCase());
+          const anio = parseInt(parts[2], 10);
+          const h = parts[3].split(":");
+          
+          if (isNaN(dia) || mesIndex === -1 || isNaN(anio) || h.length < 2) {
+            return 0;
+          }
+          
+          return new Date(anio, mesIndex, dia, parseInt(h[0], 10), parseInt(h[1], 10)).getTime();
+        } catch (e) {
+          console.error("Error al parsear fecha:", str, e);
+          return 0;
+        }
+      }
+
+      // ==========================================================
+      // ★ CARGA DE CONFIGURACIÓN (DB CONFIG) ★
+      // ==========================================================
+      async function loadDbConfig() {
+        showLoading("Cargando configuración del sistema (DB 17)...");
+        try {
+          // =================================================================
+          // ★ URL DE CARGA DE LA BASE DE DATOS DE CONFIGURACIÓN (CONFIG_DB_ID)
+          // =================================================================
+          const response = await fetch(`${window.location.origin}/mod/data/view.php?d=${CONFIG_DB_ID}`);
+          if (response.ok) {
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const entries = doc.querySelectorAll(".defaulttemplate-listentry, .defaulttemplate-single, .card, .generaltable td");
+            let foundJson = null;
+
+            for (let entry of entries) {
+              const text = entry.textContent;
+              const cleanText = text.replace(/\u00a0/g, " ").replace(/&nbsp;/g, " ").trim();
+              const match = cleanText.match(/\{[\s\S]*\}/);
+              if (match) {
+                const parsed = parseCleanJSON(match[0]);
+                if (parsed && parsed.urls && parsed.urls.cmids) {
+                  foundJson = parsed;
+                  break;
+                }
+              }
+            }
+
+            if (foundJson) {
+              systemConfig = foundJson;
+              console.log("[DEBUG] Configuración del sistema cargada:", systemConfig);
+              renderActivities();
+
+            } else {
+              throw new Error("No se encontró una estructura JSON válida en la DB 17.");
+            }
+          } else {
+            throw new Error(`HTTP ${response.status} al cargar la DB 17.`);
+          }
+        } catch (e) {
+          console.error("Error cargando configuración:", e);
+          showStatusBar(`❌ Error crítico: ${e.message}. La base de datos de configuración no está accesible o su contenido es inválido.`, true);
+          
+          // Deshabilitar y vaciar los contenedores
+          const groupFrequent = document.getElementById("group-db-frequent");
+          const groupInfrequent = document.getElementById("group-db-infrequent");
+          const groupFeedback = document.getElementById("group-feedback");
+          
+          const errorHtml = `<div class="status-bar-error" style="margin: 0; padding: 8px;">Error: No se pudo cargar la configuración de Moodle. Mantenimiento inactivo.</div>`;
+          groupFrequent.innerHTML = errorHtml;
+          groupInfrequent.innerHTML = errorHtml;
+          groupFeedback.innerHTML = errorHtml;
+        } finally {
+          hideLoading();
+        }
+      }
+
+      // ==========================================================
+      // ★ RENDERIZADO DEL LISTADO DE ACTIVIDADES ★
+      // ==========================================================
+      function renderActivities() {
+        const groupFrequent = document.getElementById("group-db-frequent");
+        const groupInfrequent = document.getElementById("group-db-infrequent");
+        const groupOthers = document.getElementById("group-db-others");
+        const separatorOthers = document.getElementById("separator-db-others");
+        const groupFeedback = document.getElementById("group-feedback");
+
+        groupFrequent.innerHTML = "";
+        groupInfrequent.innerHTML = "";
+        groupOthers.innerHTML = "";
+        groupFeedback.innerHTML = "";
+
+        // Ocultar sección de otras por defecto
+        separatorOthers.style.display = "none";
+        groupOthers.style.display = "none";
+
+        const cmids = systemConfig.urls.cmids;
+        const dataids = systemConfig.urls.dataids || {};
+
+        // Clasificación de bases de datos conocidas
+        const DB_FREQUENT_KEYS = ["db_logs", "db_1er_anio", "db_control_encuestas", "db_solicitudes", "db_historial_asistencias"];
+        const DB_INFREQUENT_KEYS = [
+          "db_historico_1er_anio",
+          "db_historico",
+          "db_historico_general",
+          "db_encuestas_tutor"
+        ];
+        let otherDbsCount = 0;
+ 
+        // Process databases dynamically
+        Object.keys(dataids).forEach(key => {
+          // =================================================================
+          // ★ EXCLUSIÓN DE LA BASE DE DATOS DE CONFIGURACIÓN (db_config) ★
+          // =================================================================
+          if (key === "db_config") return; // Safety exclusion of the configuration DB itself
+ 
+          const dataId = dataids[key];
+          const cmId = cmids[key];
+          if (!cmId) return;
+ 
+          const rowHtml = `
+            <div class="activity-row" id="activity-row-${key}">
+              <div class="activity-info">
+                <input type="checkbox" name="activity-select" value="${key}" data-type="db" data-dataid="${dataId}" data-cmid="${cmId}" />
+                <span class="activity-title">${formatearNombreActividad(key)}</span>
+                <span class="activity-badge">DATAID: ${dataId} | CMID: ${cmId}</span>
+              </div>
+              <div class="activity-status" id="status-${key}"></div>
+            </div>
+          `;
+ 
+          if (DB_FREQUENT_KEYS.includes(key)) {
+            groupFrequent.insertAdjacentHTML("beforeend", rowHtml);
+          } else if (DB_INFREQUENT_KEYS.includes(key)) {
+            groupInfrequent.insertAdjacentHTML("beforeend", rowHtml);
+          } else {
+            groupOthers.insertAdjacentHTML("beforeend", rowHtml);
+            otherDbsCount++;
+          }
+        });
+
+        // Mostrar sección de otras bases de datos si tiene elementos
+        if (otherDbsCount > 0) {
+          separatorOthers.style.display = "block";
+          groupOthers.style.display = "flex";
+        }
+
+        // Placeholder fallback
+        if (groupFrequent.children.length === 0) {
+          groupFrequent.innerHTML = `<div class="loading-placeholder">No hay bases de datos frecuentes.</div>`;
+        }
+        if (groupInfrequent.children.length === 0) {
+          groupInfrequent.innerHTML = `<div class="loading-placeholder">No hay bases de datos no frecuentes registradas.</div>`;
+        }
+
+        // Render surveys
+        const feedbackActivities = [
+          { key: "encuesta_inicial", label: "Encuesta Inicial (Feedback)", cmid: cmids.encuesta_inicial },
+          { key: "encuesta_cuatrimestral", label: "Encuesta Cuatrimestral (Feedback)", cmid: cmids.encuesta_cuatrimestral }
+        ];
+
+        feedbackActivities.forEach(item => {
+          if (!item.cmid) return;
+          const rowHtml = `
+            <div class="activity-row" id="activity-row-${item.key}">
+              <div class="activity-info">
+                <input type="checkbox" name="activity-select" value="${item.key}" data-type="feedback" data-cmid="${item.cmid}" />
+                <span class="activity-title">${item.label}</span>
+                <span class="activity-badge">CMID: ${item.cmid}</span>
+              </div>
+              <div class="activity-status" id="status-${item.key}"></div>
+            </div>
+          `;
+          groupFeedback.insertAdjacentHTML("beforeend", rowHtml);
+        });
+
+        // Set event listeners on checkboxes
+        document.querySelectorAll('input[name="activity-select"]').forEach(cb => {
+          cb.addEventListener("change", checkFiltersValidity);
+        });
+      }
+
+      function formatearNombreActividad(key) {
+        const nombres = {
+          db_solicitudes:           "[SISTEMA] Solicitudes de Asistencia",
+          db_logs:                  "Registro de Asistencias",
+          db_historico:             "Histórico-Alumnos",
+          db_1er_anio:              "Base de Datos - Primer Año",
+          db_historico_1er_anio:    "Histórico 1er Año",
+          db_historico_general:     "Histórico-Indicadores Generales",
+          db_historial_asistencias: "[SISTEMA] Historial de Asistencias-Alumno",
+          db_control_encuestas:     "Registro de Mensajes",
+          db_encuestas_tutor:       "Base de datos - Encuestas Tutor"
+        };
+        return nombres[key] || `Nombre Desconocido - ${key}`;
+      }
+
+      // Parsea y valida fecha en formato dd/mm/aaaa
+      function parsearFechaArgentina(str) {
+        if (!str) return null;
+        const parts = str.trim().split("/");
+        if (parts.length !== 3) return null;
+        
+        // Verificar longitud estricta de cada componente (evita años mayores a 4 digitos)
+        if (parts[0].length > 2 || parts[1].length > 2 || parts[2].length !== 4) return null;
+        
+        const dia = parseInt(parts[0], 10);
+        const mes = parseInt(parts[1], 10) - 1;
+        const anio = parseInt(parts[2], 10);
+        
+        if (isNaN(dia) || isNaN(mes) || isNaN(anio) || anio < 1900 || anio > 2100) return null;
+        
+        const dateObj = new Date(anio, mes, dia, 0, 0, 0);
+        if (dateObj.getDate() === dia && dateObj.getMonth() === mes && dateObj.getFullYear() === anio) {
+          return dateObj;
+        }
+        return null;
+      }
+
+      // ==========================================================
+      // ★ VALIDACIÓN DE FILTROS EN TIEMPO REAL ★
+      // ==========================================================
+      function checkFiltersValidity() {
+        const fechaVal = document.getElementById("filter-fecha").value;
+        const fechaOpcional = document.getElementById("filter-fecha-opcional").checked;
+        const autorVal = document.getElementById("filter-autor").value.trim();
+        const autorOpcional = document.getElementById("filter-autor-opcional").checked;
+        const selectedCbs = document.querySelectorAll('input[name="activity-select"]:checked');
+        const btnStart = document.getElementById("btn-start-cleanup");
+
+        const hasFecha = fechaOpcional || parsearFechaArgentina(fechaVal) !== null;
+        const hasAutor = autorOpcional || autorVal !== "";
+        const hasSelected = selectedCbs.length > 0;
+
+        btnStart.disabled = !(hasFecha && hasAutor && hasSelected);
+
+        // Actualizar indicador de seleccionadas en pantalla principal
+        document.getElementById("selected-activities-badge").textContent = selectedCbs.length;
+      }
+
+      document.getElementById("filter-fecha").addEventListener("input", checkFiltersValidity);
+      document.getElementById("filter-autor").addEventListener("input", checkFiltersValidity);
+      
+      document.getElementById("filter-fecha-opcional").addEventListener("change", function () {
+        const fechaInput = document.getElementById("filter-fecha");
+        if (this.checked) {
+          fechaInput.disabled = true;
+          fechaInput.value = "";
+        } else {
+          fechaInput.disabled = false;
+        }
+        checkFiltersValidity();
+      });
+
+      document.getElementById("filter-autor-opcional").addEventListener("change", function () {
+        const autorInput = document.getElementById("filter-autor");
+        if (this.checked) {
+          autorInput.disabled = true;
+          autorInput.value = "";
+        } else {
+          autorInput.disabled = false;
+        }
+        checkFiltersValidity();
+      });
+
+      // Selection handlers
+      document.getElementById("btn-deselect-all").addEventListener("click", () => {
+        document.querySelectorAll('input[name="activity-select"]').forEach(cb => cb.checked = false);
+        checkFiltersValidity();
+      });
+
+      // ==========================================================
+      // ★ FLUJO DE ESCANEO DE ACTIVIDADES (DRY-RUN) ★
+      // ==========================================================
+      async function startCleanupWorkflow() {
+        const fechaVal = document.getElementById("filter-fecha").value;
+        const autorVal = document.getElementById("filter-autor").value.trim();
+        const autorOpcional = document.getElementById("filter-autor-opcional").checked;
+        const selectedCbs = Array.from(document.querySelectorAll('input[name="activity-select"]:checked'));
+
+        if (selectedCbs.length === 0) return;
+
+        pendingDeleteList = [];
+        selectedActivities = selectedCbs.map(cb => ({
+          key: cb.value,
+          type: cb.getAttribute("data-type"),
+          cmid: cb.getAttribute("data-cmid"),
+          dataid: cb.getAttribute("data-dataid"),
+          title: cb.closest(".activity-row").querySelector(".activity-title").textContent
+        }));
+
+        // Progress bar initialization
+        const progressCard = document.getElementById("global-progress-card");
+        const progressFill = document.getElementById("progress-bar-fill");
+        const progressStatus = document.getElementById("progress-status-text");
+        const progressPercent = document.getElementById("progress-percent-text");
+
+        progressCard.style.display = "block";
+        progressFill.style.width = "0%";
+        progressPercent.textContent = "0%";
+        progressStatus.textContent = "Iniciando escaneo dinámico de actividades...";
+
+        // Reset activity rows statuses
+        selectedActivities.forEach(act => {
+          const el = document.getElementById(`status-${act.key}`);
+          if (el) {
+            el.className = "activity-status scanning";
+            el.textContent = "🔍 Escaneando...";
+          }
+        });
+
+        const fechaOpcional = document.getElementById("filter-fecha-opcional").checked;
+        let fechaLimiteTimestamp = null;
+        if (!fechaOpcional) {
+          const dateObj = parsearFechaArgentina(fechaVal);
+          if (!dateObj) {
+            showStatusBar("❌ Error: La fecha ingresada no tiene un formato válido (dd/mm/aaaa).", true);
+            return;
+          }
+          fechaLimiteTimestamp = dateObj.getTime();
+        }
+
+        for (let idx = 0; idx < selectedActivities.length; idx++) {
+          const act = selectedActivities[idx];
+          
+          const pct = Math.round((idx / selectedActivities.length) * 100);
+          progressFill.style.width = `${pct}%`;
+          progressPercent.textContent = `${pct}%`;
+          progressStatus.textContent = `Escaneando: ${act.title}...`;
+
+          try {
+            if (act.type === "db") {
+              await scanDatabase(act, fechaLimiteTimestamp, fechaOpcional, autorVal, autorOpcional);
+            } else {
+              await scanFeedback(act, fechaLimiteTimestamp, fechaOpcional, autorVal, autorOpcional);
+            }
+          } catch (err) {
+            console.error(`Error escaneando ${act.title}:`, err);
+            const el = document.getElementById(`status-${act.key}`);
+            if (el) {
+              el.className = "activity-status error";
+              el.textContent = "❌ Error escaneo";
+            }
+          }
+        }
+
+        // Scan complete
+        progressFill.style.width = "100%";
+        progressPercent.textContent = "100%";
+        progressStatus.textContent = "Escaneo completado. Preparando confirmación...";
+
+        // If nothing was found, notify directly
+        if (pendingDeleteList.length === 0) {
+          showStatusBar("ℹ️ No se encontró ningún elemento que cumpla con los filtros de búsqueda.");
+          progressCard.style.display = "none";
+          selectedActivities.forEach(act => {
+            const el = document.getElementById(`status-${act.key}`);
+            if (el) {
+              el.className = "activity-status";
+              el.textContent = "Sin registros coincidentes";
+            }
+          });
+          return;
+        }
+
+        // Show Modal
+        openConfirmModal(fechaVal, autorVal, autorOpcional);
+      }
+
+      // Scan Database
+      async function scanDatabase(act, fechaLimite, esFechaOpcional, autor, esOpcional) {
+        let page = 0;
+        const BASE_URL = window.location.origin;
+        const found = [];
+
+        while (true) {
+          const url = `${BASE_URL}/mod/data/view.php?d=${act.dataid}&cm=${act.cmid}&page=${page}`;
+          const res = await fetch(url, { credentials: "include" });
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+          }
+
+          const html = await res.text();
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          const deleteLinks = [...doc.querySelectorAll('a[href*="delete="]')];
+
+          if (deleteLinks.length === 0) break;
+
+          deleteLinks.forEach(link => {
+            const container =
+              link.closest('[id^="entry-"]')   ||
+              link.closest(".defaulttemplate") ||
+              link.closest(".card")            ||
+              link.closest("tr")               ||
+              link.parentElement?.closest("div");
+
+            if (!container) return;
+
+            // Extract author info (Moodle profile link or avatar alt text)
+            const autorEl = container.querySelector(`a[href*="user/view.php?id="]`);
+            const autorImg = autorEl?.querySelector("img");
+            const nombreAutor = autorEl?.textContent.trim() || autorImg?.getAttribute("alt") || "";
+
+            // Extract dates
+            const fechaEls = container.querySelectorAll("span.data-timeinfo span[title]");
+            const publicadoText = fechaEls[0]?.getAttribute("title") || fechaEls[0]?.textContent || "";
+            const publicadoTimestamp = parseMoodleDate(publicadoText);
+
+            if (!publicadoTimestamp) return;
+
+            // Validate filters (exact trimmed case-insensitive match)
+            const cumpleFecha = esFechaOpcional || (publicadoTimestamp < fechaLimite);
+            const cumpleAutor = esOpcional || (nombreAutor !== "" && nombreAutor.trim().toLowerCase() === autor.trim().toLowerCase());
+ 
+            if (cumpleFecha && cumpleAutor) {
+              const match = link.href.match(/[?&]delete=(\d+)/);
+              if (match) {
+                const rid = match[1];
+                found.push({
+                  type: "db",
+                  rid: rid,
+                  dataid: act.dataid,
+                  cmid: act.cmid,
+                  autor: nombreAutor || "Desconocido",
+                  fechaText: publicadoText,
+                  actividadKey: act.key,
+                  actividadTitle: act.title
+                });
+              }
+            }
+          });
+
+          const hasNext = doc.querySelector(`a[href*="page=${page + 1}"]`);
+          if (!hasNext) break;
+          page++;
+        }
+
+        console.log(`[DEBUG] Escaneo DB ${act.title}:`, found);
+        pendingDeleteList.push(...found);
+        
+        const el = document.getElementById(`status-${act.key}`);
+        if (el) {
+          el.className = "activity-status success";
+          el.textContent = `Listos para borrar: ${found.length}`;
+        }
+      }
+
+      // Scan Feedback
+      async function scanFeedback(act, fechaLimite, esFechaOpcional, autor, esOpcional) {
+        let page = 0;
+        const BASE_URL = window.location.origin;
+        const found = [];
+
+        while (true) {
+          const url = `${BASE_URL}/mod/feedback/show_entries.php?id=${act.cmid}&page=${page}`;
+          const res = await fetch(url, { credentials: "include" });
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+          }
+
+          const html = await res.text();
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          
+          const rows = [...doc.querySelectorAll('tr[id^="feedback-showentry-list-"]')];
+          if (rows.length === 0) break;
+
+          rows.forEach(row => {
+            const userEl = row.querySelector("td.fullname a");
+            const nombreAlumno = userEl?.textContent.trim() || "";
+
+            const dateEl = row.querySelector("td.completed_timemodified a") || row.querySelector("td.completed_timemodified");
+            const fechaText = dateEl?.textContent.trim() || "";
+            const fechaTimestamp = parseMoodleDate(fechaText);
+
+            const deleteLink = row.querySelector("td.deleteentry a");
+            if (!deleteLink || !fechaTimestamp) return;
+
+            const cumpleFecha = esFechaOpcional || (fechaTimestamp < fechaLimite);
+            const cumpleAutor = esOpcional || (nombreAlumno !== "" && nombreAlumno.trim().toLowerCase() === autor.trim().toLowerCase());
+ 
+            if (cumpleFecha && cumpleAutor) {
+              const urlObj = new URL(deleteLink.href);
+              const completedId = urlObj.searchParams.get("delete");
+              const sesskeyValue = urlObj.searchParams.get("sesskey") || sesskey;
+
+              if (completedId) {
+                found.push({
+                  type: "feedback",
+                  completedId: completedId,
+                  cmid: act.cmid,
+                  sesskey: sesskeyValue,
+                  autor: nombreAlumno || "Anónimo",
+                  fechaText: fechaText,
+                  actividadKey: act.key,
+                  actividadTitle: act.title,
+                  deleteUrl: deleteLink.href
+                });
+              }
+            }
+          });
+
+          const hasNext = doc.querySelector(`a[href*="page=${page + 1}"]`);
+          if (!hasNext) break;
+          page++;
+        }
+
+        console.log(`[DEBUG] Escaneo Encuesta ${act.title}:`, found);
+        pendingDeleteList.push(...found);
+
+        const el = document.getElementById(`status-${act.key}`);
+        if (el) {
+          el.className = "activity-status success";
+          el.textContent = `Listos para borrar: ${found.length}`;
+        }
+      }
+
+      // ==========================================================
+      // ★ MANEJO DEL MODAL DE CONFIRMACIÓN ★
+      // ==========================================================
+      function openConfirmModal(fecha, autor, esOpcional) {
+        const modal = document.getElementById("modal-confirm");
+        const summaryText = document.getElementById("confirm-summary-text");
+        const accordionContainer = document.getElementById("confirm-accordion-container");
+
+        summaryText.innerHTML = `Se eliminarán permanentemente <strong>${pendingDeleteList.length}</strong> registros coincidentes distribuidos en las actividades seleccionadas.`;
+        accordionContainer.innerHTML = "";
+
+        const agrupado = {};
+        pendingDeleteList.forEach(item => {
+          if (!agrupado[item.actividadTitle]) agrupado[item.actividadTitle] = [];
+          agrupado[item.actividadTitle].push(item);
+        });
+
+        let totalLineCount = 0;
+        let truncatedGlobal = false;
+
+        for (let title in agrupado) {
+          const items = agrupado[title];
+          let txtActividad = "";
+          let lineCountActividad = 0;
+          let truncatedActividad = false;
+
+          for (let i = 0; i < items.length; i++) {
+            if (totalLineCount >= MAX_DISPLAYED_ITEMS) {
+              truncatedGlobal = true;
+              truncatedActividad = true;
+              break;
+            }
+            const it = items[i];
+            if (it.type === "feedback") {
+              txtActividad += `• Alumno: ${it.autor} | Fecha: ${it.fechaText} | ID: ${it.completedId}\n`;
+            } else {
+              const autorString = (it.autor && it.autor !== "Desconocido") ? `Autor (Creador): ${it.autor} | ` : "";
+              txtActividad += `• ${autorString}Fecha: ${it.fechaText} | ID: ${it.rid}\n`;
+            }
+            totalLineCount++;
+            lineCountActividad++;
+          }
+
+          if (truncatedActividad) {
+            const remainingAct = items.length - lineCountActividad;
+            txtActividad += `... y ${remainingAct} registros más de esta actividad no listados por rendimiento.\n`;
+          }
+
+          const detailsEl = document.createElement("details");
+          detailsEl.open = true;
+          detailsEl.style.marginBottom = "8px";
+          detailsEl.style.border = "1px solid #ddd";
+          detailsEl.style.borderRadius = "4px";
+          detailsEl.style.background = "#fff";
+          detailsEl.style.boxShadow = "0 1px 3px rgba(0,0,0,0.02)";
+
+          const summaryEl = document.createElement("summary");
+          summaryEl.style.padding = "8px 12px";
+          summaryEl.style.fontWeight = "700";
+          summaryEl.style.cursor = "pointer";
+          summaryEl.style.color = "hsl(168, 60%, 25%)";
+          summaryEl.style.background = "#f8f9fa";
+          summaryEl.style.borderBottom = "1px solid #ddd";
+          summaryEl.style.userSelect = "none";
+          summaryEl.textContent = `📦 Actividad: ${title} (${items.length} registros)`;
+
+          const contentDiv = document.createElement("div");
+          contentDiv.style.padding = "8px";
+
+          const subTextarea = document.createElement("textarea");
+          subTextarea.readOnly = true;
+          subTextarea.style.width = "100%";
+          subTextarea.style.height = "100px";
+          subTextarea.style.fontFamily = "monospace";
+          subTextarea.style.fontSize = "11px";
+          subTextarea.style.boxSizing = "border-box";
+          subTextarea.style.border = "1px solid #eee";
+          subTextarea.style.borderRadius = "4px";
+          subTextarea.style.backgroundColor = "#fafafa";
+          subTextarea.style.resize = "none";
+          subTextarea.style.color = "#333";
+          subTextarea.style.outline = "none";
+          subTextarea.style.margin = "0";
+          subTextarea.value = txtActividad || "No se listaron registros.";
+
+          contentDiv.appendChild(subTextarea);
+          detailsEl.appendChild(summaryEl);
+          detailsEl.appendChild(contentDiv);
+          accordionContainer.appendChild(detailsEl);
+        }
+
+        if (truncatedGlobal) {
+          const warningDiv = document.createElement("div");
+          warningDiv.style.fontSize = "11px";
+          warningDiv.style.color = "#c0392b";
+          warningDiv.style.fontWeight = "600";
+          warningDiv.style.marginTop = "4px";
+          warningDiv.textContent = `⚠️ Se ha alcanzado el límite de ${MAX_DISPLAYED_ITEMS} registros para la vista previa detallada. Los registros restantes se eliminarán normalmente al confirmar.`;
+          accordionContainer.appendChild(warningDiv);
+        }
+
+        modal.style.display = "flex";
+      }
+
+      function closeConfirmModal() {
+        document.getElementById("modal-confirm").style.display = "none";
+        
+        // Reiniciar barra de progreso y ocultar el panel
+        const progressCard = document.getElementById("global-progress-card");
+        if (progressCard) progressCard.style.display = "none";
+        const progressFill = document.getElementById("progress-bar-fill");
+        if (progressFill) progressFill.style.width = "0%";
+        const progressPercent = document.getElementById("progress-percent-text");
+        if (progressPercent) progressPercent.textContent = "0%";
+        const progressStatus = document.getElementById("progress-status-text");
+        if (progressStatus) progressStatus.textContent = "";
+
+        // Restablecer estados de las actividades seleccionadas a "Idle"
+        if (selectedActivities) {
+          selectedActivities.forEach(act => {
+            const el = document.getElementById(`status-${act.key}`);
+            if (el) {
+              el.className = "activity-status";
+              el.textContent = "";
+            }
+          });
+        }
+
+        // Limpiar lista de elementos pendientes de eliminación
+        pendingDeleteList = [];
+      }
+
+      document.getElementById("btn-modal-close").addEventListener("click", closeConfirmModal);
+      document.getElementById("btn-modal-cancel").addEventListener("click", closeConfirmModal);
+
+      // ==========================================================
+      // ★ PROCESAMIENTO DE ELIMINACIÓN SECUENCIAL REAL ★
+      // ==========================================================
+      document.getElementById("btn-modal-danger-confirm").addEventListener("click", async function () {
+        document.getElementById("modal-confirm").style.display = "none";
+        await executeCleanup();
+      });
+
+      async function executeCleanup() {
+        console.log("[DEBUG] Iniciando executeCleanup(). Elementos pendientes a borrar:", pendingDeleteList);
+        const progressFill = document.getElementById("progress-bar-fill");
+        const progressStatus = document.getElementById("progress-status-text");
+        const progressPercent = document.getElementById("progress-percent-text");
+
+        progressFill.style.width = "0%";
+        progressPercent.textContent = "0%";
+        progressStatus.textContent = "Iniciando borrado secuencial...";
+
+        const totalItems = pendingDeleteList.length;
+        const delay = systemConfig.umbrales.historico_delay_ms || 500;
+        const BASE_URL = window.location.origin;
+
+        selectedActivities.forEach(act => {
+          const el = document.getElementById(`status-${act.key}`);
+          if (el) {
+            el.className = "activity-status deleting";
+            el.textContent = "🗑️ Eliminando...";
+          }
+        });
+
+        let successCount = 0;
+        let failCount = 0;
+
+        const statsPorActividad = {};
+        selectedActivities.forEach(act => {
+          statsPorActividad[act.key] = { total: 0, borrados: 0, fallidos: 0 };
+        });
+        pendingDeleteList.forEach(item => {
+          if (statsPorActividad[item.actividadKey]) {
+            statsPorActividad[item.actividadKey].total++;
+          }
+        });
+
+        for (let i = 0; i < totalItems; i++) {
+          const item = pendingDeleteList[i];
+          
+          const pct = Math.round((i / totalItems) * 100);
+          progressFill.style.width = `${pct}%`;
+          progressPercent.textContent = `${pct}%`;
+          progressStatus.textContent = `Borrando (${i + 1}/${totalItems}): ${item.autor} de ${item.actividadTitle}...`;
+
+          const elAct = document.getElementById(`status-${item.actividadKey}`);
+          if (elAct) {
+            const stats = statsPorActividad[item.actividadKey];
+            elAct.textContent = `🗑️ Borrando (${stats.borrados + stats.fallidos + 1}/${stats.total})`;
+          }
+
+          console.log(`[DEBUG] Borrando (${i + 1}/${totalItems}) - Tipo: ${item.type}, ID: ${item.rid || item.completedId}, Autor: ${item.autor}, Actividad: ${item.actividadTitle}`);
+
+          let ok = false;
+          try {
+            if (item.type === "db") {
+              const form = new FormData();
+              form.append("d", item.dataid);
+              form.append("delete", item.rid);
+              form.append("confirm", "1");
+              form.append("sesskey", sesskey);
+
+              console.log(`[DEBUG] Enviando POST a /mod/data/view.php con d=${item.dataid}, delete=${item.rid}`);
+              const res = await fetch(`${BASE_URL}/mod/data/view.php`, {
+                method: "POST",
+                body: form,
+                credentials: "include",
+                redirect: "manual"
+              });
+              ok = (res.status === 200 || res.status === 0 || res.status === 303);
+              console.log(`[DEBUG] Resultado POST: status=${res.status}, ok=${ok}`);
+            } else {
+              console.log(`[DEBUG] Enviando GET a feedback deleteUrl: ${item.deleteUrl}`);
+              const res = await fetch(item.deleteUrl, { credentials: "include" });
+              ok = (res.status === 200 || res.status === 0 || res.status === 303);
+              console.log(`[DEBUG] Resultado GET feedback: status=${res.status}, ok=${ok}`);
+            }
+          } catch (err) {
+            console.error(`[DEBUG] Fallo al eliminar registro ${item.rid || item.completedId}:`, err);
+            ok = false;
+          }
+
+          if (ok) {
+            successCount++;
+            statsPorActividad[item.actividadKey].borrados++;
+          } else {
+            failCount++;
+            statsPorActividad[item.actividadKey].fallidos++;
+          }
+
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+
+        // Completion
+        progressFill.style.width = "100%";
+        progressPercent.textContent = "100%";
+        progressStatus.textContent = `Completado: ${successCount} borrados con éxito, ${failCount} fallidos.`;
+
+        // Update statuses
+        selectedActivities.forEach(act => {
+          const el = document.getElementById(`status-${act.key}`);
+          if (el) {
+            const stats = statsPorActividad[act.key];
+            if (stats.fallidos === 0 && stats.borrados > 0) {
+              el.className = "activity-status success";
+              el.textContent = `✅ Listo: ${stats.borrados} eliminados`;
+            } else if (stats.borrados > 0 || stats.fallidos > 0) {
+              el.className = "activity-status success";
+              el.textContent = `✅ Finalizado (${stats.borrados} ok, ${stats.fallidos} error)`;
+            } else {
+              el.className = "activity-status";
+              el.textContent = "Sin registros coincidentes";
+            }
+          }
+        });
+
+        showStatusBar(`🎉 Operación completada de forma secuencial. Total eliminados: ${successCount} registros. Fallidos: ${failCount}.`);
+        pendingDeleteList = [];
+        checkFiltersValidity();
+      }
+
+      // ==========================================================
+      // ★ INICIALIZACIÓN GENERAL DEL SISTEMA ★
+      // ==========================================================
+      function initDashboard() {
+        loadDbConfig();
+        
+        // Event listener to toggle the visibility of Moodle navigation
+        const btnToggleMoodle = document.getElementById("btn-toggle-moodle-nav");
+        if (btnToggleMoodle) {
+          btnToggleMoodle.addEventListener("click", function () {
+            const isHidden = document.body.classList.contains("hide-moodle-navigation");
+            if (isHidden) {
+              document.body.classList.remove("hide-moodle-navigation");
+              this.textContent = "Ocultar Configuración de Actividad";
+            } else {
+              document.body.classList.add("hide-moodle-navigation");
+              this.textContent = "Mostrar Configuración de Actividad";
+            }
+          });
+        }
+      }
+
+      document.getElementById("btn-start-cleanup").addEventListener("click", startCleanupWorkflow);
+
+      // Inicializar el dashboard directamente al cargar
+      initDashboard();
+
+    })();
+  </script>
+</p>

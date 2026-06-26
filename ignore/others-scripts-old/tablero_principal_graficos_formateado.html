@@ -1,4 +1,347 @@
+<p>
+  <script>
+    // Quitar margen del <p> que Moodle crea alrededor del script
+    if (document.currentScript?.parentElement?.tagName === "P") {
+      document.currentScript.parentElement.style.margin = "0";
+    }
 
+    // Ocultar el título de la página de Moodle lo más rápido posible
+    (function() {
+      var style = document.createElement("style");
+      style.textContent = `
+         h2:first-of-type, .page-header-headings, .activity-header {
+           display: none !important;
+         }
+      `;
+      document.head.appendChild(style);
+    })();
+  </script>
+</p>
+<p>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</p>
+<div id="pantalla-falsa">
+  <p style="font-size: 15px; color: #444; line-height: 1.8;"><strong>Página de
+      pruebaa Moodle</strong></p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Lorem ipsum dolor
+    sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+    exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
+    aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+    fugiat nulla pariatur.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Pellentesque
+    habitant morbi tristique senectus et netus et malesuada fames ac turpis
+    egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit
+    amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies
+    mi vitae est, et nunc <span id="btn-oculto"
+      style="cursor: text;">accumsan</span> vehicula nisi. Mauris placerat
+    eleifend leo, quisque sit amet est et sapien ullamcorper pharetra.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Curabitur pretium
+    tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis molestie
+    dictum semper, quam quam congue erat, vitae sodales nisi metus a nunc.
+    Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod sodales,
+    sollicitudin vel, wisi.</p>
+</div>
+<div id="tablero" style="display: none;">
+  <div id="dashboard-container">
+    <div class="dashboard-header">
+      <div>
+        <h3
+          style="color: hsl(168, 60%, 35%) !important; margin-top: 0 !important; margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important;">
+          📊 Sistema de Seguimiento Estudiantil - Tablero de Control General
+        </h3>
+      </div>
+      <div class="header-actions"
+        style="display: flex; gap: 8px; align-items: center;"><span
+          id="txt-last-update"
+          style="font-size: 13px; color: #666; margin-right: 4px;">Última
+          actualización: —</span> <button id="btn-refresh" class="btn-action"
+          type="button"> Actualizar datos </button> <button
+          id="btn-save-historical" class="btn-action" type="button"> 💾 Guardar
+          Histórico </button></div>
+    </div>
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="spinner"> </div>
+      <div id="loading-text" class="loading-text">Cargando configuración...
+      </div>
+    </div>
+    <div class="grid-kpis">
+      <div class="card-kpi bg-light-red"><span id="kpi-alto-riesgo"
+          class="kpi-value color-red">0</span> <span class="kpi-label">Alumnos
+          en riesgo alto (IRD ≥ 80)</span></div>
+      <div class="card-kpi bg-light-yellow"><span id="kpi-medio-riesgo"
+          class="kpi-value color-yellow">0</span> <span
+          class="kpi-label">Alumnos en riesgo medio (40-79)</span></div>
+      <div class="card-kpi bg-light-green"><span id="kpi-bajo-riesgo"
+          class="kpi-value color-green">0</span> <span class="kpi-label">Alumnos
+          sin riesgo (&lt; 40)</span></div>
+      <div class="card-kpi bg-light-blue"><span id="kpi-solicitudes-pendientes"
+          class="kpi-value color-blue">0</span> <span
+          class="kpi-label">Solicitudes pendientes de ayuda</span></div>
+    </div>
+    <div class="tabs-navigation"><button class="tab-btn active" type="button"
+        data-tab="tab-listado-alumnos">📊 Riesgo Estudiantil (IRD)</button>
+      <button class="tab-btn" type="button" data-tab="tab-solicitudes">🆘
+        Solicitudes de Ayuda</button> <button class="tab-btn" type="button"
+        data-tab="tab-historial">📋 Historial de Asistencias</button> <button
+        class="tab-btn" type="button" data-tab="tab-cohortes">🎓 Indicadores por
+        Cohorte</button> <button class="tab-btn" type="button"
+        data-tab="tab-peso-preguntas">📈 Peso de Preguntas</button> <button
+        class="tab-btn" type="button" data-tab="tab-graficos">📈 Análisis
+        Visual</button></div>
+    <div id="tab-listado-alumnos" class="tab-content active">
+      <div class="section-card">
+        <div id="filters-toggle-btn" class="filters-header"
+          style="cursor: pointer;"><span
+            style="font-weight: 500; color: hsl(168, 60%, 25%);">🔍 Filtros de
+            Búsqueda</span> <span id="filters-arrow-icon">▼</span></div>
+        <div id="filters-container" class="filters-row" style="display: none;">
+          <div class="filter-item"><label for="filter-search">Buscar
+              Alumno</label> <input id="filter-search" class="filter-input"
+              type="text" placeholder="Nombre, apellido o email..."></div>
+          <div class="filter-item" style="max-width: 120px;"><label
+              for="filter-ird-min">IRD Mínimo</label> <input id="filter-ird-min"
+              class="filter-input" max="100" min="0" type="number"></div>
+          <div class="filter-item" style="max-width: 120px;"><label
+              for="filter-ird-max">IRD Máximo</label> <input id="filter-ird-max"
+              class="filter-input" max="100" min="0" type="number"></div>
+          <div class="filter-item"><label for="filter-asistencia">Estado de
+              Asistencia</label><select id="filter-asistencia"
+              class="filter-input">
+              <option value="todos">Todos</option>
+              <option value="asistidos">Asistidos</option>
+              <option value="sin_asistir">Sin asistir</option>
+            </select></div>
+          <div class="filter-item"><label
+              for="filter-riesgo-perceb">Autopercepción de Riesgo</label><select
+              id="filter-riesgo-perceb" class="filter-input">
+              <option value="todos">Todos</option>
+              <option value="si">Se percibe en riesgo</option>
+              <option value="no">No se percibe</option>
+            </select></div>
+          <div class="filter-item"
+            style="align-self: flex-end; display: flex; gap: 8px;"><button
+              id="btn-clear-filters" class="btn-action"
+              type="button">Limpiar</button></div>
+        </div>
+        <div class="table-responsive">
+          <table id="table-students" class="table-dashboard">
+            <thead>
+              <tr>
+                <th style="width: 50px;">Foto</th>
+                <th>Nombre</th>
+                <th class="sortable" data-sort="ird">IRD ↕</th>
+                <th class="sortable" data-sort="ralentizacion">Ralentización ↕
+                </th>
+                <th class="sortable" style="text-align: center;"
+                  data-sort="sePercibeRiesgo">¿Se percibe en riesgo? ↕</th>
+                <th class="sortable" data-sort="asistencia">Últ. Asistencia ↕
+                </th>
+                <th class="sortable" data-sort="solicitud">Últ. Solicitud ↕</th>
+                <th style="width: 100px; text-align: center;">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody">
+              <tr>
+                <td style="text-align: center; padding: 32px; color: #666;"
+                  colspan="8">No hay datos cargados. Presiona "Actualizar datos"
+                  para comenzar.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination-row">
+          <div id="pagination-info" style="font-size: 13px; color: #666;">
+            Mostrando 0-0 de 0 alumnos</div>
+          <div id="pagination-nav" class="pagination-buttons"></div>
+        </div>
+      </div>
+    </div>
+    <div id="tab-solicitudes" class="tab-content">
+      <div class="section-card">
+        <h3
+          style="margin-top: 0; margin-bottom: 16px; color: hsl(168, 60%, 25%); display: flex; align-items: center; gap: 8px;">
+          🆘 Solicitudes de Ayuda Pendientes de Atención</h3>
+        <div class="table-responsive">
+          <table id="table-requests" class="table-dashboard">
+            <thead>
+              <tr>
+                <th style="width: 50px;">Foto</th>
+                <th>Alumno</th>
+                <th>Fecha de Solicitud</th>
+                <th>Últ. Asistencia</th>
+                <th>Detalle / Mensaje del Alumno</th>
+                <th style="width: 180px; text-align: center;">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="requests-tbody">
+              <tr>
+                <td style="text-align: center; padding: 32px; color: #666;"
+                  colspan="6">No hay solicitudes pendientes en este momento.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="tab-historial" class="tab-content">
+      <div class="section-card">
+        <h3
+          style="margin-top: 0; margin-bottom: 16px; color: hsl(168, 60%, 25%); display: flex; align-items: center; gap: 8px;">
+          📋 Historial de Asistencias Registradas</h3>
+        <div class="table-responsive">
+          <table id="table-historial" class="table-dashboard">
+            <thead>
+              <tr>
+                <th style="width: 50px;">Foto</th>
+                <th>Alumno</th>
+                <th>Fecha de Asistencia</th>
+                <th>Tutor</th>
+                <th>Origen</th>
+                <th>Consulta Alumno</th>
+                <th>Orientación Tutor</th>
+              </tr>
+            </thead>
+            <tbody id="historial-tbody">
+              <tr>
+                <td style="text-align: center; padding: 32px; color: #666;"
+                  colspan="6">No hay asistencias registradas.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="tab-cohortes" class="tab-content">
+      <div class="section-card">
+        <h3
+          style="margin-top: 0; margin-bottom: 16px; color: hsl(168, 60%, 25%);">
+          🎓 Indicadores de Deserción y Eficiencia por Cohorte (Año de Ingreso)
+        </h3>
+        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Calculado
+          sobre el estado actual de los alumnos del curso. Los alumnos
+          ingresados hace más de 2 cuatrimestres (360 días) sin responder
+          encuestas cuatrimestrales se computan como desertores.</p>
+        <div class="table-responsive">
+          <table id="table-cohortes-data" class="table-dashboard">
+            <thead>
+              <tr>
+                <th>Cohorte</th>
+                <th>Ingresantes</th>
+                <th>Alumnos Activos (%)</th>
+                <th>Egresados (%)</th>
+                <th>Desertados (%)</th>
+              </tr>
+            </thead>
+            <tbody id="cohortes-tbody">
+              <tr>
+                <td style="text-align: center; padding: 32px; color: #666;"
+                  colspan="5">No hay datos estadísticos de cohorte disponibles.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="tab-peso-preguntas" class="tab-content">
+      <div class="section-card">
+        <h3
+          style="margin-top: 0; margin-bottom: 16px; color: hsl(168, 60%, 25%);">
+          📈 Impacto de Indicadores en el Riesgo Global del Grupo</h3>
+        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Muestra la
+          suma acumulada de la contribución (β × x) de cada pregunta para todos
+          los estudiantes evaluados. Permite identificar los factores de riesgo
+          con mayor prevalencia en este grupo.</p>
+        <div class="table-responsive">
+          <table id="table-questions-weight" class="table-dashboard">
+            <thead>
+              <tr>
+                <th style="width: 50px; text-align: center;">N°</th>
+                <th>Pregunta / Indicador</th>
+                <th>Origen</th>
+                <th style="text-align: right; width: 180px;">Peso Acumulado (%)
+                  ↓</th>
+              </tr>
+            </thead>
+            <tbody id="questions-tbody">
+              <tr>
+                <td style="text-align: center; padding: 32px; color: #666;"
+                  colspan="4">No hay datos de peso por pregunta calculados.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="tab-graficos" class="tab-content">
+      <div class="section-card">
+        <h3
+          style="margin-top: 0; margin-bottom: 16px; color: hsl(168, 60%, 25%);">
+          📈 Análisis Visual del Cuatrimestre Actual</h3>
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+          <div
+            style="background: #fff; padding: 16px; border: 1px solid #eaecf4; border-radius: 6px; position: relative;">
+            <canvas id="chart-tendencia-ird" height="250"></canvas></div>
+          <div
+            style="background: #fff; padding: 16px; border: 1px solid #eaecf4; border-radius: 6px; position: relative;">
+            <canvas id="chart-dispersion" height="250"></canvas></div>
+          <div
+            style="background: #fff; padding: 16px; border: 1px solid #eaecf4; border-radius: 6px; position: relative;">
+            <canvas id="chart-brecha" height="250"></canvas></div>
+          <div
+            style="background: #fff; padding: 16px; border: 1px solid #eaecf4; border-radius: 6px; position: relative;">
+            <canvas id="chart-radar" height="250"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="modal-asistencia" class="modal-wrapper" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-title">Registrar Asistencia Académica</h3>
+      <button id="btn-modal-close" class="modal-close-btn"
+        type="button">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-student-info"
+        style="margin-bottom: 16px; padding: 12px; background: #f8f9fa; border-radius: 6px; font-weight: 600; font-size: 14px; color: #333;">
+        Alumno: —</div>
+      <form id="form-asistencia"
+        style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group"><label
+            style="font-weight: 600; margin-bottom: 6px; display: block; font-size: 13px; color: #555;"
+            for="asistencia-origen">Origen de la Asistencia</label><select
+            id="asistencia-origen" class="filter-input"
+            style="width: 100%; box-sizing: border-box;" required="">
+            <option value="Proactivo">Proactivo (Detección del Tutor por IRD)
+            </option>
+            <option value="Solicitud">Solicitud (Respuesta a pedido de ayuda del
+              Alumno)</option>
+          </select></div>
+        <div class="form-group"><label
+            style="font-weight: 600; margin-bottom: 6px; display: block; font-size: 13px; color: #555;"
+            for="asistencia-mensaje"> Mensaje de asistencia / Orientación
+            brindada </label> <textarea id="asistencia-mensaje"
+            style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: 13px; padding: 10px; border: 1px solid #d1d3e2; border-radius: 6px; resize: vertical;"
+            rows="6"
+            placeholder="Escribe aquí el mensaje u orientación que le enviarás al alumno por chat interno de Moodle y guardarás en los logs..."></textarea>
+        </div>
+        <div id="modal-error" class="status-text text-danger"
+          style="margin-top: 4px; display: none;"></div>
+        <div class="modal-footer"><button id="btn-modal-cancel"
+            class="btn-action btn-secondary-action"
+            type="button">Cancelar</button> <button id="btn-modal-save"
+            class="btn-action" type="submit">Guardar y Enviar</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+<p>
+  <script>
     (function() {
       // Inyección dinámica de CSS para evitar la sanitización de etiquetas <style> de Moodle
       (function() {
@@ -454,6 +797,13 @@
             font-weight: 700;
             font-size: 12px;
           }
+
+          .text-ellipsis {
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
           
           /* Paginación */
           .pagination-row {
@@ -619,6 +969,64 @@
         });
 
       // ==========================================================
+      // ★ HELPERS DE CONEXIÓN CON MOODLE (FORMULARIOS Y FIRMAS) ★
+      // ==========================================================
+      function buildMoodleFormData(docForm, fieldsValues) {
+        const formData = new FormData();
+        const inputs = docForm.querySelectorAll("input, textarea, select");
+        inputs.forEach(input => {
+          const name = input.getAttribute("name");
+          if (!name) return;
+          if (input.type === "submit" || input.type === "button") return;
+          if ((input.type === "checkbox" || input.type === "radio") && !
+            input.checked) return;
+          const val = input.value || input.getAttribute("value") || "";
+          formData.set(name, val);
+        });
+        for (let key in fieldsValues) {
+          if (fieldsValues[key] !== undefined && fieldsValues[key] !== null) {
+            formData.set(key, fieldsValues[key]);
+          }
+        }
+        const submitBtn = docForm.querySelector('input[type="submit"]');
+        if (submitBtn && submitBtn.name) {
+          formData.set(submitBtn.name, submitBtn.value || "Guardar");
+        } else {
+          formData.set("saveandview", "Guardar");
+        }
+        return formData;
+      }
+
+      async function verifyMoodlePost(response, studentName) {
+        const text = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "text/html");
+        const hasForm = doc.querySelector(
+          'form#mform1, form[action*="edit.php"]') !== null;
+        const errorEl = doc.querySelector(
+          '.errormsg, .error, .alert-danger');
+        if (hasForm) {
+          let errorMsg =
+            "Moodle devolvió el formulario de edición nuevamente (posible fallo de validación o firma).";
+          if (errorEl) {
+            errorMsg += ` Detalle: ${errorEl.textContent.trim()}`;
+          }
+          console.warn(
+            `[DEBUG] Guardado fallido para ${studentName || "el registro"}:`,
+            errorMsg);
+          return {
+            success: false,
+            error: errorMsg
+          };
+        }
+        return {
+          success: true
+        };
+      }
+
+
+
+      // ==========================================================
       // ★ CONSTANTES DE CONFIGURACIÓN MOODLE (FALLBACK POR DEFECTO) ★
       // ==========================================================
       const CONFIG_DB_CMID = 54785; // CMID de la base de datos "Db Config"
@@ -635,12 +1043,18 @@
             encuesta_cuatrimestral: 54284,
             db_solicitudes: 54783,
             db_logs: 54784,
-            db_historico: 54788
+            db_historico: 54788,
+            db_1er_anio: 54789,
+            db_historico_1er_anio: 54791,
+            db_historico_general: 54862
           },
           dataids: {
             db_solicitudes: 15,
             db_logs: 16,
-            db_historico: 18
+            db_historico: 18,
+            db_1er_anio: 19,
+            db_historico_1er_anio: 20,
+            db_historico_general: 21
           }
         },
         umbrales: {
@@ -675,10 +1089,14 @@
       // Estado en memoria
       let alumnosCalculados = [];
       let solicitudesPendientes = [];
+      let logsHistorial = [];
       let pesosPreguntasGlobal = [];
       let cohortesStats = [];
       let lastUpdateDate = null;
       let refreshCooldownActive = false;
+
+      // Manejador de Gráficos (Dashboard)
+      let visualCharts = {};
 
       // Variables de Paginación y Filtros
       let currentPage = 1;
@@ -713,6 +1131,32 @@
         }
       }
 
+      // Parsea de manera tolerante y robusta los formatos de fecha de Moodle y en caliente
+      function parseDate(str) {
+        if (!str) return 0;
+        try {
+          const meses = ["enero", "febrero", "marzo", "abril", "mayo",
+            "junio", "julio", "agosto", "septiembre", "octubre",
+            "noviembre", "diciembre"
+          ];
+          const clean = str.replace(/de/g, "").replace(/,/g, "").replace(
+            /\s+/g, " ").trim();
+          const parts = clean.split(" ");
+          if (isNaN(parseInt(parts[0], 10))) {
+            parts.shift();
+          }
+          const dia = parseInt(parts[0], 10);
+          const mesIndex = meses.indexOf(parts[1].toLowerCase());
+          const anio = parseInt(parts[2], 10);
+          const h = parts[3].split(":");
+          return new Date(anio, mesIndex, dia, parseInt(h[0], 10), parseInt(h[
+            1], 10)).getTime();
+        } catch (e) {
+          console.error("Error al parsear fecha en UI:", str, e);
+          return 0;
+        }
+      }
+
       // Parsea las entradas HTML de bases de datos
       function parseEntriesHTML(htmlText) {
         const parser = new DOMParser();
@@ -721,9 +1165,8 @@
           ".defaulttemplate-listentry, .defaulttemplate-single"));
       }
 
-      // Parser de CSV robusto (RFC 4180 completo) — soporta comillas, saltos de línea y escapes "" dentro de celdas
+      // Parser de CSV robusto (RFC 4180 completo)
       function parseCSV(text) {
-        // Si el texto parece HTML, Moodle devolvió una página en lugar del CSV — retornar vacío
         const trimmedText = text.trimStart();
         if (trimmedText.startsWith("<!DOCTYPE") || trimmedText.startsWith(
             "<html") || trimmedText.startsWith("<HTML")) {
@@ -742,36 +1185,28 @@
 
         while (i < len) {
           const ch = text[i];
-
           if (inQuotes) {
             if (ch === '"') {
-              // Comilla de cierre o escape ""
               if (i + 1 < len && text[i + 1] === '"') {
-                // Escape "" → agregar una comilla literal
                 col += '"';
                 i += 2;
               } else {
-                // Cierre de campo entre comillas
                 inQuotes = false;
                 i++;
               }
             } else {
-              // Cualquier char dentro de comillas (incluyendo \n, \r) es parte del valor
               col += ch;
               i++;
             }
           } else {
             if (ch === '"') {
-              // Apertura de campo entre comillas
               inQuotes = true;
               i++;
             } else if (ch === ',') {
-              // Separador de columna
               row.push(col);
               col = "";
               i++;
             } else if (ch === '\r') {
-              // Fin de línea (CRLF o CR sólo)
               row.push(col);
               col = "";
               rows.push(row);
@@ -779,7 +1214,6 @@
               if (i + 1 < len && text[i + 1] === '\n') i++;
               i++;
             } else if (ch === '\n') {
-              // Fin de línea (LF)
               row.push(col);
               col = "";
               rows.push(row);
@@ -792,21 +1226,14 @@
           }
         }
 
-        // Agregar la última columna/fila si quedó contenido
         if (col !== "" || row.length > 0) {
           row.push(col);
-          // Solo agregar si la fila no está completamente vacía
-          if (row.some(c => c.trim() !== "")) {
-            rows.push(row);
-          }
+          if (row.some(c => c.trim() !== "")) rows.push(row);
         }
 
         if (rows.length === 0) return [];
-
-        // La primera fila es el encabezado
         const headers = rows[0].map(h => h.trim());
 
-        // Convertir filas en objetos {columna: valor}
         return rows.slice(1)
           .filter(r => r.some(c => c.trim() !== ""))
           .map(r => Object.fromEntries(
@@ -832,14 +1259,14 @@
         try {
           const response = await fetch(
             `${window.location.origin}/mod/data/view.php?d=${CONFIG_DB_ID}`
-            );
+          );
           if (response.ok) {
             const html = await response.text();
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, "text/html");
             const entries = doc.querySelectorAll(
               ".defaulttemplate-listentry, .defaulttemplate-single, .card, .generaltable td"
-              );
+            );
             let foundJson = null;
 
             for (let entry of entries) {
@@ -858,7 +1285,6 @@
             }
 
             if (!foundJson) {
-              // Buscar en todo el body
               const bodyText = doc.body ? doc.body.textContent : html;
               const cleanBody = bodyText.replace(/\u00a0/g, " ").replace(
                 /&nbsp;/g, " ").trim();
@@ -879,45 +1305,32 @@
             } else {
               console.warn(
                 "No se encontró entrada de configuración válida en la DB. Usando fallback."
-                );
-              alert(
-                "Aviso: No se encontró una entrada de configuración válida en la base de datos de Moodle. Se intentará cargar el respaldo local."
-                );
+              );
               await loadFallbackConfig();
             }
           } else {
             console.error(
               "Error al obtener la configuración de la DB. Usando fallback."
-              );
-            alert(
-              "Error: No se pudo obtener la configuración desde la base de datos de Moodle (código de respuesta no exitoso). Se intentará cargar el respaldo local."
-              );
+            );
             await loadFallbackConfig();
           }
         } catch (e) {
           console.error("Excepción al cargar config:", e);
-          alert(
-            "Error de red o sesión al intentar cargar la configuración de Moodle. Se cargará el respaldo local."
-            );
           await loadFallbackConfig();
         }
       }
 
-      // Carga configuración fallback leyéndola desde config_2.md local (si no cargó de Moodle)
+      // Carga configuración fallback
       async function loadFallbackConfig() {
         try {
           const response = await fetch(
             `${window.location.origin}/scripts/config_2.md`);
           if (response.ok) {
             let text = await response.text();
-            // Limpiar Markdown blocks si vienen incluidos
             text = text.replace(/```json/g, "").replace(/```/g, "").trim();
             const parsed = parseCleanJSON(text);
             if (parsed) {
               systemConfig = parsed;
-              console.log(
-                "Configuración cargada de config_2.md fallback local:",
-                systemConfig);
               return;
             }
           }
@@ -927,11 +1340,7 @@
             e);
         }
 
-        alert(
-          "Error crítico: No se pudo leer el archivo de configuración local config_2.md. Se usará la configuración mínima predeterminada."
-          );
-
-        // Configuración mínima hardcodeada por si fallan todos los fetches de config
+        // Configuración mínima hardcodeada
         systemConfig = {
           urls: {
             base: window.location.origin,
@@ -941,12 +1350,14 @@
               encuesta_cuatrimestral: 54284,
               db_solicitudes: 54783,
               db_logs: 54784,
-              db_historico: 54788
+              db_historico: 54788,
+              db_historico_general: 54862
             },
             dataids: {
               db_solicitudes: 15,
               db_logs: 16,
-              db_historico: 18
+              db_historico: 18,
+              db_historico_general: 21
             }
           },
           umbrales: {
@@ -1175,7 +1586,7 @@
         };
       }
 
-      // Scraping paginado de participantes en Moodle (de 50 en 50)
+      // Scraping paginado de participantes en Moodle
       async function fetchParticipantes() {
         let page = 0;
         const estudiantesMap = new Map();
@@ -1185,36 +1596,18 @@
         while (true) {
           const url =
             `${window.location.origin}/user/index.php?id=${CURSO_ID}&page=${page}&perpage=5000&group=0`;
-          console.log(
-            `[DEBUG] Descargando página ${page} de participantes... URL: ${url}`
-            );
           const response = await fetch(url);
-          if (!response.ok) {
-            console.warn(
-              `[DEBUG] Error de respuesta HTTP al obtener participantes en página ${page}`
-              );
-            break;
-          }
+          if (!response.ok) break;
 
           const htmlText = await response.text();
           const parser = new DOMParser();
           const doc = parser.parseFromString(htmlText, "text/html");
 
           const table = doc.getElementById("participants");
-          if (!table) {
-            console.log(
-              `[DEBUG] No se encontró la tabla de participantes en la página ${page}. Fin de la paginación.`
-              );
-            break;
-          }
+          if (!table) break;
 
           const rows = table.querySelectorAll("tbody tr");
-          if (rows.length === 0) {
-            console.log(
-              `[DEBUG] La tabla de participantes está vacía en la página ${page}. Fin de la paginación.`
-              );
-            break;
-          }
+          if (rows.length === 0) break;
 
           let nuevosEnPagina = 0;
 
@@ -1241,24 +1634,18 @@
             const matchId = profileHref.match(/id=(\d+)/);
             const idAlumno = matchId ? matchId[1] : null;
 
-            if (!idAlumno) continue;
-
-            // Si el alumno ya fue procesado en una página anterior, lo omitimos
-            if (idsVistos.has(idAlumno)) {
-              continue;
-            }
+            if (!idAlumno || idsVistos.has(idAlumno)) continue;
 
             idsVistos.add(idAlumno);
             nuevosEnPagina++;
 
-            // Extraer foto de perfil buscando en toda la fila (evita fallos por columna incorrecta c0/c1)
             const imgEl = row.querySelector("img.userpicture");
             const avatarHtml = imgEl ?
               `<div class="user-pic-wrapper">${imgEl.outerHTML}</div>` :
               `<div class="userinitials">${nombreCompleto.substring(0, 2).toUpperCase()}</div>`;
 
             const groupsText = row.querySelector(".c4")?.textContent
-            ?.trim() || "";
+              ?.trim() || "";
 
             estudiantesMap.set(email, {
               id: idAlumno,
@@ -1267,66 +1654,46 @@
               avatarHtml: avatarHtml,
               grupo: groupsText
             });
-
             idToEstudiante.set(idAlumno, estudiantesMap.get(email));
           }
 
-          console.log(
-            `[DEBUG] Página ${page}: Procesados ${rows.length} registros, se encontraron ${nuevosEnPagina} estudiantes nuevos.`
-            );
-
-          // Si no se detectó ningún estudiante nuevo en esta página, es porque llegamos al final de la lista
-          // o Moodle está devolviendo la misma página (redirección)
-          if (nuevosEnPagina === 0) {
-            console.log(
-              `[DEBUG] No se encontraron nuevos estudiantes en la página ${page}. Deteniendo bucle de paginación.`
-              );
-            break;
-          }
-
+          if (nuevosEnPagina === 0) break;
           page++;
         }
-
         return {
           estudiantesMap,
           idToEstudiante
         };
       }
 
-      // Parsea solicitudes de ayuda desde la DB
+      // Parsea solicitudes de ayuda
       function parseSolicitudes(htmlText, idToEstudiante) {
         const entries = parseEntriesHTML(htmlText);
         const list = [];
-
         entries.forEach(entry => {
           const userLink = entry.querySelector(
-          "a[href*='user/view.php']");
+            "a[href*='user/view.php']");
           if (!userLink) return;
-          const href = userLink.getAttribute("href");
-          const matchUser = href.match(/id=(\d+)/);
+          const matchUser = userLink.getAttribute("href").match(
+            /id=(\d+)/);
           if (!matchUser) return;
           const idAlumno = matchUser[1];
 
           let rid = null;
-          const actionLinks = entry.querySelectorAll("a[href*='rid=']");
-          for (let link of actionLinks) {
-            const linkHref = link.getAttribute("href");
-            const matchRid = linkHref.match(/rid=(\d+)/);
-            if (matchRid) {
-              rid = matchRid[1];
+          for (let link of entry.querySelectorAll("a[href*='delete=']")) {
+            const m = link.getAttribute("href").match(/delete=(\d+)/);
+            if (m) {
+              rid = m[1];
               break;
             }
           }
           if (!rid) {
-            const deleteLinks = entry.querySelectorAll(
-              "a[href*='delete='], a[href*='approve='], a[href*='disapprove=']"
-              );
-            for (let link of deleteLinks) {
-              const linkHref = link.getAttribute("href");
-              const match = linkHref.match(
-                /(?:delete|approve|disapprove)=(\d+)/);
-              if (match) {
-                rid = match[1];
+            for (let link of entry.querySelectorAll(
+                "a[href*='approve='], a[href*='disapprove=']")) {
+              const m = link.getAttribute("href").match(
+                /(?:approve|disapprove)=(\d+)/);
+              if (m) {
+                rid = m[1];
                 break;
               }
             }
@@ -1341,7 +1708,7 @@
           const descripcion = descEl ? descEl.textContent.trim() : "";
 
           const timeEl = entry.querySelector(
-          ".data-timeinfo span[title]");
+            ".data-timeinfo span[title]");
           const fechaText = timeEl ? timeEl.getAttribute("title") : (entry
             .querySelector(".data-timeinfo")?.textContent?.trim() || "");
 
@@ -1360,7 +1727,6 @@
             });
           }
         });
-
         return list;
       }
 
@@ -1368,19 +1734,17 @@
       function parseLogs(htmlText) {
         const entries = parseEntriesHTML(htmlText);
         const logsMap = new Map();
-
         entries.forEach(entry => {
           const userLink = entry.querySelector(
-          "a[href*='user/view.php']");
+            "a[href*='user/view.php']");
           if (!userLink) return;
-          const href = userLink.getAttribute("href");
-          const matchUser = href.match(/id=(\d+)/);
+          const matchUser = userLink.getAttribute("href").match(
+            /id=(\d+)/);
           if (!matchUser) return;
           const idAlumno = matchUser[1];
 
-          let tutor = "";
-          let origen = "";
-
+          let tutor = "",
+            origen = "";
           const rows = entry.querySelectorAll(".row, div");
           rows.forEach(row => {
             const labelEl = row.querySelector(
@@ -1390,22 +1754,17 @@
               let val = "";
               const valEl = row.querySelector(
                 ".col-8, .col-lg-9, p.mt-2, .data-field-html");
-              if (valEl) {
-                val = valEl.textContent.trim();
-              } else if (labelEl.nextElementSibling) {
-                val = labelEl.nextElementSibling.textContent.trim();
-              }
+              if (valEl) val = valEl.textContent.trim();
+              else if (labelEl.nextElementSibling) val = labelEl
+                .nextElementSibling.textContent.trim();
 
-              if (text.includes("tutor")) {
-                tutor = val;
-              } else if (text.includes("origen")) {
-                origen = val;
-              }
+              if (text.includes("tutor")) tutor = val;
+              else if (text.includes("origen")) origen = val;
             }
           });
 
           const timeEl = entry.querySelector(
-          ".data-timeinfo span[title]");
+            ".data-timeinfo span[title]");
           const fechaText = timeEl ? timeEl.getAttribute("title") : (entry
             .querySelector(".data-timeinfo")?.textContent?.trim() || "");
 
@@ -1419,15 +1778,12 @@
               const mesText = parts[2].toLowerCase();
               const anio = parseInt(parts[3]);
               const horaParts = parts[4].split(":");
-              const horas = parseInt(horaParts[0]);
-              const minutos = parseInt(horaParts[1]);
-
               const meses = ["enero", "febrero", "marzo", "abril",
                 "mayo", "junio", "julio", "agosto", "septiembre",
                 "octubre", "noviembre", "diciembre"
               ];
-              const mesIndex = meses.indexOf(mesText);
-              return new Date(anio, mesIndex, dia, horas, minutos);
+              return new Date(anio, meses.indexOf(mesText), dia,
+                parseInt(horaParts[0]), parseInt(horaParts[1]));
             } catch (e) {
               return new Date(str);
             }
@@ -1444,36 +1800,100 @@
             });
           }
         });
-
         return logsMap;
       }
 
-      // Procesa y realiza todos los cálculos de alumnos en paralelo
+      function parseLogsHistorial(htmlText, idToEstudiante) {
+        const entries = parseEntriesHTML(htmlText);
+        const historial = [];
+        const parseMoodleDate = (str) => {
+          if (!str) return new Date(0);
+          try {
+            const clean = str.replace(/de/g, "").replace(/,/g, "").replace(
+              /\s+/g, " ");
+            const parts = clean.split(" ");
+            const dia = parseInt(parts[1]);
+            const mesText = parts[2].toLowerCase();
+            const anio = parseInt(parts[3]);
+            const horaParts = parts[4].split(":");
+            const meses = ["enero", "febrero", "marzo", "abril", "mayo",
+              "junio", "julio", "agosto", "septiembre", "octubre",
+              "noviembre", "diciembre"
+            ];
+            return new Date(anio, meses.indexOf(mesText), dia, parseInt(
+              horaParts[0]), parseInt(horaParts[1]));
+          } catch (e) {
+            return new Date(str);
+          }
+        };
+
+        entries.forEach(entry => {
+          const userLink = entry.querySelector(
+            "a[href*='user/view.php']");
+          if (!userLink) return;
+          const matchUser = userLink.getAttribute("href").match(
+            /id=(\d+)/);
+          if (!matchUser) return;
+          const idAlumno = matchUser[1];
+
+          let tutor = "",
+            origen = "",
+            mensajeAlumno = "",
+            mensajeTutor = "";
+          entry.querySelectorAll(".row, div").forEach(row => {
+            const labelEl = row.querySelector(
+              ".font-weight-bold, span");
+            if (labelEl) {
+              const text = labelEl.textContent.trim().toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              let val = "";
+              const valEl = row.querySelector(
+                ".col-8, .col-lg-9, p.mt-2, .data-field-html");
+              if (valEl) val = valEl.textContent.trim();
+              else if (labelEl.nextElementSibling) val = labelEl
+                .nextElementSibling.textContent.trim();
+
+              if (text.includes("tutor")) tutor = val;
+              else if (text.includes("origen")) origen = val;
+              else if (text.includes("mensaje_alumno") || text
+                .includes("mensaje alumno")) mensajeAlumno = val;
+              else if (text.includes("mensaje") || text.includes(
+                  "orientacion")) mensajeTutor = val;
+            }
+          });
+
+          const timeEl = entry.querySelector(
+            ".data-timeinfo span[title]");
+          const fechaText = timeEl ? timeEl.getAttribute("title") : (entry
+            .querySelector(".data-timeinfo")?.textContent?.trim() || "");
+          const estudianteInfo = idToEstudiante.get(idAlumno);
+
+          historial.push({
+            idAlumno: idAlumno,
+            nombre: estudianteInfo ? estudianteInfo.nombre :
+              "Alumno Desconocido",
+            avatarHtml: estudianteInfo ? estudianteInfo.avatarHtml :
+              '<div class="userinitials">A</div>',
+            fechaText: fechaText,
+            fechaDate: parseMoodleDate(fechaText),
+            tutor: tutor || "—",
+            origen: origen || "—",
+            mensajeAlumno: mensajeAlumno,
+            mensajeTutor: mensajeTutor
+          });
+        });
+        return historial.sort((a, b) => b.fechaDate - a.fechaDate);
+      }
+
+      // Procesa y realiza todos los cálculos
       async function updateDashboardData() {
-        console.log(
-          "=== INICIO DE ACTUALIZACIÓN DE DATOS DEL DASHBOARD ===");
-        console.time("Tiempo Total Actualización Dashboard");
         showLoading("Descargando datos del aula Moodle...");
         try {
-          // 1. Obtener participantes en paginación
-          console.log(
-            "Descargando listado de participantes del aula Moodle...");
-          console.time("Obtención de Participantes Moodle");
           const {
             estudiantesMap,
             idToEstudiante
           } = await fetchParticipantes();
-          console.timeEnd("Obtención de Participantes Moodle");
-          console.log(
-            `Participantes obtenidos: ${estudiantesMap.size} estudiantes.`
-            );
 
-          // 2. Realizar llamadas en paralelo
-          console.log(
-            "Descargando encuestas de feedback y bases de datos Moodle en paralelo..."
-            );
-          console.time("Descargas de Encuestas y DBs en Paralelo");
-          // URL correcta para descargar respuestas CSV de Moodle Feedback (verificada via Network tab)
           const urlInicial =
             `${window.location.origin}/mod/feedback/show_entries.php?sesskey=${sesskey}&download=csv&id=${systemConfig.urls.cmids.encuesta_inicial}`;
           const urlCuat =
@@ -1483,65 +1903,35 @@
           const urlLogs =
             `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_logs}&perpage=1000`;
 
-          console.log("[DEBUG] URL encuesta inicial:", urlInicial);
-          console.log("[DEBUG] URL encuesta cuatrimestral:", urlCuat);
-
           const [resInic, resCuat, resSoli, resLogs] = await Promise.all([
             fetch(urlInicial).then(r => r.text()),
             fetch(urlCuat).then(r => r.text()),
             fetch(urlSolicitudes).then(r => r.text()),
             fetch(urlLogs).then(r => r.text())
           ]);
-          console.timeEnd("Descargas de Encuestas y DBs en Paralelo");
 
-          // 3. Parsear
-          console.log(
-            "Parseando archivos CSV de encuestas y registros HTML...");
-          console.time("Parseo e Indexación de Datos");
-          // Diagnóstico: mostrar los primeros 300 chars del raw para detectar si Moodle devolvió HTML
-          console.log("[RAW] Inicio respuesta CSV Inicial:", resInic
-            .substring(0, 300));
-          console.log("[RAW] Inicio respuesta CSV Cuatrimestral:", resCuat
-            .substring(0, 300));
           const csvInicial = parseCSV(resInic);
           const csvCuat = parseCSV(resCuat);
           const logsAsistencias = parseLogs(resLogs);
+          logsHistorial = parseLogsHistorial(resLogs, idToEstudiante);
           solicitudesPendientes = parseSolicitudes(resSoli, idToEstudiante);
-          console.timeEnd("Parseo e Indexación de Datos");
-          console.log(
-            `CSV Inicial: ${csvInicial.length} respuestas. CSV Cuatrimestral: ${csvCuat.length} respuestas. Logs asistencia: ${logsAsistencias.size} registros. Solicitudes de ayuda: ${solicitudesPendientes.length} pendientes.`
-            );
 
-          // Función auxiliar para extraer el email de una fila de encuesta de forma robusta
           function getEmailFromRow(row) {
             if (!row) return "";
-            const keys = Object.keys(row);
-            // Intentar coincidencia directa primero por eficiencia
             if (row["Dirección de correo"]) return row[
               "Dirección de correo"];
             if (row["email"]) return row["email"];
             if (row["Dirección de correo electrónico"]) return row[
               "Dirección de correo electrónico"];
-
-            // Si no, buscar dinámicamente cualquier columna que tenga relación con correo/email
-            for (let key of keys) {
+            for (let key of Object.keys(row)) {
               const normKey = key.toLowerCase().normalize("NFD").replace(
                 /[\u0300-\u036f]/g, "");
               if (normKey.includes("email") || normKey.includes("correo") ||
-                normKey.includes("mail")) {
-                return row[key];
-              }
+                normKey.includes("mail")) return row[key];
             }
             return "";
           }
 
-          // console.log("Cabeceras de las columnas del CSV Inicial:", csvInicial.length > 0 ? Object.keys(csvInicial[0]) : "Vacío");
-          // console.log("Cabeceras de las columnas del CSV Cuatrimestral:", csvCuat.length > 0 ? Object.keys(csvCuat[0]) : "Vacío");
-          console.log(
-            "Correos de los alumnos obtenidos del scraping de participantes de Moodle:",
-            Array.from(estudiantesMap.keys()));
-
-          // Mapear encuestas por email
           const mapInicialByEmail = new Map();
           csvInicial.forEach(row => {
             const email = getEmailFromRow(row);
@@ -1556,14 +1946,6 @@
               row);
           });
 
-          console.log(
-            `Mapeado de encuesta inicial: ${mapInicialByEmail.size} correos. Algunos ejemplos indexados:`,
-            Array.from(mapInicialByEmail.keys()).slice(0, 5));
-          console.log(
-            `Mapeado de encuesta cuatrimestral: ${mapCuatByEmail.size} correos. Algunos ejemplos indexados:`,
-            Array.from(mapCuatByEmail.keys()).slice(0, 5));
-
-          // 4. Calcular Zmax dinámicamente
           let Z_max = 0;
           [...systemConfig.encuesta_inicial.preguntas, ...systemConfig
             .encuesta_cuatrimestral.preguntas
@@ -1572,20 +1954,12 @@
           });
 
           const pesosPreguntas = {};
-          const
-          cohortes = {}; // cohorte -> { ingresantes, activos, egresados, desertados }
-
+          const cohortes = {};
           const computedAlumnos = [];
 
-          // Iterar por todos los estudiantes encontrados en el campus
-          console.log(
-            "Iniciando procesamiento y cálculo del IRD para cada estudiante..."
-            );
-          console.time("Procesamiento de Estudiantes (IRD/Ralentización)");
           for (let [email, est] of estudiantesMap.entries()) {
             const emailKey = email.trim().toLowerCase();
-
-            // Filtro temporal: permitir únicamente a Renzo y a Martin Girau para simulación
+            /*
             const esRenzo = emailKey === "renzogijon1234@gmail.com" || est
               .nombre.toLowerCase().includes("gijon") || est.nombre
               .toLowerCase().includes("renzo");
@@ -1593,78 +1967,53 @@
               .nombre.toLowerCase().includes("girau") || est.nombre
               .toLowerCase().includes("martin");
 
-            if (!esRenzo && !esMartin) {
-              console.log(
-                `[TEMPORAL] Omitiendo a ${est.nombre} por filtro de prueba.`
-                );
-              continue;
-            }
-
+            if (!esRenzo && !esMartin) continue; // Filtro de pruebas actual
+            */
             const rowInic = mapInicialByEmail.get(emailKey);
             const rowCuat = mapCuatByEmail.get(emailKey);
 
-            console.log(
-              `Evaluando estudiante: ${est.nombre} (${emailKey}). Encuesta inicial completada: ${rowInic !== undefined}. Encuesta cuatrimestral completada: ${rowCuat !== undefined}`
-              );
+            if (!rowInic && !rowCuat) continue;
 
-            // Punto 8: Si el estudiante no completó la encuesta inicial ni la cuatrimestral, se omite
-            if (!rowInic && !rowCuat) {
-              console.log(
-                `Omitiendo estudiante ${est.nombre} por no haber completado ninguna encuesta.`
-                );
-              continue;
-            }
-
-            const solicitudObj = solicitudesPendientes.find(s => s
+            let solicitudObj = null;
+            const solicitudesAlumno = solicitudesPendientes.filter(s => s
               .idAlumno === est.id);
+            if (solicitudesAlumno.length > 0) {
+              solicitudObj = solicitudesAlumno[0];
+              solicitudesAlumno.forEach(s => {
+                if (parseDate(s.fechaText) > parseDate(solicitudObj
+                    .fechaText)) solicitudObj = s;
+              });
+            }
             const logObj = logsAsistencias.get(est.id);
 
-            // Determinar año de ingreso
             let anioIngreso = null;
             if (rowInic) {
-              const keyAnio = systemConfig.preguntas_especiales
-                .id_anio_ingreso;
-              anioIngreso = parseInt(rowInic[keyAnio]) || null;
+              anioIngreso = parseInt(rowInic[systemConfig
+                .preguntas_especiales.id_anio_ingreso]) || null;
             }
 
-            // Determinar si se percibe en riesgo
             let sePercibeRiesgo = false;
-            if (rowCuat) {
-              const keyRiesgo = systemConfig.preguntas_especiales
-                .id_percepcion_riesgo;
-              const valRiesgo = rowCuat[keyRiesgo] || "";
-              if (valRiesgo.toLowerCase().includes("sí") || valRiesgo
-                .toLowerCase().includes("si")) {
-                sePercibeRiesgo = true;
-              }
-            }
-
-            // Determinar si egresó
             let esEgresado = false;
-            if (rowCuat) {
-              const keyEgreso = systemConfig.preguntas_especiales.id_egreso;
-              const valEgreso = rowCuat[keyEgreso] || "";
-              if (valEgreso.toLowerCase().includes("sí") || valEgreso
-                .toLowerCase().includes("si")) {
-                esEgresado = true;
-              }
-            }
-
-            // Determinar si es desertor
             let esDesertor = false;
-            let fechaCuat = null;
+
             if (rowCuat) {
-              // El campo de fecha en el CSV exportado de Moodle es "Período de envío" o "Completado"
-              // Se prueba ambos nombres posibles
+              const valRiesgo = rowCuat[systemConfig.preguntas_especiales
+                .id_percepcion_riesgo] || "";
+              if (valRiesgo.toLowerCase().includes("sí") || valRiesgo
+                .toLowerCase().includes("si")) sePercibeRiesgo = true;
+
+              const valEgreso = rowCuat[systemConfig.preguntas_especiales
+                .id_egreso] || "";
+              if (valEgreso.toLowerCase().includes("sí") || valEgreso
+                .toLowerCase().includes("si")) esEgresado = true;
+
               const fechaRawCuat = rowCuat["Período de envío"] || rowCuat[
                 "Completado"] || rowCuat["Fecha"] || "";
               if (fechaRawCuat) {
                 try {
-                  // Formato de fecha de Moodle en exportación: "sábado, 13 de junio de 2026, 13:47"
                   const clean = fechaRawCuat.replace(/de/g, "").replace(
                     /,/g, "").replace(/\s+/g, " ").trim();
                   const parts = clean.split(" ");
-                  // Si hay día de semana al frente, partes[0] es texto, partes[1] es número
                   const diaIdx = isNaN(parseInt(parts[0])) ? 1 : 0;
                   const dia = parseInt(parts[diaIdx]);
                   const mesText = parts[diaIdx + 1].toLowerCase();
@@ -1674,45 +2023,28 @@
                     "mayo", "junio", "julio", "agosto", "septiembre",
                     "octubre", "noviembre", "diciembre"
                   ];
-                  const mesIndex = meses.indexOf(mesText);
-                  if (mesIndex === -1 || isNaN(dia) || isNaN(anio))
-                  throw new Error("Formato de fecha inválido");
-                  fechaCuat = new Date(anio, mesIndex, dia);
-
-                  const diffTime = Math.abs(new Date() - fechaCuat);
-                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 *
-                    24));
-                  const diasDesercion = (systemConfig.umbrales
-                    .cuatrimestres_desercion || 2) * 180;
-
-                  if (diffDays >= diasDesercion) {
-                    esDesertor = true;
-                  }
-                } catch (e) {
-                  console.error(
-                    "Error al parsear fecha de encuesta cuatrimestral:",
-                    fechaRawCuat, e);
-                }
+                  const fechaCuat = new Date(anio, meses.indexOf(mesText),
+                    dia);
+                  const diffDays = Math.ceil(Math.abs(new Date() -
+                    fechaCuat) / (1000 * 60 * 60 * 24));
+                  if (diffDays >= ((systemConfig.umbrales
+                      .cuatrimestres_desercion || 2) * 180)) esDesertor =
+                    true;
+                } catch (e) {}
               }
             }
 
             let IRD = null;
-
-            // Solo si completó ambas encuestas se calcula el IRD
             if (rowInic && rowCuat) {
               let Z = 0;
-
-              // Evaluar preguntas iniciales
               systemConfig.encuesta_inicial.preguntas.forEach(p => {
                 let X = 0;
                 let valText = rowInic[p.id];
-
                 if (valText !== undefined && valText !== null) {
                   valText = valText.trim();
                   if (valText.toLowerCase() === "otros" || valText
-                    .toLowerCase() === "otro") {
-                    X = 0;
-                  } else if (p.tipo === "numerico") {
+                    .toLowerCase() === "otro") X = 0;
+                  else if (p.tipo === "numerico") {
                     const n = parseInt(valText) || 0;
                     if (n === 0) X = p.respuestas["0"] !== undefined ? p
                       .respuestas["0"] : (p.respuestas["Ninguna"] || 0);
@@ -1727,20 +2059,16 @@
                       .toLowerCase() === "sí") {
                       if (p.subpreguntas && p.subpreguntas.length > 0) {
                         const sub = p.subpreguntas[0];
-                        const subValText = rowInic[sub.id] || "";
-                        X = sub.respuestas[subValText.trim()] || 0;
+                        X = sub.respuestas[(rowInic[sub.id] || "")
+                          .trim()] || 0;
                       } else {
                         X = p.respuestas["Si"] !== undefined ? p
                           .respuestas["Si"] : (p.respuestas["Sí"] ||
                             0.3);
                       }
-                    } else {
-                      X = p.respuestas["No"] || 0;
-                    }
-                  } else {
-                    X = p.respuestas[valText] !== undefined ? p
-                      .respuestas[valText] : 0;
-                  }
+                    } else X = p.respuestas["No"] || 0;
+                  } else X = p.respuestas[valText] !== undefined ? p
+                    .respuestas[valText] : 0;
                 }
                 const aporte = (p.beta || 0) * X;
                 Z += aporte;
@@ -1748,58 +2076,43 @@
                   aporte;
               });
 
-              // Evaluar preguntas cuatrimestrales
               systemConfig.encuesta_cuatrimestral.preguntas.forEach(p => {
                 let X = 0;
                 let valText = rowCuat[p.id];
-
                 if (valText !== undefined && valText !== null) {
                   valText = valText.trim();
                   if (valText.toLowerCase() === "otros" || valText
-                    .toLowerCase() === "otro") {
-                    X = 0;
-                  } else if (p.tipo === "si_no") {
+                    .toLowerCase() === "otro") X = 0;
+                  else if (p.tipo === "si_no") {
                     if (valText.toLowerCase() === "si" || valText
                       .toLowerCase() === "sí") {
                       if (p.subpreguntas && p.subpreguntas.length > 0) {
                         const sub = p.subpreguntas[0];
-                        const subValText = rowCuat[sub.id] || "";
-                        const nSub = parseInt(subValText) || 0;
+                        const nSub = parseInt(rowCuat[sub.id] || 0) ||
+                          0;
                         if (sub.respuestas) {
-                          if (nSub === 0) X = sub.respuestas["0"] !==
-                            undefined ? sub.respuestas["0"] : 0;
+                          if (nSub === 0) X = sub.respuestas["0"] || 0;
                           else if (nSub === 1) X = sub.respuestas[
-                            "1"] !== undefined ? sub.respuestas["1"] :
-                            0;
+                            "1"] || 0;
                           else if (nSub === 2) X = sub.respuestas[
-                            "2"] !== undefined ? sub.respuestas["2"] :
-                            0;
+                            "2"] || 0;
                           else if (nSub === 3) X = sub.respuestas[
-                            "3"] !== undefined ? sub.respuestas["3"] :
-                            0;
+                            "3"] || 0;
                           else if (nSub >= 4) X = sub.respuestas[
-                            "4 o mas"] !== undefined ? sub.respuestas[
-                            "4 o mas"] : (sub.respuestas["4 o más"] ||
-                            1);
+                              "4 o mas"] || sub.respuestas["4 o más"] ||
+                            1;
                         } else {
-                          // Mapeo directo para valor numérico puro
                           if (nSub === 0) X = 0;
                           else if (nSub === 1) X = 0.1;
                           else if (nSub === 2) X = 0.6;
                           else if (nSub === 3) X = 0.9;
                           else if (nSub >= 4) X = 1.0;
                         }
-                      } else {
-                        X = p.respuestas["Si"] !== undefined ? p
-                          .respuestas["Si"] : (p.respuestas["Sí"] || 1);
-                      }
-                    } else {
-                      X = p.respuestas["No"] || 0;
-                    }
-                  } else {
-                    X = p.respuestas[valText] !== undefined ? p
-                      .respuestas[valText] : 0;
-                  }
+                      } else X = p.respuestas["Si"] !== undefined ? p
+                        .respuestas["Si"] : (p.respuestas["Sí"] || 1);
+                    } else X = p.respuestas["No"] || 0;
+                  } else X = p.respuestas[valText] !== undefined ? p
+                    .respuestas[valText] : 0;
                 }
                 const aporte = (p.beta || 0) * X;
                 Z += aporte;
@@ -1807,30 +2120,24 @@
                   aporte;
               });
 
-              Z = Math.max(Z, 0); // Truncar a cero
+              Z = Math.max(Z, 0);
               IRD = Z_max > 0 ? parseFloat(((Z / Z_max) * 100).toFixed(1)) :
                 0;
             }
 
-            // Calcular ralentización
             let ralentizacion = null;
             let materiasAprobadas = 0;
             if (rowCuat && anioIngreso) {
-              const anioActual = new Date().getFullYear();
-              const anioEnCarrera = Math.min(Math.max(anioActual -
-                anioIngreso + 1, 1), 5);
-
+              const anioEnCarrera = Math.min(Math.max(new Date()
+                .getFullYear() - anioIngreso + 1, 1), 5);
               if (anioEnCarrera >= 2) {
-                // Contar materias con nota >= 5
                 Object.keys(rowCuat).forEach(key => {
                   if (key.endsWith(": Nota")) {
                     const notaVal = parseInt(rowCuat[key]);
-                    if (!isNaN(notaVal) && notaVal >= 5) {
+                    if (!isNaN(notaVal) && notaVal >= 5)
                       materiasAprobadas++;
-                    }
                   }
                 });
-
                 const esperadas = PLAN_DE_ESTUDIOS["anio" +
                   anioEnCarrera] || 51;
                 ralentizacion = parseFloat(((1 - (materiasAprobadas /
@@ -1839,24 +2146,17 @@
               }
             }
 
-            // Acumular estadísticas de cohorte
             if (anioIngreso) {
-              if (!cohortes[anioIngreso]) {
-                cohortes[anioIngreso] = {
-                  ingresantes: 0,
-                  activos: 0,
-                  egresados: 0,
-                  desertados: 0
-                };
-              }
+              if (!cohortes[anioIngreso]) cohortes[anioIngreso] = {
+                ingresantes: 0,
+                activos: 0,
+                egresados: 0,
+                desertados: 0
+              };
               cohortes[anioIngreso].ingresantes++;
-              if (esEgresado) {
-                cohortes[anioIngreso].egresados++;
-              } else if (esDesertor) {
-                cohortes[anioIngreso].desertados++;
-              } else {
-                cohortes[anioIngreso].activos++;
-              }
+              if (esEgresado) cohortes[anioIngreso].egresados++;
+              else if (esDesertor) cohortes[anioIngreso].desertados++;
+              else cohortes[anioIngreso].activos++;
             }
 
             computedAlumnos.push({
@@ -1881,10 +2181,8 @@
             });
           }
 
-          // Guardar estado global
           alumnosCalculados = computedAlumnos;
 
-          // Formatear pesos de preguntas
           pesosPreguntasGlobal = Object.keys(pesosPreguntas).map(key => {
             const isInicial = systemConfig.encuesta_inicial.preguntas
               .find(p => p.id === key) !== undefined;
@@ -1896,7 +2194,6 @@
             };
           }).sort((a, b) => b.peso - a.peso);
 
-          // Formatear estadísticas de cohorte
           cohortesStats = Object.keys(cohortes).map(anio => {
             const data = cohortes[anio];
             return {
@@ -1914,41 +2211,25 @@
             };
           }).sort((a, b) => parseInt(b.cohorte) - parseInt(a.cohorte));
 
-          // Actualizar hora de actualización
           lastUpdateDate = new Date();
           const formatDigits = (n) => n < 10 ? "0" + n : n;
           document.getElementById("txt-last-update").textContent =
             `Última actualización: ${formatDigits(lastUpdateDate.getDate())}/${formatDigits(lastUpdateDate.getMonth()+1)}/${lastUpdateDate.getFullYear()} ${formatDigits(lastUpdateDate.getHours())}:${formatDigits(lastUpdateDate.getMinutes())}`;
 
-          // Renderizar vistas
-          console.time("Renderizado de Tablero");
           renderDashboard();
-          console.timeEnd("Renderizado de Tablero");
-
-          console.timeEnd(
-            "Procesamiento de Estudiantes (IRD/Ralentización)");
-          console.timeEnd("Tiempo Total Actualización Dashboard");
-          console.log("=== ACTUALIZACIÓN FINALIZADA CON ÉXITO ===");
           hideLoading();
         } catch (e) {
           console.error("Error al actualizar los datos:", e);
-          try {
-            console.timeEnd(
-              "Procesamiento de Estudiantes (IRD/Ralentización)");
-          } catch (err) {}
-          try {
-            console.timeEnd("Tiempo Total Actualización Dashboard");
-          } catch (err) {}
           alert(
             "Error al cargar los datos de Moodle. Por favor, verifica tu sesión o la base de datos."
-            );
+          );
           hideLoading();
         }
       }
 
-      // Ordenar y renderizar el listado
+      // Renderizado General del Dashboard
       function renderDashboard() {
-        // Actualizar KPIs de la cabecera
+        // 1. KPIs
         let alto = 0,
           medio = 0,
           bajo = 0;
@@ -1964,36 +2245,75 @@
         document.getElementById("kpi-solicitudes-pendientes").textContent =
           solicitudesPendientes.length;
 
-        // Renderizar Panel 2: Solicitudes
+        // 2. Panel 2: Solicitudes
         const reqTbody = document.getElementById("requests-tbody");
         reqTbody.innerHTML = "";
         if (solicitudesPendientes.length === 0) {
-          reqTbody.innerHTML = `
-            <tr>
-              <td colspan="5" style="text-align: center; padding: 24px; color: #145a32; background: #e8f8f5; font-weight: 600;">
-                ✅ Sin solicitudes pendientes de atención en este momento
-              </td>
-            </tr>
-          `;
+          reqTbody.innerHTML =
+            `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #145a32; background: #e8f8f5; font-weight: 600;">✅ Sin solicitudes pendientes de atención en este momento</td></tr>`;
         } else {
+          let hayPendientes = false;
           solicitudesPendientes.forEach(req => {
+            const studentObj = alumnosCalculados.find(a => a.id === req
+              .idAlumno);
+            let esPendiente = true;
+            if (studentObj && studentObj.ultimaAsistencia && req
+              .fechaText) {
+              if (parseDate(req.fechaText) <= parseDate(studentObj
+                  .ultimaAsistencia)) esPendiente = false;
+            }
+            if (!esPendiente) return;
+
+            hayPendientes = true;
+            const asistTooltip = studentObj && studentObj
+              .ultimaAsistencia ?
+              `${studentObj.ultimaAsistencia} (Por: ${studentObj.ultimoTutor})`
+              .replace(/"/g, '&quot;') : "";
+            const lastAsistText = studentObj && studentObj
+              .ultimaAsistencia ?
+              `<div class="text-ellipsis" title="${asistTooltip}">${studentObj.ultimaAsistencia}</div>` :
+              "—";
+
             reqTbody.innerHTML += `
               <tr>
                 <td>${req.avatarHtml}</td>
                 <td><a href="${window.location.origin}/user/view.php?id=${req.idAlumno}&course=${CURSO_ID}" target="_blank" class="user-link">${req.nombre}</a></td>
                 <td>${req.fechaText}</td>
+                <td>${lastAsistText}</td>
                 <td style="font-style: italic;">"${req.descripcion || 'Sin mensaje adicional'}"</td>
-                <td style="text-align: center;">
-                  <button type="button" class="btn-action btn-table" onclick="abrirModalAsistencia('${req.idAlumno}', '${req.nombre}', 'Solicitud')">
-                    Asistir
-                  </button>
-                </td>
-              </tr>
-            `;
+                <td style="text-align: center;"><button type="button" class="btn-action btn-table" onclick="abrirModalAsistencia('${req.idAlumno}', '${req.nombre}', 'Solicitud')">Asistir</button></td>
+              </tr>`;
+          });
+          if (!hayPendientes) reqTbody.innerHTML =
+            `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #145a32; background: #e8f8f5; font-weight: 600;">✅ Sin solicitudes pendientes de atención en este momento</td></tr>`;
+        }
+
+        // 3. Panel 3: Historial
+        const histTbody = document.getElementById("historial-tbody");
+        histTbody.innerHTML = "";
+        if (logsHistorial.length === 0) {
+          histTbody.innerHTML =
+            `<tr><td colspan="7" style="text-align: center; padding: 24px; color: #666;">No hay asistencias registradas aún.</td></tr>`;
+        } else {
+          logsHistorial.forEach(log => {
+            const msgAlumnoText = log.mensajeAlumno ? log.mensajeAlumno :
+              '—';
+            const msgTutorText = log.mensajeTutor ? log.mensajeTutor :
+              '—';
+            histTbody.innerHTML += `
+              <tr>
+                <td>${log.avatarHtml}</td>
+                <td><a href="${window.location.origin}/user/view.php?id=${log.idAlumno}&course=${CURSO_ID}" target="_blank" class="user-link">${log.nombre}</a></td>
+                <td>${log.fechaText}</td>
+                <td>${log.tutor}</td>
+                <td>${log.origen}</td>
+                <td class="text-ellipsis" title="${msgAlumnoText.replace(/"/g, '&quot;')}">${msgAlumnoText}</td>
+                <td class="text-ellipsis" title="${msgTutorText.replace(/"/g, '&quot;')}">${msgTutorText}</td>
+              </tr>`;
           });
         }
 
-        // Renderizar Panel 3: Cohortes
+        // 4. Panel 4: Cohortes
         const cohTbody = document.getElementById("cohortes-tbody");
         cohTbody.innerHTML = "";
         if (cohortesStats.length === 0) {
@@ -2008,12 +2328,11 @@
                 <td>${stat.activos} (${stat.activosPorc})</td>
                 <td>${stat.egresados} (${stat.egresadosPorc})</td>
                 <td>${stat.desertados} (${stat.desertadosPorc})</td>
-              </tr>
-            `;
+              </tr>`;
           });
         }
 
-        // Renderizar Panel 4: Peso de Preguntas
+        // 5. Panel 5: Preguntas
         const qTbody = document.getElementById("questions-tbody");
         qTbody.innerHTML = "";
         if (pesosPreguntasGlobal.length === 0) {
@@ -2030,18 +2349,13 @@
                 <td style="text-align: center; font-weight: 700; color: #666;">${idx + 1}</td>
                 <td><strong>${p.pregunta}</strong></td>
                 <td><span style="font-size: 11px; background: #eee; padding: 2px 6px; border-radius: 4px; color: #555;">${p.origen}</span></td>
-                <td style="text-align: right; font-weight: 700; color: hsl(168, 60%, 25%);">
-                  ${p.peso} <span style="font-size: 11px; font-weight: normal; color: #666; margin-left: 4px;">(${porc})</span>
-                </td>
-              </tr>
-            `;
+                <td style="text-align: right; font-weight: 700; color: hsl(168, 60%, 25%);">${p.peso} <span style="font-size: 11px; font-weight: normal; color: #666; margin-left: 4px;">(${porc})</span></td>
+              </tr>`;
           });
         }
 
-        // Aplicar filtrado y ordenamiento al listado del Panel 1
+        // 6. Panel 1: Lista Alumnos con Filtros
         let list = [...alumnosCalculados];
-
-        // 1. Filtrado
         if (filters.search) {
           const query = filters.search.toLowerCase().normalize("NFD").replace(
             /[\u0300-\u036f]/g, "");
@@ -2053,42 +2367,28 @@
               query));
           });
         }
+        if (filters.irdMin !== null) list = list.filter(a => a.IRD !== null &&
+          a.IRD >= filters.irdMin);
+        if (filters.irdMax !== null) list = list.filter(a => a.IRD !== null &&
+          a.IRD <= filters.irdMax);
+        if (filters.asistencia === "asistidos") list = list.filter(a => a
+          .asistido);
+        else if (filters.asistencia === "sin_asistir") list = list.filter(a =>
+          !a.asistido);
+        if (filters.riesgoPerceb === "si") list = list.filter(a => a
+          .sePercibeRiesgo);
+        else if (filters.riesgoPerceb === "no") list = list.filter(a => !a
+          .sePercibeRiesgo);
 
-        if (filters.irdMin !== null) {
-          list = list.filter(a => a.IRD !== null && a.IRD >= filters.irdMin);
-        }
-        if (filters.irdMax !== null) {
-          list = list.filter(a => a.IRD !== null && a.IRD <= filters.irdMax);
-        }
-
-        if (filters.asistencia === "asistidos") {
-          list = list.filter(a => a.asistido);
-        } else if (filters.asistencia === "sin_asistir") {
-          list = list.filter(a => !a.asistido);
-        }
-
-        if (filters.riesgoPerceb === "si") {
-          list = list.filter(a => a.sePercibeRiesgo);
-        } else if (filters.riesgoPerceb === "no") {
-          list = list.filter(a => !a.sePercibeRiesgo);
-        }
-
-        // 2. Ordenamiento Predeterminado e Interactivo
         list.sort((a, b) => {
-          // Si la columna activa no es la autopercepción de riesgo, los de riesgo van arriba por defecto
           if (activeSort.column !== "sePercibeRiesgo") {
             if (a.sePercibeRiesgo && !b.sePercibeRiesgo) return -1;
             if (!a.sePercibeRiesgo && b.sePercibeRiesgo) return 1;
           }
-
-          // Si pertenecen al mismo grupo (o la columna activa es sePercibeRiesgo), ordenar por la columna activa
-          let valA = a[activeSort.column];
-          let valB = b[activeSort.column];
-
-          // Manejo de nulos al final
+          let valA = a[activeSort.column],
+            valB = b[activeSort.column];
           if (valA === null || valA === undefined) return 1;
           if (valB === null || valB === undefined) return -1;
-
           if (typeof valA === "boolean") {
             valA = valA ? 1 : 0;
             valB = valB ? 1 : 0;
@@ -2096,13 +2396,11 @@
             valA = valA.toLowerCase();
             valB = valB.toLowerCase();
           }
-
           if (valA < valB) return activeSort.direction === "asc" ? -1 : 1;
           if (valA > valB) return activeSort.direction === "asc" ? 1 : -1;
           return 0;
         });
 
-        // 3. Paginación (default 30 por página)
         const pageSize = systemConfig.umbrales.page_size_paneles || 30;
         const totalAlumnos = list.length;
         const totalPages = Math.ceil(totalAlumnos / pageSize);
@@ -2113,18 +2411,12 @@
         const endIdx = Math.min(startIdx + pageSize, totalAlumnos);
         const paginatedList = list.slice(startIdx, endIdx);
 
-        // Renderizar tabla
         const tbody = document.getElementById("students-tbody");
         tbody.innerHTML = "";
 
         if (paginatedList.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="8" style="text-align: center; padding: 24px; color: #666;">
-                Ningún alumno coincide con los filtros aplicados.
-              </td>
-            </tr>
-          `;
+          tbody.innerHTML =
+            `<tr><td colspan="8" style="text-align: center; padding: 24px; color: #666;">Ningún alumno coincide con los filtros aplicados.</td></tr>`;
         } else {
           paginatedList.forEach(alumno => {
             const hasData = alumno.IRD !== null;
@@ -2137,12 +2429,11 @@
               if (alumno.IRD >= 80) colorClass = "badge-ird-red";
               else if (alumno.IRD >= systemConfig.umbrales.threshold_ird)
                 colorClass = "badge-ird-yellow";
-
               irdBadge =
                 `<span class="badge-ird ${colorClass}">${alumno.IRD}</span>`;
             }
             const percibeRiesgoText = alumno.sePercibeRiesgo ? "Sí" :
-            "No";
+              "No";
             let ralentText = "—";
             if (alumno.ralentizacion !== null) {
               let colorClass = "badge-ralent-green";
@@ -2150,7 +2441,6 @@
                 "badge-ralent-red";
               else if (alumno.ralentizacion >= 40) colorClass =
                 "badge-ralent-yellow";
-
               ralentText =
                 `<span class="badge-ralent ${colorClass}">${alumno.ralentizacion}%</span>`;
             }
@@ -2161,51 +2451,20 @@
               `<span title="${alumno.solicitudText}">${alumno.solicitudFecha.substring(0, 16)}</span>` :
               "—";
 
-            // Mostrar botón asistir si: tiene IRD y supera umbral, y no ha sido asistido tras su última solicitud
             let btnAsistir = "";
             const superaUmbral = hasData && alumno.IRD >= systemConfig
               .umbrales.threshold_ird;
             let mostrarBoton = false;
-
             if (superaUmbral) {
-              if (!alumno.ultimaAsistencia) {
+              if (!alumno.ultimaAsistencia) mostrarBoton = true;
+              else if (alumno.solicitudFecha && parseDate(alumno
+                  .solicitudFecha) > parseDate(alumno.ultimaAsistencia))
                 mostrarBoton = true;
-              } else if (alumno.solicitudFecha) {
-                // Comparar fechas de última solicitud y última asistencia
-                const parseDate = (str) => {
-                  if (!str) return 0;
-                  const clean = str.replace(/de/g, "").replace(/,/g, "")
-                    .replace(/\s+/g, " ");
-                  const parts = clean.split(" ");
-                  const dia = parseInt(parts[1]);
-                  const meses = ["enero", "febrero", "marzo", "abril",
-                    "mayo", "junio", "julio", "agosto", "septiembre",
-                    "octubre", "noviembre", "diciembre"
-                  ];
-                  const mesIndex = meses.indexOf(parts[2]
-                .toLowerCase());
-                  const anio = parseInt(parts[3]);
-                  const h = parts[4].split(":");
-                  return new Date(anio, mesIndex, dia, parseInt(h[0]),
-                    parseInt(h[1])).getTime();
-                };
-                if (parseDate(alumno.solicitudFecha) > parseDate(alumno
-                    .ultimaAsistencia)) {
-                  mostrarBoton = true;
-                }
-              }
             }
-
-            if (mostrarBoton) {
-              btnAsistir = `
-                <button type="button" class="btn-action btn-table" onclick="abrirModalAsistencia('${alumno.id}', '${alumno.nombre}', 'Proactivo')">
-                  Asistir
-                </button>
-              `;
-            } else if (alumno.asistido) {
-              btnAsistir =
-                `<span style="font-size: 11px; font-weight: 700; color: #16a085;">✅ Asistido</span>`;
-            }
+            if (mostrarBoton) btnAsistir =
+              `<button type="button" class="btn-action btn-table" onclick="abrirModalAsistencia('${alumno.id}', '${alumno.nombre}', 'Proactivo')">Asistir</button>`;
+            else if (alumno.asistido) btnAsistir =
+              `<span style="font-size: 11px; font-weight: 700; color: #16a085;">✅ Asistido</span>`;
 
             tbody.innerHTML += `
               <tr class="${rowClass}">
@@ -2217,80 +2476,269 @@
                 <td>${asistText}</td>
                 <td>${reqText}</td>
                 <td style="text-align: center;">${btnAsistir}</td>
-              </tr>
-            `;
+              </tr>`;
           });
         }
 
-        // Renderizar Info de Paginación
-        const infoDesde = totalAlumnos === 0 ? 0 : startIdx + 1;
         document.getElementById("pagination-info").textContent =
-          `Mostrando ${infoDesde}-${endIdx} de ${totalAlumnos} alumnos`;
+          `Mostrando ${totalAlumnos === 0 ? 0 : startIdx + 1}-${endIdx} de ${totalAlumnos} alumnos`;
 
-        let navHtml = "";
-        navHtml +=
+        let navHtml =
           `<button type="button" class="page-btn" ${currentPage === 1 ? "disabled" : ""} onclick="changePage(${currentPage - 1})">◀ Prev</button>`;
         for (let i = 1; i <= totalPages; i++) {
           if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <=
               currentPage + 2)) {
             navHtml +=
               `<button type="button" class="page-btn ${currentPage === i ? "active" : ""}" onclick="changePage(${i})">${i}</button>`;
-          } else if (i === currentPage - 3 || i === currentPage + 3) {
+          } else if (i === currentPage - 3 || i === currentPage + 3)
             navHtml +=
-              `<span style="padding: 0 4px; align-self: flex-end; color: #666;">...</span>`;
-          }
+            `<span style="padding: 0 4px; align-self: flex-end; color: #666;">...</span>`;
         }
         navHtml +=
           `<button type="button" class="page-btn" ${currentPage === totalPages || totalPages === 0 ? "disabled" : ""} onclick="changePage(${currentPage + 1})">Sig ▶</button>`;
-
         const navContainer = document.getElementById("pagination-nav");
-        if (navContainer) {
-          navContainer.innerHTML = navHtml;
-        }
+        if (navContainer) navContainer.innerHTML = navHtml;
+
+        // 7. Renderizar Gráficos de Análisis Visual
+        renderizarGraficos();
       }
 
-      // Cambiar de página
+      function renderizarGraficos() {
+        if (alumnosCalculados.length === 0) return;
+
+        // Limpiar gráficos anteriores para evitar sobreescritura visual
+        if (visualCharts.tendenciaIrd) visualCharts.tendenciaIrd.destroy();
+        if (visualCharts.dispersion) visualCharts.dispersion.destroy();
+        if (visualCharts.brecha) visualCharts.brecha.destroy();
+        if (visualCharts.radar) visualCharts.radar.destroy();
+
+        // 1. Promedio IRD por Cohorte (Line Chart)
+        const irdByCohorte = {};
+        alumnosCalculados.forEach(a => {
+          if (a.IRD !== null && a.anioIngreso) {
+            if (!irdByCohorte[a.anioIngreso]) irdByCohorte[a
+              .anioIngreso] = {
+              sum: 0,
+              count: 0
+            };
+            irdByCohorte[a.anioIngreso].sum += a.IRD;
+            irdByCohorte[a.anioIngreso].count++;
+          }
+        });
+        const cohortesLabels = Object.keys(irdByCohorte).sort();
+        const cohortesData = cohortesLabels.map(c => parseFloat((irdByCohorte[
+          c].sum / irdByCohorte[c].count).toFixed(1)));
+
+        visualCharts.tendenciaIrd = new Chart(document.getElementById(
+          'chart-tendencia-ird').getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: cohortesLabels,
+            datasets: [{
+              label: 'IRD Promedio (%)',
+              data: cohortesData,
+              borderColor: '#3498db',
+              tension: 0.3,
+              fill: true,
+              backgroundColor: 'rgba(52, 152, 219, 0.1)'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Promedio de Riesgo por Cohorte'
+              }
+            }
+          }
+        });
+
+        // 2. Dispersión Ralentización vs IRD (Scatter)
+        const scatterData = [];
+        alumnosCalculados.forEach(a => {
+          if (a.IRD !== null && a.ralentizacion !== null) {
+            let color = 'rgba(46, 204, 113, 0.7)'; // Verde
+            if (a.IRD >= 80) color = 'rgba(231, 76, 60, 0.7)'; // Rojo
+            else if (a.IRD >= (systemConfig.umbrales.threshold_ird || 40))
+              color = 'rgba(243, 156, 18, 0.7)'; // Amarillo
+            scatterData.push({
+              x: a.ralentizacion,
+              y: a.IRD,
+              backgroundColor: color,
+              nombre: a.nombre
+            });
+          }
+        });
+
+        visualCharts.dispersion = new Chart(document.getElementById(
+          'chart-dispersion').getContext('2d'), {
+          type: 'scatter',
+          data: {
+            datasets: [{
+              label: 'Alumnos',
+              data: scatterData,
+              pointBackgroundColor: scatterData.map(d => d
+                .backgroundColor),
+              pointRadius: 5,
+              pointHoverRadius: 7
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Ralentización (%)'
+                },
+                min: 0,
+                max: 100
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'IRD (%)'
+                },
+                min: 0,
+                max: 100
+              }
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: 'Correlación: Atraso vs Riesgo'
+              },
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    return ctx.raw.nombre + ' - Ralent: ' + ctx.raw.x +
+                      '%, IRD: ' + ctx.raw.y + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // 3. Brecha Percepción vs Realidad (Bar)
+        let percibenRiesgo = 0;
+        let irdAlto = 0;
+        alumnosCalculados.forEach(a => {
+          if (a.sePercibeRiesgo) percibenRiesgo++;
+          if (a.IRD !== null && a.IRD >= 80) irdAlto++;
+        });
+
+        visualCharts.brecha = new Chart(document.getElementById(
+          'chart-brecha').getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: ['Población en Riesgo'],
+            datasets: [{
+                label: 'Se autoperciben en riesgo',
+                data: [percibenRiesgo],
+                backgroundColor: '#f39c12'
+              },
+              {
+                label: 'Riesgo Real Alto (IRD ≥ 80)',
+                data: [irdAlto],
+                backgroundColor: '#c0392b'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Autopercepción vs Riesgo Real'
+              }
+            }
+          }
+        });
+
+        // 4. Radar de Factores de Riesgo
+        // Ordenamos los pesos globales de mayor a menor y tomamos los 6 principales
+        const topPesos = [...pesosPreguntasGlobal].sort((a, b) => b.peso - a
+          .peso).slice(0, 6);
+        const radarLabels = topPesos.map(p => p.pregunta.length > 25 ? p
+          .pregunta.substring(0, 25) + '...' : p.pregunta);
+        const radarData = topPesos.map(p => p.peso);
+
+        visualCharts.radar = new Chart(document.getElementById('chart-radar')
+          .getContext('2d'), {
+            type: 'radar',
+            data: {
+              labels: radarLabels,
+              datasets: [{
+                label: 'Peso Acumulado en el Grupo',
+                data: radarData,
+                backgroundColor: 'rgba(155, 89, 182, 0.3)',
+                borderColor: '#8e44ad',
+                pointBackgroundColor: '#8e44ad'
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Top 6 Factores de Riesgo Activos'
+                }
+              },
+              scales: {
+                r: {
+                  ticks: {
+                    display: false
+                  }
+                }
+              }
+            }
+          });
+      }
+
       window.changePage = function(page) {
         currentPage = page;
         renderDashboard();
       };
 
-      // Manejar el ordenamiento al hacer click en las cabeceras de tabla
       document.querySelectorAll("#table-students th.sortable").forEach(th => {
         th.addEventListener("click", () => {
           const col = th.getAttribute("data-sort");
-          if (activeSort.column === col) {
-            activeSort.direction = activeSort.direction === "asc" ?
-              "desc" : "asc";
-          } else {
+          if (activeSort.column === col) activeSort.direction =
+            activeSort.direction === "asc" ? "desc" : "asc";
+          else {
             activeSort.column = col;
-            activeSort.direction = "desc"; // Por defecto descendente
+            activeSort.direction = "desc";
           }
           renderDashboard();
         });
       });
 
-      // Inicialización general del Dashboard
       async function initDashboard() {
         await loadDbConfig();
         await updateDashboardData();
       }
 
-      // Eventos de Pestañas
       document.querySelectorAll(".tab-btn").forEach(btn => {
         btn.addEventListener("click", () => {
           document.querySelectorAll(".tab-btn").forEach(b => b
             .classList.remove("active"));
           document.querySelectorAll(".tab-content").forEach(c => c
             .classList.remove("active"));
-
           btn.classList.add("active");
-          const tabId = btn.getAttribute("data-tab");
-          document.getElementById(tabId).classList.add("active");
+          document.getElementById(btn.getAttribute("data-tab"))
+            .classList.add("active");
         });
       });
 
-      // Evento expandir/colapsar filtros
       const filterToggle = document.getElementById("filters-toggle-btn");
       const filtersRow = document.getElementById("filters-container");
       const arrowIcon = document.getElementById("filters-arrow-icon");
@@ -2300,26 +2748,20 @@
         arrowIcon.textContent = isCollapsed ? "▲" : "▼";
       });
 
-      // Función para aplicar filtros en tiempo real
       function applyFilters() {
         filters.search = document.getElementById("filter-search").value;
-
         const minVal = document.getElementById("filter-ird-min").value;
         filters.irdMin = minVal !== "" ? parseInt(minVal) : null;
-
         const maxVal = document.getElementById("filter-ird-max").value;
         filters.irdMax = maxVal !== "" ? parseInt(maxVal) : null;
-
         filters.asistencia = document.getElementById("filter-asistencia")
           .value;
         filters.riesgoPerceb = document.getElementById("filter-riesgo-perceb")
           .value;
-
         currentPage = 1;
         renderDashboard();
       }
 
-      // Escuchar cambios en los inputs para filtrar en tiempo real
       document.getElementById("filter-search").addEventListener("input",
         applyFilters);
       document.getElementById("filter-ird-min").addEventListener("input",
@@ -2331,54 +2773,45 @@
       document.getElementById("filter-riesgo-perceb").addEventListener(
         "change", applyFilters);
 
-      // Evento limpiar filtros
       document.getElementById("btn-clear-filters").addEventListener("click",
-      () => {
-        document.getElementById("filter-search").value = "";
-        document.getElementById("filter-ird-min").value = "";
-        document.getElementById("filter-ird-max").value = "";
-        document.getElementById("filter-asistencia").value = "todos";
-        document.getElementById("filter-riesgo-perceb").value = "todos";
+        () => {
+          document.getElementById("filter-search").value = "";
+          document.getElementById("filter-ird-min").value = "";
+          document.getElementById("filter-ird-max").value = "";
+          document.getElementById("filter-asistencia").value = "todos";
+          document.getElementById("filter-riesgo-perceb").value = "todos";
+          filters = {
+            search: "",
+            irdMin: null,
+            irdMax: null,
+            asistencia: "todos",
+            riesgoPerceb: "todos"
+          };
+          currentPage = 1;
+          renderDashboard();
+        });
 
-        filters = {
-          search: "",
-          irdMin: null,
-          irdMax: null,
-          asistencia: "todos",
-          riesgoPerceb: "todos"
-        };
-        currentPage = 1;
-        renderDashboard();
-      });
-
-      // Evento de refresco de datos
       document.getElementById("btn-refresh").addEventListener("click",
-    async () => {
-        if (refreshCooldownActive) return;
-
-        // Activar Cooldown
-        refreshCooldownActive = true;
-        const btn = document.getElementById("btn-refresh");
-        btn.disabled = true;
-
-        await updateDashboardData();
-
-        let cd = systemConfig.umbrales.cooldown_actualizar_seg || 30;
-        const timer = setInterval(() => {
-          cd--;
-          if (cd <= 0) {
-            clearInterval(timer);
-            btn.disabled = false;
-            refreshCooldownActive = false;
-            btn.innerHTML = `
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-              Actualizar datos
-            `;
-          } else {
-            btn.textContent = `Esperar ${cd}s`;
-          }
-        }, 1000);
-      });
+        async () => {
+          if (refreshCooldownActive) return;
+          refreshCooldownActive = true;
+          const btn = document.getElementById("btn-refresh");
+          btn.disabled = true;
+          await updateDashboardData();
+          let cd = systemConfig.umbrales.cooldown_actualizar_seg || 30;
+          const timer = setInterval(() => {
+            cd--;
+            if (cd <= 0) {
+              clearInterval(timer);
+              btn.disabled = false;
+              refreshCooldownActive = false;
+              btn.innerHTML =
+                `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Actualizar datos`;
+            } else {
+              btn.textContent = `Esperar ${cd}s`;
+            }
+          }, 1000);
+        });
 
       // ==========================================================
       // ★ HISTÓRICO DE CUATRIMESTRES ★
@@ -2387,49 +2820,42 @@
         console.log("=== INICIANDO GUARDADO DE HISTÓRICO ===");
         showLoading("Sincronizando base de datos histórica...");
         try {
-          // 1. Obtener todas las entradas actuales de la base de datos histórica (db_historico)
           const urlHist =
             `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_historico}&perpage=1000`;
           const resHist = await fetch(urlHist);
           if (!resHist.ok) throw new Error(
             "No se pudo conectar con la base de datos histórica de Moodle"
-            );
+          );
           const htmlHist = await resHist.text();
 
-          // Parsear las entradas existentes en la base de datos histórica
           const parser = new DOMParser();
           const docHist = parser.parseFromString(htmlHist, "text/html");
           const entriesList = docHist.querySelectorAll(
             ".defaulttemplate-listentry, .defaulttemplate-single, .card, .generaltable tr"
-            );
-
-          const histEntradasMap =
-        new Map(); // email -> { rid, nombre, historialText }
+          );
+          const histEntradasMap = new Map();
 
           entriesList.forEach(entry => {
-            // Extraer rid de los links de acciones o innerHTML
             let rid = null;
             const actionLinks = entry.querySelectorAll(
               "a[href*='rid=']");
             for (let link of actionLinks) {
               const match = link.getAttribute("href").match(
-              /rid=(\d+)/);
+                /rid=(\d+)/);
               if (match) {
                 rid = match[1];
                 break;
               }
             }
             if (!rid) {
-              const match = entry.innerHTML.match(/[?\u0026]rid=(\d+)/);
+              const match = entry.innerHTML.match(/[?&]rid=(\d+)/);
               if (match) rid = match[1];
             }
             if (!rid) return;
 
-            // Extraer campos de la entrada
-            let emailVal = "";
-            let nombreVal = "";
-            let historialVal = "";
-
+            let emailVal = "",
+              nombreVal = "",
+              historialVal = "";
             const rows = entry.querySelectorAll(".row, div, td");
             rows.forEach(row => {
               const labelEl = row.querySelector(
@@ -2439,41 +2865,25 @@
               let valText = "";
               const valEl = row.querySelector(
                 ".col-8, .col-lg-9, p, td:nth-child(2), .data-field-html"
-                );
-              if (valEl) {
-                valText = valEl.textContent.trim();
-              } else if (labelEl) {
-                if (labelEl.nextElementSibling) {
-                  valText = labelEl.nextElementSibling.textContent
-                    .trim();
-                }
-              }
+              );
+              if (valEl) valText = valEl.textContent.trim();
+              else if (labelEl && labelEl.nextElementSibling)
+                valText = labelEl.nextElementSibling.textContent
+                .trim();
 
               if (labelText.includes("email") || labelText.includes(
-                  "correo")) {
-                emailVal = valText;
-              } else if (labelText.includes("alumno") || labelText
-                .includes("nombre")) {
-                nombreVal = valText;
-              } else if (labelText.includes("historial") ||
-                labelText.includes("trayectoria") || labelText
-                .includes("datos")) {
-                historialVal = valText;
-              }
+                  "correo")) emailVal = valText;
+              else if (labelText.includes("alumno") || labelText
+                .includes("nombre")) nombreVal = valText;
+              else if (labelText.includes("historial") || labelText
+                .includes("trayectoria") || labelText.includes(
+                  "datos")) historialVal = valText;
             });
 
-            // Fallback por regex si no se encontró el email mediante etiquetas
             if (!emailVal) {
               const emailMatch = entry.textContent.match(
                 /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
               if (emailMatch) emailVal = emailMatch[0];
-            }
-
-            // Fallback por regex para extraer el JSON del historial si no se encontró mediante las etiquetas
-            if (!historialVal) {
-              const jsonMatch = entry.textContent.match(
-                /\[\s*\{[\s\S]*\}\s*\]/);
-              if (jsonMatch) historialVal = jsonMatch[0];
             }
 
             if (emailVal) {
@@ -2485,169 +2895,97 @@
             }
           });
 
-          console.log(
-            `Entradas históricas preexistentes cargadas: ${histEntradasMap.size}`
-            );
-
-          // 2. Obtener el formulario de edición/creación de db_historico para mapear los nombres de campos
           const getFormRes = await fetch(
             `${window.location.origin}/mod/data/edit.php?d=${systemConfig.urls.dataids.db_historico}`
-            );
+          );
           if (!getFormRes.ok) throw new Error(
             "No se pudo obtener el formulario de creación histórica");
           const formHtml = await getFormRes.text();
           const docForm = parser.parseFromString(formHtml, "text/html");
 
           const fieldsMapeo = {};
-          const normLabel = (str) => str.trim().toLowerCase().normalize(
-            "NFD").replace(/[\u0300-\u036f]/g, "");
           const inputsDB = docForm.querySelectorAll(
-            '[name^="field_"], [id^="field_"]');
+            'input[name^="field_"], textarea[name^="field_"]');
           inputsDB.forEach(input => {
-            const name = input.getAttribute("name") || input
-              .getAttribute("id") || "";
-            const match = name.match(/field_(\d+)/);
-            if (match) {
-              const fieldName = "field_" + match[1];
+            const name = input.getAttribute("name") || "";
+            if (!/^field_\d+$/.test(name)) return;
+            if (input.tagName === "TEXTAREA") {
+              fieldsMapeo.historial = name;
+              return;
+            }
+            const id = input.getAttribute("id");
+            let labelText = "";
+            if (id) {
+              const label = docForm.querySelector(`label[for="${id}"]`);
+              if (label) labelText = label.textContent;
+            }
+            if (!labelText) {
               let parent = input.parentElement;
-              let labelText = "";
-              for (let depth of [0, 1, 2, 3]) {
-                if (parent) {
-                  const labelEl = parent.querySelector(
-                    "label, .font-weight-bold, .col-form-label, td.template-cell, th"
-                    );
-                  if (labelEl) {
-                    labelText = labelEl.textContent;
-                    break;
-                  }
-                  if (parent.previousElementSibling) {
-                    const prevLabel = parent.previousElementSibling
-                      .querySelector(
-                        "label, .font-weight-bold, .col-form-label");
-                    if (prevLabel) {
-                      labelText = prevLabel.textContent;
-                      break;
-                    }
-                  }
-                  parent = parent.parentElement;
+              for (let i = 0; i < 4 && parent; i++) {
+                const labelEl = parent.querySelector(
+                  "label, .col-form-label, .font-weight-bold, th");
+                if (labelEl) {
+                  labelText = labelEl.textContent;
+                  break;
                 }
-              }
-              const norm = normLabel(labelText);
-              if (norm.includes("email") || norm.includes("correo")) {
-                fieldsMapeo.email = fieldName;
-              } else if (norm.includes("alumno") || norm.includes(
-                  "nombre")) {
-                if (!norm.includes("id")) {
-                  if (!norm.includes("dni")) {
-                    fieldsMapeo.nombre = fieldName;
-                  }
-                }
-              } else if (norm.includes("historial") || norm.includes(
-                  "trayectoria") || norm.includes("datos")) {
-                fieldsMapeo.historial = fieldName;
+                parent = parent.parentElement;
               }
             }
+            if (!labelText && input.parentElement) labelText = input
+              .parentElement.textContent;
+            const norm = labelText.toLowerCase().normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "");
+            if (norm.includes("email") || norm.includes("correo") ||
+              norm.includes("mail")) fieldsMapeo.email = name;
+            else if (norm.includes("alumno") || norm.includes("nombre"))
+              fieldsMapeo.nombre = name;
           });
 
-          // Asignación por tipo de input como último recurso
-          if (!fieldsMapeo.email || !fieldsMapeo.historial) {
-            const allInputs = docForm.querySelectorAll(
-              'input[name^="field_"], textarea[name^="field_"]');
-            const uniqueFields = [];
-            allInputs.forEach(inp => {
-              const n = inp.getAttribute("name");
-              if (n) {
-                const m = n.match(/field_(\d+)/);
-                if (m) {
-                  const fName = "field_" + m[1];
-                  if (!uniqueFields.includes(fName)) uniqueFields.push(
-                    fName);
-                }
-              }
-            });
-            if (uniqueFields.length >= 2) {
-              const textareas = docForm.querySelectorAll(
-                'textarea[name^="field_"]');
-              textareas.forEach(ta => {
-                const n = ta.getAttribute("name");
-                if (n) {
-                  const m = n.match(/field_(\d+)/);
-                  if (m) fieldsMapeo.historial = "field_" + m[1];
-                }
-              });
-              const textInputs = docForm.querySelectorAll(
+          if (!fieldsMapeo.email || !fieldsMapeo.nombre) {
+            const textInputs = Array.from(docForm.querySelectorAll(
                 'input[type="text"][name^="field_"], input:not([type])[name^="field_"]'
-                );
-              const textFields = [];
-              textInputs.forEach(ti => {
-                const n = ti.getAttribute("name");
-                if (n) {
-                  const m = n.match(/field_(\d+)/);
-                  if (m) {
-                    const fName = "field_" + m[1];
-                    if (fName !== fieldsMapeo.historial) {
-                      if (!textFields.includes(fName)) {
-                        textFields.push(fName);
-                      }
-                    }
-                  }
-                }
-              });
-              if (textFields.length >= 2) {
-                if (!fieldsMapeo.nombre) fieldsMapeo.nombre = textFields[0];
-                if (!fieldsMapeo.email) fieldsMapeo.email = textFields[1];
-              } else if (textFields.length === 1) {
-                if (!fieldsMapeo.email) fieldsMapeo.email = textFields[0];
-              }
+              ))
+              .filter(inp => /^field_\d+$/.test(inp.getAttribute("name") ||
+                ""));
+            if (!fieldsMapeo.email) {
+              const unused = textInputs.find(inp => inp.getAttribute(
+                "name") !== fieldsMapeo.nombre);
+              if (unused) fieldsMapeo.email = unused.getAttribute("name");
+            }
+            if (!fieldsMapeo.nombre) {
+              const unused = textInputs.find(inp => inp.getAttribute(
+                "name") !== fieldsMapeo.email);
+              if (unused) fieldsMapeo.nombre = unused.getAttribute("name");
             }
           }
 
-          if (!fieldsMapeo.email || !fieldsMapeo.historial) {
-            console.error("Campos mapeados detectados:", fieldsMapeo);
-            throw new Error(
-              "No se pudo detectar dinámicamente el campo de Email o Historial en la base de datos de Moodle"
-              );
-          }
+          if (!fieldsMapeo.email || !fieldsMapeo.historial) throw new Error(
+            "No se pudo detectar dinámicamente el campo de Email o Historial en la base de datos de Moodle"
+          );
 
-          // Determinamos el cuatrimestre/periodo actual de forma dinámica
           const hoy = new Date();
-          const anioActual = hoy.getFullYear();
-          const cuatActual = hoy.getMonth() <= 6 ? 1 : 2;
-          const periodoActual = `${anioActual}-${cuatActual}`;
+          const periodoActual =
+            `${hoy.getFullYear()}-${hoy.getMonth() <= 6 ? 1 : 2}`;
 
-          let guardadosCount = 0;
-          let creadosCount = 0;
-          let editadosCount = 0;
+          let guardadosCount = 0,
+            creadosCount = 0,
+            editadosCount = 0;
 
-          console.log(
-            `Iniciando guardado de datos históricos para el periodo ${periodoActual}...`
-            );
-
-          // 3. Iterar por cada alumno calculado en el dashboard para guardarlo/actualizarlo
           for (let alumno of alumnosCalculados) {
-            if (alumno.IRD === null)
-          continue; // Si no tiene datos de IRD, no se guarda histórico
+            if (alumno.IRD === null) continue;
 
             const emailKey = alumno.email.trim().toLowerCase();
             const entradaExistente = histEntradasMap.get(emailKey);
 
-            // Parsear o inicializar el historial del cuatrimestre
             let historial = [];
             if (entradaExistente && entradaExistente.historialText) {
               try {
                 const parsed = parseCleanJSON(entradaExistente
                   .historialText);
-                if (Array.isArray(parsed)) {
-                  historial = parsed;
-                }
-              } catch (e) {
-                console.warn(
-                  "No se pudo parsear el historial previo del alumno:",
-                  emailKey, entradaExistente.historialText);
-              }
+                if (Array.isArray(parsed)) historial = parsed;
+              } catch (e) {}
             }
 
-            // Crear el registro de datos para este periodo
             const registroPeriodo = {
               periodo: periodoActual,
               ird: alumno.IRD,
@@ -2657,127 +2995,264 @@
               fecha: hoy.toISOString().substring(0, 10)
             };
 
-            // Actualizar o añadir el registro del periodo en el historial
             const idxPeriodo = historial.findIndex(h => h.periodo ===
               periodoActual);
-            if (idxPeriodo !== -1) {
-              historial[idxPeriodo] = registroPeriodo;
-            } else {
-              historial.push(registroPeriodo);
-            }
+            if (idxPeriodo !== -1) historial[idxPeriodo] = registroPeriodo;
+            else historial.push(registroPeriodo);
 
             const historialJsonText = JSON.stringify(historial);
 
-            // Crear FormData para enviar a Moodle
             const formData = new FormData();
-            formData.append("d", systemConfig.urls.dataids.db_historico);
+            formData.append("d", systemConfig.urls.dataids.db_historico
+              .toString());
+            if (entradaExistente && entradaExistente.rid) formData.append(
+              "rid", entradaExistente.rid);
             formData.append("sesskey", sesskey);
-            formData.append("saveandview", "Guardar");
 
-            // Mapear campos obligatorios
-            formData.append(fieldsMapeo.email, alumno.email);
-            if (fieldsMapeo.nombre) formData.append(fieldsMapeo.nombre,
-              alumno.nombre);
-            formData.append(fieldsMapeo.historial, historialJsonText);
+            const submitBtn = docForm.querySelector('input[type="submit"]');
+            if (submitBtn) formData.append(submitBtn.name ? submitBtn.name :
+              "saveandview", submitBtn.value || "Guardar");
+            else formData.append("saveandview", "Guardar");
 
-            if (entradaExistente && entradaExistente.rid) {
-              // Actualizar entrada existente
-              formData.append("rid", entradaExistente.rid);
-              const postUrl =
-                `${window.location.origin}/mod/data/edit.php?d=${systemConfig.urls.dataids.db_historico}\u0026rid=${entradaExistente.rid}`;
-              const postRes = await fetch(postUrl, {
+            const camposAEnviar = {
+              [fieldsMapeo.email]: alumno.email,
+              [fieldsMapeo.historial]: historialJsonText
+            };
+            if (fieldsMapeo.nombre) camposAEnviar[fieldsMapeo.nombre] =
+              alumno.nombre;
+
+            Object.entries(camposAEnviar).forEach(pair => {
+              formData.append(pair[0], pair[1]);
+              docForm.querySelectorAll('[name^="' + pair[0] + '_"]')
+                .forEach(input => {
+                  if (input.getAttribute("name")) formData.append(
+                    input.getAttribute("name"), input.value || "");
+                });
+            });
+
+            const postRes = await fetch(
+              `${window.location.origin}/mod/data/edit.php`, {
                 method: "POST",
-                body: formData
+                body: formData,
+                credentials: "include"
               });
-              if (!postRes.ok) throw new Error(
-                `Fallo al actualizar el histórico de ${alumno.nombre}`);
-              editadosCount++;
-            } else {
-              // Crear nueva entrada
-              formData.append("rid", "0");
-              const postUrl =
-                `${window.location.origin}/mod/data/edit.php?d=${systemConfig.urls.dataids.db_historico}`;
-              const postRes = await fetch(postUrl, {
-                method: "POST",
-                body: formData
-              });
-              if (!postRes.ok) throw new Error(
-                `Fallo al crear el histórico de ${alumno.nombre}`);
-              creadosCount++;
-            }
+            const isSuccess = postRes.status === 200 || postRes.status ===
+              303 || postRes.type === "opaqueredirect";
 
+            if (!isSuccess) throw new Error(
+              "Fallo de validación en Moodle.");
+
+            if (entradaExistente && entradaExistente.rid) editadosCount++;
+            else creadosCount++;
             guardadosCount++;
 
-            // Breve delay para evitar sobrecargar a Moodle
             await new Promise(r => setTimeout(r, systemConfig.umbrales
               .historico_delay_ms || 300));
           }
-
           alert(
             `Histórico guardado correctamente.\nTotal procesados: ${guardadosCount} alumnos (Nuevos: ${creadosCount}, Actualizados: ${editadosCount}) para el periodo ${periodoActual}.`
-            );
-          console.log(
-            `Sincronización histórica finalizada. Guardados: ${guardadosCount}.`
-            );
+          );
         } catch (error) {
-          console.error("Error al guardar el histórico en Moodle:", error);
           alert(`Error al guardar histórico: ${error.message}`);
         } finally {
           hideLoading();
         }
       }
 
-      // Evento de guardado histórico
+      async function guardarHistoricoGeneral() {
+        try {
+          const parser = new DOMParser();
+          const hoy = new Date();
+          const anioActual = hoy.getFullYear();
+          const cuatActual = hoy.getMonth() <= 6 ? 1 : 2;
+          const periodoActual = `${anioActual}-${cuatActual}`;
+          const fechaHoy =
+            `${String(hoy.getDate()).padStart(2, "0")}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${hoy.getFullYear()}`;
+          const dataid = (systemConfig.urls.dataids.db_historico_general) ||
+            21;
+
+          const threshold = systemConfig.umbrales.threshold_ird;
+          let altoRiesgo = 0,
+            medioRiesgo = 0,
+            bajoRiesgo = 0;
+          alumnosCalculados.forEach(a => {
+            if (a.IRD === null || a.IRD === undefined) return;
+            if (a.IRD >= 80) altoRiesgo++;
+            else if (a.IRD >= threshold) medioRiesgo++;
+            else bajoRiesgo++;
+          });
+
+          const cuatInicio = cuatActual === 1 ? new Date(anioActual, 0, 1) :
+            new Date(anioActual, 6, 1);
+          const cuatFin = cuatActual === 1 ? new Date(anioActual, 6, 1) :
+            new Date(anioActual + 1, 0, 1);
+          const logsCuat = logsHistorial.filter(l => l.fechaDate && l
+            .fechaDate >= cuatInicio && l.fechaDate < cuatFin);
+          const solicAtendidas = logsCuat.filter(l => (l.origen || "")
+            .toLowerCase().trim() === "solicitud").length;
+          const asistProactivas = logsCuat.filter(l => (l.origen || "")
+            .toLowerCase().trim() === "proactivo").length;
+
+          const datosJson = JSON.stringify({
+            kpis: {
+              alto_riesgo: altoRiesgo,
+              medio_riesgo: medioRiesgo,
+              bajo_riesgo: bajoRiesgo,
+              solicitudes_atendidas: solicAtendidas,
+              asistencias_proactivas: asistProactivas
+            },
+            cohortes: cohortesStats,
+            pesos_preguntas: pesosPreguntasGlobal
+          });
+
+          const resHist = await fetch(
+            `${window.location.origin}/mod/data/view.php?d=${dataid}&perpage=1000`
+          );
+          if (!resHist.ok) throw new Error(
+            "No se pudo conectar con db_historico_general");
+          const docHist = parser.parseFromString(await resHist.text(),
+            "text/html");
+
+          let existingRid = null;
+          docHist.querySelectorAll(".defaulttemplate-listentry").forEach(
+            entry => {
+              entry.querySelectorAll(".row").forEach(row => {
+                const lbl = row.querySelector(".font-weight-bold");
+                const val = row.querySelector(".col-8, .col-lg-9");
+                if (lbl && val && lbl.textContent.trim()
+                  .toLowerCase() === "cuatrimestre" && val.textContent
+                  .trim() === periodoActual) {
+                  for (let link of entry.querySelectorAll(
+                      "a[href*='delete=']")) {
+                    const m = link.getAttribute("href").match(
+                      /delete=(\d+)/);
+                    if (m) {
+                      existingRid = m[1];
+                      break;
+                    }
+                  }
+                }
+              });
+            });
+
+          const formUrl =
+            `${window.location.origin}/mod/data/edit.php?d=${dataid}`;
+          const docForm = parser.parseFromString(await (await fetch(
+            formUrl)).text(), "text/html");
+
+          let fCuatrimestre = null,
+            fFecha = null,
+            fDatos = null,
+            fDatosItemid = null;
+          docForm.querySelectorAll(
+            'input[name^="field_"], textarea[name^="field_"]').forEach(
+            el => {
+              const name = el.getAttribute("name") || "";
+              if (name.endsWith("_itemid")) {
+                fDatosItemid = el.getAttribute("value");
+                return;
+              }
+              if (!/^field_\d+$/.test(name)) return;
+              if (el.tagName === "TEXTAREA") {
+                fDatos = name;
+                return;
+              }
+              const id = el.getAttribute("id");
+              let labelText = "";
+              if (id) {
+                const lbl = docForm.querySelector(`label[for="${id}"]`);
+                if (lbl) labelText = lbl.textContent;
+              }
+              if (!labelText) {
+                let p = el.parentElement;
+                for (let i = 0; i < 5 && p; i++) {
+                  const lb = p.querySelector(".font-weight-bold");
+                  if (lb) {
+                    labelText = lb.textContent;
+                    break;
+                  }
+                  p = p.parentElement;
+                }
+              }
+              const norm = labelText.toLowerCase().trim();
+              if (norm === "cuatrimestre") fCuatrimestre = name;
+              else if (norm.includes("fecha")) fFecha = name;
+            });
+
+          if (!fCuatrimestre || !fDatos) throw new Error(
+            "No se pudieron mapear los campos de db_historico_general");
+
+          const formData = new FormData();
+          formData.append("d", String(dataid));
+          if (existingRid) formData.append("rid", existingRid);
+          formData.append("sesskey", sesskey);
+          formData.append("saveandview", "Guardar");
+          formData.append(fCuatrimestre, periodoActual);
+          if (fFecha) formData.append(fFecha, fechaHoy);
+          if (fDatosItemid) formData.append(fDatos + "_itemid",
+            fDatosItemid);
+          formData.append(fDatos, datosJson);
+          formData.append(fDatos + "_content1", "1");
+
+          const postRes = await fetch(
+            `${window.location.origin}/mod/data/edit.php`, {
+              method: "POST",
+              body: formData,
+              credentials: "include",
+              redirect: "manual"
+            });
+          if (!postRes.ok && postRes.type !== "opaqueredirect")
+            throw new Error("Error HTTP al guardar histórico general: " +
+              postRes.status);
+        } catch (error) {
+          console.error("Error al guardar el histórico general:", error);
+        }
+      }
+
       document.getElementById("btn-save-historical").addEventListener("click",
         async () => {
           if (!alumnosCalculados || alumnosCalculados.length === 0) {
             alert(
               "No hay datos de alumnos cargados para guardar. Por favor, actualiza los datos primero."
-              );
+            );
             return;
           }
-          const confirmar = confirm(
-            "¿Deseas guardar/actualizar los resultados actuales del cuatrimestre en el registro histórico?"
-            );
-          if (confirmar) {
-            await guardarHistorico();
+          if (confirm(
+              "¿Deseas guardar/actualizar los resultados actuales del cuatrimestre en el registro histórico?"
+            )) {
+            await Promise.all([guardarHistorico(),
+              guardarHistoricoGeneral()
+            ]);
           }
         });
 
       // ==========================================================
       // ★ MODAL Y REGISTRO DE ASISTENCIA ★
       // ==========================================================
-      let activeStudentId = null;
-      let activeStudentName = "";
+      let activeStudentId = null,
+        activeStudentName = "";
 
       window.abrirModalAsistencia = function(id, name, defaultOrigen) {
         activeStudentId = id;
         activeStudentName = name;
-
         document.getElementById("modal-student-info").textContent =
           `Alumno: ${name}`;
         document.getElementById("asistencia-origen").value = defaultOrigen;
         document.getElementById("asistencia-mensaje").value = "";
         document.getElementById("modal-error").style.display = "none";
-
         document.getElementById("modal-asistencia").style.display = "flex";
       };
 
-      // Cerrar modal
-      const closeModal = () => {
-        document.getElementById("modal-asistencia").style.display = "none";
-      };
-
+      const closeModal = () => document.getElementById("modal-asistencia")
+        .style.display = "none";
       document.getElementById("btn-modal-close").addEventListener("click",
         closeModal);
       document.getElementById("btn-modal-cancel").addEventListener("click",
         closeModal);
 
-      // Guardar Asistencia (Submit de Formulario)
       document.getElementById("form-asistencia").addEventListener("submit",
         async (e) => {
           e.preventDefault();
-
           const origen = document.getElementById("asistencia-origen")
             .value;
           const mensajeText = document.getElementById(
@@ -2789,195 +3264,161 @@
           errDiv.style.display = "none";
           btnSave.disabled = true;
           btnCancel.disabled = true;
+          const studentObj = alumnosCalculados.find(a => a.id ===
+            activeStudentId);
 
           try {
-            // 1. POST a DB Logs (d=16) resolviendo dinámicamente los campos
             showLoading("Registrando log de asistencia...");
-            const getFormRes = await fetch(
-              `${window.location.origin}/mod/data/edit.php?d=${systemConfig.urls.dataids.db_logs}`
-              );
+            const getFormRes = await fetch(window.location.origin +
+              "/mod/data/edit.php?d=" + systemConfig.urls.dataids
+              .db_logs);
             if (!getFormRes.ok) throw new Error(
               "No se pudo obtener el formulario de creación de logs");
 
             const formHtml = await getFormRes.text();
-            const parser = new DOMParser();
-            const docForm = parser.parseFromString(formHtml, "text/html");
-
+            const docForm = new DOMParser().parseFromString(formHtml,
+              "text/html");
             const fieldsMapeo = {};
             const normLabel = (str) => str.trim().toLowerCase().normalize(
               "NFD").replace(/[\u0300-\u036f]/g, "");
-            const inputsDB = docForm.querySelectorAll(
-              '[name^="field_"], [id^="field_"]');
-            inputsDB.forEach(input => {
-              const name = input.getAttribute("name") || input
-                .getAttribute("id") || "";
-              const match = name.match(/field_(\d+)/);
-              if (match) {
-                const fieldName = "field_" + match[1];
-                let parent = input.parentElement;
-                let labelText = "";
-                for (let depth of [0, 1, 2, 3]) {
-                  if (parent) {
-                    const labelEl = parent.querySelector(
-                      "label, .font-weight-bold, .col-form-label, td.template-cell, th"
-                      );
-                    if (labelEl) {
-                      labelText = labelEl.textContent;
-                      break;
-                    }
-                    if (parent.previousElementSibling) {
-                      const prevLabel = parent.previousElementSibling
-                        .querySelector(
-                          "label, .font-weight-bold, .col-form-label"
-                          );
-                      if (prevLabel) {
-                        labelText = prevLabel.textContent;
-                        break;
-                      }
-                    }
-                    parent = parent.parentElement;
-                  }
-                }
-                const norm = normLabel(labelText);
-                if (norm.includes("nombre_alumno") || (norm.includes(
-                      "alumno") && !norm.includes("id") && !norm
-                    .includes("tutor"))) {
-                  fieldsMapeo.nombre_alumno = fieldName;
-                } else if (norm.includes("id_alumno") || norm
-                  .includes("id alumno") || (norm.includes(
-                    "alumno") && norm.includes("id"))) {
-                  fieldsMapeo.id_alumno = fieldName;
-                } else if (norm.includes("nombre_tutor") || norm
-                  .includes("tutor")) {
-                  fieldsMapeo.nombre_tutor = fieldName;
-                } else if (norm.includes("origen")) {
-                  fieldsMapeo.origen = fieldName;
-                } else if (norm.includes("mensaje") || norm.includes(
-                    "orientacion") || norm.includes("orientación") ||
-                  norm.includes("ayuda")) {
-                  fieldsMapeo.mensaje = fieldName;
+
+            docForm.querySelectorAll("label[for]").forEach(label => {
+              const text = normLabel(label.textContent);
+              const inputEl = docForm.getElementById(label
+                .getAttribute("for")) || docForm.querySelector(
+                '[name="' + label.getAttribute("for") + '"]');
+              if (inputEl) {
+                const fieldName = inputEl.getAttribute("name");
+                if (fieldName) {
+                  if (text.includes("id_alumno") || text.includes(
+                      "id alumno")) fieldsMapeo.id_alumno = fieldName;
+                  else if (text.includes("nombre_alumno")) fieldsMapeo
+                    .nombre_alumno = fieldName;
+                  else if (text.includes("nombre_tutor") || text
+                    .includes("tutor")) fieldsMapeo.nombre_tutor =
+                    fieldName;
+                  else if (text.includes("origen")) fieldsMapeo
+                    .origen = fieldName;
+                  else if (text.includes("mensaje_alumno") || text
+                    .includes("mensaje alumno")) fieldsMapeo
+                    .mensaje_alumno = fieldName;
+                  else if (text.includes("mensaje") || text.includes(
+                      "orientacion") || text.includes("orientación"))
+                    fieldsMapeo.mensaje = fieldName;
+                  else if (text.includes("alumno")) fieldsMapeo
+                    .nombre_alumno = fieldName;
                 }
               }
             });
 
-            // Asignación por tipo de input como último recurso
-            if (!fieldsMapeo.nombre_alumno || !fieldsMapeo.id_alumno || !
-              fieldsMapeo.mensaje) {
-              const allInputs = docForm.querySelectorAll(
-                'input[name^="field_"], textarea[name^="field_"], select[name^="field_"]'
-                );
-              const uniqueFields = [];
-              allInputs.forEach(inp => {
-                const n = inp.getAttribute("name");
-                if (n) {
-                  const m = n.match(/field_(\d+)/);
-                  if (m) {
-                    const fName = "field_" + m[1];
-                    if (!uniqueFields.includes(fName)) uniqueFields
-                      .push(fName);
-                  }
-                }
-              });
-              if (uniqueFields.length >= 3) {
-                const textareas = docForm.querySelectorAll(
-                  'textarea[name^="field_"]');
-                textareas.forEach(ta => {
-                  const n = ta.getAttribute("name");
-                  if (n) {
-                    const m = n.match(/field_(\d+)/);
-                    if (m) fieldsMapeo.mensaje = "field_" + m[1];
-                  }
-                });
-                const selects = docForm.querySelectorAll(
-                  'select[name^="field_"]');
-                selects.forEach(sel => {
-                  const n = sel.getAttribute("name");
-                  if (n) {
-                    const m = n.match(/field_(\d+)/);
-                    if (m) fieldsMapeo.origen = "field_" + m[1];
-                  }
-                });
-                const textInputs = docForm.querySelectorAll(
-                  'input[type="text"][name^="field_"], input:not([type])[name^="field_"]'
-                  );
-                const textFields = [];
-                textInputs.forEach(ti => {
-                  const n = ti.getAttribute("name");
-                  if (n) {
-                    const m = n.match(/field_(\d+)/);
-                    if (m) {
-                      const fName = "field_" + m[1];
-                      if (fName !== fieldsMapeo.mensaje) {
-                        if (fName !== fieldsMapeo.origen) {
-                          if (!textFields.includes(fName)) {
-                            textFields.push(fName);
-                          }
-                        }
+            if (!fieldsMapeo.nombre_alumno) {
+              docForm.querySelectorAll(
+                  "#defaulttemplate-addentry > div, .form-group, .fitem")
+                .forEach(row => {
+                  const label = row.querySelector(
+                    ".font-weight-bold, label, .col-form-label");
+                  if (label) {
+                    const text = normLabel(label.textContent);
+                    const input = row.querySelector(
+                      "input[name], textarea[name], select[name]");
+                    if (input) {
+                      const fieldName = input.getAttribute("name");
+                      if (fieldName) {
+                        if (text.includes("id_alumno") || text.includes(
+                            "id alumno")) fieldsMapeo.id_alumno =
+                          fieldName;
+                        else if (text.includes("nombre_alumno"))
+                          fieldsMapeo.nombre_alumno = fieldName;
+                        else if (text.includes("nombre_tutor") || text
+                          .includes("tutor")) fieldsMapeo.nombre_tutor =
+                          fieldName;
+                        else if (text.includes("origen")) fieldsMapeo
+                          .origen = fieldName;
+                        else if (text.includes("mensaje_alumno") || text
+                          .includes("mensaje alumno")) fieldsMapeo
+                          .mensaje_alumno = fieldName;
+                        else if (text.includes("mensaje") || text
+                          .includes("orientacion")) fieldsMapeo
+                          .mensaje = fieldName;
+                        else if (text.includes("alumno")) fieldsMapeo
+                          .nombre_alumno = fieldName;
                       }
                     }
                   }
                 });
-                if (textFields.length >= 3) {
-                  if (!fieldsMapeo.nombre_alumno) fieldsMapeo
-                    .nombre_alumno = textFields[0];
-                  if (!fieldsMapeo.id_alumno) fieldsMapeo.id_alumno =
-                    textFields[1];
-                  if (!fieldsMapeo.nombre_tutor) fieldsMapeo
-                    .nombre_tutor = textFields[2];
-                }
-              }
             }
 
-            // Resolver el nombre del tutor logueado
-            const tutorNombre = window.M?.cfg?.userfullname ||
-              document.querySelector('.userbutton .usertext')?.textContent
-              ?.trim() ||
-              document.querySelector('.usermenu .usertext')?.textContent
-              ?.trim() ||
-              document.querySelector('.usertext')?.textContent?.trim() ||
-              "Tutor";
-
+            const tutorNombre = window.M?.cfg?.userfullname || document
+              .querySelector('.usertext')?.textContent?.trim() || "Tutor";
             const formData = new FormData();
-            formData.append("d", systemConfig.urls.dataids.db_logs);
-            formData.append("rid", "0");
+            formData.append("d", systemConfig.urls.dataids.db_logs
+              .toString());
             formData.append("sesskey", sesskey);
-            formData.append("saveandview", "Guardar");
 
-            if (fieldsMapeo.nombre_alumno) formData.append(fieldsMapeo
-              .nombre_alumno, activeStudentName);
-            if (fieldsMapeo.id_alumno) formData.append(fieldsMapeo
-              .id_alumno, activeStudentId);
-            if (fieldsMapeo.nombre_tutor) formData.append(fieldsMapeo
-              .nombre_tutor, tutorNombre);
-            if (fieldsMapeo.origen) formData.append(fieldsMapeo.origen,
-              origen);
-            if (fieldsMapeo.mensaje) formData.append(fieldsMapeo.mensaje,
-              mensajeText);
+            const submitBtn = docForm.querySelector(
+              'input[type="submit"]');
+            if (submitBtn) formData.append(submitBtn.name ? submitBtn
+              .name : "saveandview", submitBtn.value || "Guardar");
+            else formData.append("saveandview", "Guardar");
 
-            const postLogRes = await fetch(
-              `${window.location.origin}/mod/data/edit.php`, {
+            const camposAEnviar = {};
+            if (fieldsMapeo.nombre_alumno) camposAEnviar[fieldsMapeo
+              .nombre_alumno] = activeStudentName;
+            if (fieldsMapeo.id_alumno) camposAEnviar[fieldsMapeo
+              .id_alumno] = activeStudentId;
+            if (fieldsMapeo.nombre_tutor) camposAEnviar[fieldsMapeo
+              .nombre_tutor] = tutorNombre;
+            if (fieldsMapeo.origen) camposAEnviar[fieldsMapeo.origen] =
+              origen;
+            if (fieldsMapeo.mensaje) camposAEnviar[fieldsMapeo.mensaje] =
+              mensajeText;
+            if (fieldsMapeo.mensaje_alumno) camposAEnviar[fieldsMapeo
+              .mensaje_alumno] = (origen === "Solicitud" &&
+              studentObj) ? studentObj.solicitudText : "";
+
+            Object.entries(camposAEnviar).forEach(pair => {
+              formData.append(pair[0], pair[1]);
+              docForm.querySelectorAll('[name^="' + pair[0] + '_"]')
+                .forEach(input => {
+                  if (input.getAttribute("name")) formData.append(
+                    input.getAttribute("name"), input.value || "");
+                });
+            });
+
+            const postLogRes = await fetch(window.location.origin +
+              "/mod/data/edit.php", {
                 method: "POST",
-                body: formData
+                body: formData,
+                credentials: "include"
               });
-            if (!postLogRes.ok) throw new Error(
-              "No se pudo registrar la asistencia en la base de datos"
-              );
+            const isSuccessLog = postLogRes.status === 200 || postLogRes
+              .status === 303 || postLogRes.type === "opaqueredirect";
 
-            // 2. Si el origen es "Solicitud", RECHAZAR en DB Solicitudes (d=15)
-            const studentObj = alumnosCalculados.find(a => a.id ===
-              activeStudentId);
+            if (!isSuccessLog) throw new Error(
+              "Fallo en la petición de red para registrar asistencia."
+            );
+
+            const verify = await verifyMoodlePost(postLogRes,
+              activeStudentName);
+            if (!verify.success) throw new Error(verify.error);
+
             if (origen === "Solicitud" && studentObj && studentObj
               .solicitudRid) {
-              showLoading("Archivando solicitud del alumno...");
-              const disapproveUrl =
-                `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_solicitudes}\u0026disapprove=${studentObj.solicitudRid}\u0026sesskey=${sesskey}`;
-              const disapproveRes = await fetch(disapproveUrl);
-              if (!disapproveRes.ok) console.warn(
-                "El rechazo/archivado de la solicitud de Moodle retornó un error."
-                );
+              showLoading("Borrando solicitud atendida...");
+              const deleteForm = new FormData();
+              deleteForm.append("d", systemConfig.urls.dataids
+                .db_solicitudes);
+              deleteForm.append("delete", studentObj.solicitudRid);
+              deleteForm.append("confirm", "1");
+              deleteForm.append("sesskey", sesskey);
+              await fetch(window.location.origin + "/mod/data/view.php", {
+                method: "POST",
+                body: deleteForm,
+                credentials: "include",
+                redirect: "manual"
+              });
             }
 
-            // 3. Enviar mensaje por mensajería instantánea AJAX si se escribió un mensaje
             if (mensajeText) {
               showLoading("Enviando mensaje interno en Moodle...");
               const payload = [{
@@ -2990,71 +3431,37 @@
                   }]
                 }
               }];
-              const msgUrl =
-                `${window.location.origin}/lib/ajax/service.php?sesskey=${sesskey}\u0026info=core_message_send_instant_messages`;
-              const msgRes = await fetch(msgUrl, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-              });
-              if (msgRes.ok) {
-                const resJson = await msgRes.json();
-                if (resJson[0]) {
-                  if (resJson[0].error) {
-                    console.warn(
-                      "Moodle reportó error al enviar mensaje:",
-                      resJson[0].exception);
-                  }
-                }
-              } else {
-                console.warn(
-                  "Fallo de red al enviar el mensaje por chat.");
-              }
+              await fetch(window.location.origin +
+                "/lib/ajax/service.php?sesskey=" + sesskey +
+                "&info=core_message_send_instant_messages", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify(payload)
+                });
             }
 
-            // Actualizar en caliente el estado en memoria para reflejar la asistencia de inmediato sin hacer recarga de red
-            const studentObjToUpdate = alumnosCalculados.find(a => a
-              .id === activeStudentId);
-            if (studentObjToUpdate) {
-              studentObjToUpdate.asistido = true;
+            const hoy = new Date();
+            const meses = ["enero", "febrero", "marzo", "abril", "mayo",
+              "junio", "julio", "agosto", "septiembre", "octubre",
+              "noviembre", "diciembre"
+            ];
+            const fechaFormateada = hoy.getDate() + " de " + meses[hoy
+              .getMonth()] + " de " + hoy.getFullYear() + ", " + String(
+              hoy.getHours()).padStart(2, "0") + ":" + String(hoy
+              .getMinutes()).padStart(2, "0");
 
-              // Generar fecha actual en formato Moodle: "miércoles, 17 de junio de 2026, 14:41"
-              const diasSemana = ["domingo", "lunes", "martes",
-                "miércoles", "jueves", "viernes", "sábado"
-              ];
-              const meses = ["enero", "febrero", "marzo", "abril", "mayo",
-                "junio", "julio", "agosto", "septiembre", "octubre",
-                "noviembre", "diciembre"
-              ];
-              const ahora = new Date();
-              const diaSem = diasSemana[ahora.getDay()];
-              const diaMes = ahora.getDate();
-              const mes = meses[ahora.getMonth()];
-              const anio = ahora.getFullYear();
-              const hora = ahora.getHours().toString().padStart(2, '0');
-              const min = ahora.getMinutes().toString().padStart(2, '0');
-              const fechaFormateada =
-                `${diaSem}, ${diaMes} de ${mes} de ${anio}, ${hora}:${min}`;
-
-              studentObjToUpdate.ultimaAsistencia = fechaFormateada;
-              studentObjToUpdate.ultimoTutor = tutorNombre;
-
-              // Si proviene de una solicitud de ayuda, la removemos de la lista de solicitudes pendientes
-              if (origen === "Solicitud") {
-                solicitudesPendientes = solicitudesPendientes.filter(s =>
-                  s.idAlumno !== activeStudentId);
-                studentObjToUpdate.hasSolicitud = false;
-                studentObjToUpdate.solicitudFecha = null;
-              }
+            if (studentObj) {
+              studentObj.asistido = true;
+              studentObj.ultimaAsistencia = fechaFormateada;
+              studentObj.ultimoTutor = tutorNombre;
             }
 
             closeModal();
             renderDashboard();
           } catch (error) {
-            console.error("Error al registrar la asistencia:", error);
-            errDiv.textContent = `Error: ${error.message}`;
+            errDiv.textContent = "Error: " + error.message;
             errDiv.style.display = "block";
           } finally {
             btnSave.disabled = false;
@@ -3064,4 +3471,5 @@
         });
 
     })();
-  
+  </script>
+</p>

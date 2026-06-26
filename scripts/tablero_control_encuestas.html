@@ -1,0 +1,1934 @@
+<p>
+  <script>
+    // Quitar margen del párrafo contenedor que Moodle inserta automáticamente
+    if (document.currentScript?.parentElement?.tagName === "P") {
+      document.currentScript.parentElement.style.margin = "0";
+    }
+
+    // Ocultar rápidamente la navegación y títulos nativos de Moodle
+    (function () {
+      const estilo = document.createElement("style");
+      estilo.id = "estilo-toggle-moodle";
+      estilo.textContent = `
+         body.hide-moodle-navigation h2:first-of-type, 
+         body.hide-moodle-navigation .page-header-headings, 
+         body.hide-moodle-navigation .activity-header, 
+         body.hide-moodle-navigation .secondary-navigation {
+           display: none !important;
+         }
+         body.hide-moodle-navigation #page-header {
+           margin-bottom: 0 !important;
+           padding-bottom: 0 !important;
+         }
+         body.hide-moodle-navigation #region-main-box {
+           padding-top: 0 !important;
+         }
+         body.hide-moodle-navigation #region-main {
+           padding-top: 8px !important;
+         }
+      `;
+      document.head.appendChild(estilo);
+
+      if (document.body) {
+        document.body.classList.add("hide-moodle-navigation");
+      } else {
+        document.addEventListener("DOMContentLoaded", function () {
+          document.body.classList.add("hide-moodle-navigation");
+        });
+      }
+    })();
+  </script>
+</p>
+
+<!-- Tablero Real de Control de Encuestas -->
+<div id="tablero">
+  <div id="contenedor-tablero">
+    
+    <!-- Cabecera del Tablero -->
+    <div class="cabecera-tablero">
+      <div>
+        <h3 style="color: hsl(168, 60%, 35%) !important; margin-top: 0 !important; margin-bottom: 4px !important; border-bottom: none !important; padding-bottom: 0 !important;">
+          📝 Tablero de Control de Encuestas y Mensajería
+        </h3>
+        <p style="margin: 0; font-size: 13px; color: #666;">Seguimiento de encuestas iniciales, cuatrimestrales y alumnos detectados en situación de deserción.</p>
+      </div>
+      <div class="cabecera-acciones">
+        <span id="texto-actualizacion" style="font-size: 13px; color: #666;">Última actualización: —</span>
+        <button type="button" id="btn-actualizar" class="btn-accion">
+          Actualizar datos
+        </button>
+        <button type="button" id="btn-toggle-moodle-nav" class="btn-accion btn-secundario">
+          Mostrar Configuración de Actividad
+        </button>
+      </div>
+    </div>
+
+    <!-- Overlay de Carga -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+      <div class="spinner"></div>
+      <div id="loading-text" class="loading-text">Cargando datos...</div>
+    </div>
+
+    <!-- Panel de Filtros -->
+    <div class="tarjeta-filtro">
+      <h4 style="margin-top: 0; margin-bottom: 16px; color: hsl(168, 60%, 25%); font-size: 14px; font-weight: 700; border-bottom: 1px solid #e3e6f0; padding-bottom: 8px;">
+        🔍 Panel de Filtros
+      </h4>
+      <div class="grilla-filtros">
+        <!-- Filtro por Estado de Encuesta (Excluyentes) -->
+        <div class="grupo-filtro">
+          <label for="filtro-estado-encuesta">Estado de Encuesta</label>
+          <select id="filtro-estado-encuesta" class="control-filtro">
+            <option value="todos">Todos los alumnos</option>
+            <option value="sin-inicial">Sin Encuesta Inicial</option>
+            <option value="sin-cuatrimestral">Sin Encuesta Cuatrimestral</option>
+            <option value="sin-ninguna">Sin Ninguna Encuesta</option>
+            <option value="desercion">En Estado de Deserción</option>
+            <option value="completaron-ambas">Completaron ambas encuestas</option>
+            <option value="inicial-no-cuatrimestral">Completo Inicial y No cuatrimetral</option>
+            <option value="cuatrimestral-no-inicial">Completo Cuatrimestral y No inicial</option>
+          </select>
+          <div id="explicacion-desercion" style="display: none; font-size: 11px; color: #666; margin-top: 6px; line-height: 1.3;">
+            Según la configuración del sistema, se consideran en deserción a los alumnos con más de <strong id="val-cuat-desercion">2</strong> cuatrimestres (<strong id="val-dias-desercion">360</strong> días) sin completar la encuesta cuatrimestral.
+          </div>
+        </div>
+
+        <!-- Filtro por Cooldown de Contactos (Combinable) -->
+        <div class="grupo-filtro">
+          <label style="display: flex; align-items: center; gap: 6px;">
+            <input type="checkbox" id="chk-cooldown" style="margin: 0; transform: scale(1.05);">
+            <span>Ignorar contactados recientemente</span>
+          </label>
+          <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
+            <input type="number" id="num-cooldown-dias" class="control-filtro" min="1" value="7" style="width: 70px;">
+            <span style="font-size: 13px; color: #555;">días de margen</span>
+          </div>
+        </div>
+
+        <!-- Filtro por Búsqueda de Texto -->
+        <div class="grupo-filtro">
+          <label for="filtro-buscar">Buscar por nombre o correo</label>
+          <input type="text" id="filtro-buscar" class="control-filtro" placeholder="Escribe nombre o correo..." autocomplete="off">
+        </div>
+      </div>
+      
+      <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+        <button type="button" id="btn-limpiar-filtros" class="btn-accion btn-secundario" style="height: 34px; font-size: 12px; padding: 0 16px;">
+          Limpiar Filtros
+        </button>
+      </div>
+    </div>
+
+    <!-- Acciones de Selección y Mensajería -->
+    <div class="barra-acciones-tabla">
+      <div style="display: flex; gap: 8px;">
+        <button type="button" id="btn-seleccionar-todos" class="btn-accion btn-secundario">
+          Seleccionar Todos
+        </button>
+        <button type="button" id="btn-deseleccionar-todos" class="btn-accion btn-secundario">
+          Deseleccionar Todos
+        </button>
+      </div>
+      <div>
+        <button type="button" id="btn-abrir-mensaje" class="btn-accion" disabled>
+          Enviar mensaje a seleccionados (0)
+        </button>
+      </div>
+    </div>
+
+    <!-- Listado Paginado de Estudiantes -->
+    <div class="tarjeta-dashboard" style="position: relative;">
+      <div class="tabla-responsiva">
+        <table class="tabla-dashboard" id="tabla-estudiantes">
+          <thead>
+            <tr>
+              <th style="width: 40px; text-align: center;"></th>
+              <th style="width: 60px; text-align: center;">Foto</th>
+              <th>Nombre Completo</th>
+              <th>Correo</th>
+              <th>Estado Encuestas</th>
+              <th>Último Contacto</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-estudiantes-tbody">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 48px; color: #777;">
+                Cargando datos desde Moodle...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Fila de Paginación -->
+      <div class="row-paginacion" id="paginacion-container">
+        <!-- Dinámico -->
+      </div>
+    </div>
+
+    <!-- Footer Fijado de Totales -->
+    <div class="footer-totales">
+      <div class="footer-contenido">
+        <span>Total en lista: <strong id="total-alumnos-tabla">0</strong></span>
+        <span style="margin: 0 16px; color: #ccc;">|</span>
+        <span>Seleccionados: <strong id="total-seleccionados-tabla">0</strong></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal para Redactar Mensaje Masivo / Individual -->
+<div id="modal-mensaje" class="modal-wrapper" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-titulo-accion">Enviar Mensaje</h3>
+      <button type="button" id="btn-modal-cerrar" class="modal-close-btn">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Indicación del destinatario(s) -->
+      <div id="modal-info-destinatario" style="margin-bottom: 16px; padding: 12px; background: #e8f8f0; border-radius: 6px; font-weight: 600; font-size: 13px; color: hsl(168, 60%, 20%); border: 1px solid #b7e4c7;">
+        Se enviará un mensaje a 0 alumnos seleccionados.
+      </div>
+      
+      <!-- Herramientas de Redacción (Insertar Variable) -->
+      <div style="margin-bottom: 8px; display: flex; justify-content: flex-start;">
+        <button type="button" id="btn-insertar-nombre" class="btn-accion btn-secundario" style="height: 32px; font-size: 12px; padding: 0 12px; display: inline-flex; align-items: center; gap: 4px;">
+          👤 Insertar Nombre Alumno
+        </button>
+      </div>
+
+      <!-- Editor Editable para soporte de badges no-modificables -->
+      <div style="margin-bottom: 16px;">
+        <label for="editor-mensaje" style="font-weight: 600; margin-bottom: 6px; display: block; font-size: 13px; color: #555;">
+          Redacta el mensaje:
+        </label>
+        <div id="editor-mensaje" contenteditable="true" class="editor-contenteditable" placeholder="Escribe aquí tu mensaje u orientación para los alumnos..."></div>
+        <p style="margin: 4px 0 0 0; font-size: 11px; color: #777;">
+          El badge <span style="color: hsl(168, 60%, 35%); font-weight: bold; background: #e8f8f0; padding: 1px 4px; border-radius: 3px;">[Nombre Alumno]</span> se convertirá automáticamente en el primer nombre de cada alumno (ej: "Juan").
+        </p>
+      </div>
+
+      <!-- Estado del Envío / Barra de Progreso -->
+      <div id="seccion-progreso" style="display: none; margin-top: 16px; padding: 16px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e3e6f0;">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; color: #333; margin-bottom: 8px;">
+          <span id="texto-progreso-envio">Enviando mensajes...</span>
+          <span id="porcentaje-progreso-envio">0%</span>
+        </div>
+        <div class="contenedor-barra-progreso">
+          <div id="barra-progreso-llenado" class="llenado-barra-progreso" style="width: 0%;"></div>
+        </div>
+        <div id="detalle-progreso" style="font-size: 13px; color: #666; margin-top: 6px; font-family: monospace; max-height: 120px; overflow-y: auto;">
+          <!-- Mensajes de progreso de red -->
+        </div>
+      </div>
+
+      <div id="modal-error-mensaje" class="status-text text-danger" style="margin-top: 8px; display: none; font-size: 12px; font-weight: bold;"></div>
+    </div>
+    
+    <div class="modal-footer" id="modal-footer-botones">
+      <button type="button" id="btn-modal-cancelar" class="btn-accion btn-secundario">Cancelar</button>
+      <button type="button" id="btn-modal-enviar" class="btn-accion">Enviar Mensajes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ==========================================================
+  // ★ INYECCIÓN DINÁMICA DE CSS EVITANDO SANITIZACIÓN MOODLE ★
+  // ==========================================================
+  (function () {
+    const cssContent = `
+      #contenedor-tablero {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: #333;
+        background-color: #fcfcfc;
+        border: 1px solid #e3e6f0;
+        border-radius: 8px;
+        padding: 16px 16px 70px 16px;
+        margin: 0;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.05);
+        position: relative;
+      }
+      .cabecera-tablero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid hsl(168, 60%, 90%);
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .cabecera-acciones {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .tarjeta-dashboard {
+        background: white;
+        border: 1px solid #e3e6f0;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        margin-bottom: 20px;
+      }
+      .tarjeta-filtro {
+        background: white;
+        border: 1px solid #e3e6f0;
+        border-radius: 8px;
+        padding: 16px 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+        margin-bottom: 16px;
+      }
+      .grilla-filtros {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+      .grupo-filtro {
+        display: flex;
+        flex-direction: column;
+      }
+      .grupo-filtro label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 6px;
+        user-select: none;
+      }
+      .control-filtro {
+        padding: 8px 12px;
+        border: 1px solid #d1d3e2;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #333;
+        background-color: white;
+        height: 38px;
+        transition: border-color 0.15s ease;
+        box-sizing: border-box;
+      }
+      .control-filtro:focus {
+        outline: none;
+        border-color: hsl(168, 60%, 35%);
+      }
+      .btn-accion {
+        background: hsl(168, 60%, 35%);
+        color: white !important;
+        border: none;
+        padding: 8px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 6px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 38px;
+        transition: background 0.15s ease;
+        box-sizing: border-box;
+      }
+      .btn-accion:hover:not(:disabled) {
+        background: hsl(168, 60%, 28%);
+      }
+      .btn-accion:disabled {
+        background: #a5c7be;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+      .btn-accion.btn-secundario {
+        background: #f8f9fa !important;
+        color: #495057 !important;
+        border: 1px solid #d1d3e2 !important;
+      }
+      .btn-accion.btn-secundario:hover:not(:disabled) {
+        background: #e9ecef !important;
+        color: #333 !important;
+      }
+      .barra-acciones-tabla {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .tabla-responsiva {
+        overflow-x: auto;
+      }
+      .tabla-dashboard {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .tabla-dashboard th, .tabla-dashboard td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e3e6f0;
+        text-align: left;
+        vertical-align: middle;
+      }
+      .tabla-dashboard th {
+        background-color: #f8f9fa;
+        font-weight: 700;
+        color: #495057;
+        user-select: none;
+      }
+      .tabla-dashboard tr:hover {
+        background-color: #fcfcfc;
+      }
+      .user-pic-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .user-pic-wrapper img {
+        border-radius: 50%;
+        background-color: #eee;
+        object-fit: cover;
+      }
+      .iniciales-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 35px;
+        height: 35px;
+        background-color: hsl(168, 60%, 45%);
+        color: white;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 12px;
+      }
+      .badge-estado {
+        display: inline-block;
+        padding: 3px 8px;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 12px;
+        line-height: 1.3;
+        margin: 2px;
+      }
+      .badge-completado {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .badge-pendiente {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .badge-alerta {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+      }
+      .row-paginacion {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .botones-paginacion {
+        display: flex;
+        gap: 4px;
+      }
+      .page-btn {
+        padding: 6px 12px;
+        background: #f8f9fa;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        color: #333 !important;
+        transition: all 0.15s ease;
+      }
+      .page-btn.active {
+        background: hsl(168, 60%, 35%) !important;
+        color: white !important;
+        border-color: hsl(168, 60%, 35%) !important;
+      }
+      .page-btn:hover:not(.active):not(:disabled) {
+        background: #e9ecef;
+      }
+      .page-btn:disabled {
+        background: #f8f9fa !important;
+        color: #aaa !important;
+        border-color: #ddd !important;
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .footer-totales {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: hsl(168, 60%, 95%);
+        border-top: 2px solid hsl(168, 60%, 35%);
+        padding: 12px 20px;
+        box-shadow: 0 -4px 10px rgba(0,0,0,0.12);
+        z-index: 999;
+        box-sizing: border-box;
+      }
+      .footer-contenido {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        font-size: 13px;
+        color: hsl(168, 60%, 20%);
+      }
+      .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255,255,255,0.85);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        border-radius: 8px;
+        gap: 12px;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid hsl(168, 60%, 35%);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      .loading-text {
+        font-size: 14px;
+        font-weight: 700;
+        color: hsl(168, 60%, 25%);
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .modal-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      .modal-box {
+        background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .modal-header {
+        background: hsl(168, 60%, 35%);
+        color: white;
+        padding: 16px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: white;
+      }
+      .modal-close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+        opacity: 0.8;
+      }
+      .modal-close-btn:hover {
+        opacity: 1;
+      }
+      .modal-body {
+        padding: 20px;
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        border-top: 1px solid #eee;
+        padding: 16px 20px;
+        background-color: #f8f9fa;
+      }
+      .editor-contenteditable {
+        border: 1px solid #d1d3e2;
+        border-radius: 6px;
+        padding: 10px;
+        min-height: 130px;
+        font-family: inherit;
+        font-size: 13px;
+        outline: none;
+        background: white;
+        overflow-y: auto;
+        box-sizing: border-box;
+      }
+      .editor-contenteditable:focus {
+        border-color: hsl(168, 60%, 35%);
+      }
+      .editor-contenteditable[placeholder]:empty:before {
+        content: attr(placeholder);
+        color: #aaa;
+      }
+      .var-badge {
+        color: hsl(168, 60%, 35%) !important;
+        background-color: #e8f8f0;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid #b7e4c7;
+        display: inline-block;
+        margin: 0 3px;
+        user-select: none;
+      }
+      .contenedor-barra-progreso {
+        width: 100%;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        height: 10px;
+        overflow: hidden;
+      }
+      .llenado-barra-progreso {
+        height: 100%;
+        background-color: hsl(168, 60%, 35%);
+        transition: width 0.15s ease;
+      }
+      #detalle-progreso .text-danger, #detalle-progreso .text-success {
+        font-size: 13px !important;
+        font-weight: bold !important;
+        font-family: inherit !important;
+      }
+      .text-danger { color: #c0392b; }
+      .text-success { color: #27ae60; }
+    `;
+    const styleTag = document.createElement("style");
+    styleTag.textContent = cssContent;
+    document.head.appendChild(styleTag);
+  })();
+
+  // ==========================================================
+  // ★ CONFIGURACIÓN DEL SISTEMA MOODLE (BASE DE DATOS CONFIG) ★
+  // ==========================================================
+  // ==========================================================
+  const CONFIG_DB_CMID = 54785;  // CMID fijo de la DB "Db Config" en Moodle
+  const CONFIG_DB_ID = 17;       // DATAID fijo de la DB "Db Config" en Moodle
+  // ==========================================================
+
+  // Configuración en memoria con valores por defecto (se descargarán de Moodle)
+  let systemConfig = {
+    urls: {
+      base: window.location.origin,
+      curso_id: null,
+      cmids: {
+        encuesta_inicial: null,
+        encuesta_cuatrimestral: null,
+        db_control_encuestas: null
+      },
+      dataids: {
+        db_control_encuestas: null
+      }
+    },
+    umbrales: {
+      cuatrimestres_desercion: 2,
+      cooldown_control_encuestas_dias: 7,
+      historico_delay_ms: 500,
+      page_size_paneles: 30
+    }
+  };
+
+  // Clave de sesión del aula de Moodle
+  const sesskey = window.M?.cfg?.sesskey || document.querySelector('input[name="sesskey"]')?.value || "";
+
+  // Estado global en memoria
+  let listadoAlumnosCurso = [];       // Todos los alumnos del scraping de Moodle
+  let registrosControlCooldown = new Map(); // id_alumno -> { rid, fechaDate, fechaText, detalle }
+  let alumnosCalculados = [];        // Alumnos con sus cruces de datos y estados de encuesta calculados
+  let alumnosSeleccionados = new Set(); // IDs de alumnos seleccionados
+  
+  // Paginación y Filtrado
+  let paginaActual = 1;
+  let filtroEstadoEncuesta = "todos";
+  let cooldownActivo = false;
+  let cooldownDias = 7;
+  let busquedaTexto = "";
+
+  // ==========================================================
+  // ★ INICIALIZACIÓN DIRECTA DEL TABLERO ★
+  // ==========================================================
+  iniciarTableroControl();
+
+  // ==========================================================
+  // ★ FUNCIONES DE NEGOCIO Y PETICIONES DE DATOS ★
+  // ==========================================================
+
+  // Limpia JSON con caracteres Unicode no separables
+  function limpiarYParsearJSON(textoCrudo) {
+    if (!textoCrudo) return null;
+    let limpio = textoCrudo.replace(/<[^>]*>/g, "");
+    limpio = limpio.replace(/&nbsp;/g, " ").replace(/&quot;/g, '"');
+    limpio = limpio.replace(/\u00a0/g, " "); // Limpieza de espacios Unicode
+    limpio = limpio.replace(/\s+/g, " ").trim();
+    try {
+      return JSON.parse(limpio);
+    } catch (e) {
+      console.error("Fallo al parsear JSON:", textoCrudo, e);
+      return null;
+    }
+  }
+
+  // Muestra/Oculta overlay de carga
+  function alternarCarga(visible, mensaje = "Cargando...") {
+    const overlay = document.getElementById("loading-overlay");
+    const texto = document.getElementById("loading-text");
+    if (overlay && texto) {
+      texto.textContent = mensaje;
+      overlay.style.display = visible ? "flex" : "none";
+    }
+  }
+
+  // Formatea el nombre completo del alumno al primer nombre capitalizado
+  function formatearNombrePila(nombreCompleto) {
+    if (!nombreCompleto) return "";
+    const primeraPalabra = nombreCompleto.trim().split(/\s+/)[0];
+    if (!primeraPalabra) return "";
+    return primeraPalabra.charAt(0).toUpperCase() + primeraPalabra.slice(1).toLowerCase();
+  }
+
+  // Escapa cadenas para evitar inyecciones HTML en renderizados
+  function escaparHTML(texto) {
+    return String(texto || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Parsea formatos de fecha procedentes de exportaciones de Moodle
+  function parsearFechaMoodle(fechaStr) {
+    if (!fechaStr) return new Date(0);
+    try {
+      const limpio = fechaStr.replace(/de/g, "").replace(/,/g, "").replace(/\s+/g, " ").trim();
+      const partes = limpio.split(" ");
+      let indexDia = 0;
+      while (indexDia < partes.length && isNaN(parseInt(partes[indexDia], 10))) {
+        indexDia++;
+      }
+      if (indexDia >= partes.length) return new Date(fechaStr);
+
+      const dia = parseInt(partes[indexDia], 10);
+      const mesTexto = partes[indexDia + 1].toLowerCase();
+      const anio = parseInt(partes[indexDia + 2], 10);
+      const horasMin = partes[indexDia + 3] ? partes[indexDia + 3].split(":") : [0, 0];
+
+      const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+      const mesesAbreviados = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+
+      let indexMes = meses.indexOf(mesTexto);
+      if (indexMes === -1) indexMes = mesesAbreviados.indexOf(mesTexto.substring(0, 3));
+      if (indexMes === -1) return new Date(fechaStr);
+
+      return new Date(anio, indexMes, dia, parseInt(horasMin[0] || 0, 10), parseInt(horasMin[1] || 0, 10));
+    } catch (e) {
+      console.warn("Excepción al parsear fecha de Moodle:", fechaStr, e);
+      return new Date(fechaStr);
+    }
+  }
+
+  // Carga la configuración principal desde la base de datos "Db Config" de Moodle
+  async function cargarConfiguracionMoodle() {
+    try {
+      const respuesta = await fetch(`${window.location.origin}/mod/data/view.php?d=${CONFIG_DB_ID}`);
+      if (respuesta.ok) {
+        const html = await respuesta.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const entradas = doc.querySelectorAll(".defaulttemplate-listentry, .defaulttemplate-single, .card, .generaltable td");
+        let jsonEncontrado = null;
+
+        for (let entrada of entradas) {
+          const textoLimpio = entrada.textContent.replace(/\u00a0/g, " ").replace(/&nbsp;/g, " ").trim();
+          const match = textoLimpio.match(/\{[\s\S]*\}/);
+          if (match) {
+            const parseado = limpiarYParsearJSON(match[0]);
+            if (parseado && (parseado.urls || parseado.umbrales || parseado.encuesta_inicial)) {
+              jsonEncontrado = parseado;
+              break;
+            }
+          }
+        }
+
+        if (jsonEncontrado) {
+          systemConfig = jsonEncontrado;
+          console.log("Configuración cargada con éxito desde DB Moodle:", systemConfig);
+        } else {
+          console.warn("No se encontró JSON válido de configuración en DB Moodle. Usando fallbacks.");
+        }
+      }
+    } catch (e) {
+      console.error("Excepción durante la carga de la configuración de Moodle:", e);
+    }
+    
+    // Sincronizar UI con valores de configuración cargados
+    cooldownDias = systemConfig.umbrales.cooldown_control_encuestas_dias || 7;
+    document.getElementById("num-cooldown-dias").value = cooldownDias;
+  }
+
+  // Parser robusto de CSV (RFC 4180) para procesar las exportaciones de las encuestas
+  function parsearCSV(textoRaw) {
+
+    const lineas = [];
+    let columna = "";
+    let linea = [];
+    let dentroComillas = false;
+    let i = 0;
+    const len = textoRaw.length;
+
+    while (i < len) {
+      const char = textoRaw[i];
+      if (dentroComillas) {
+        if (char === '"') {
+          if (i + 1 < len && textoRaw[i + 1] === '"') {
+            columna += '"';
+            i += 2;
+          } else {
+            dentroComillas = false;
+            i++;
+          }
+        } else {
+          columna += char;
+          i++;
+        }
+      } else {
+        if (char === '"') {
+          dentroComillas = true;
+          i++;
+        } else if (char === ',') {
+          linea.push(columna);
+          columna = "";
+          i++;
+        } else if (char === '\r') {
+          linea.push(columna);
+          columna = "";
+          lineas.push(linea);
+          linea = [];
+          if (i + 1 < len && textoRaw[i + 1] === '\n') i++;
+          i++;
+        } else if (char === '\n') {
+          linea.push(columna);
+          columna = "";
+          lineas.push(linea);
+          linea = [];
+          i++;
+        } else {
+          columna += char;
+          i++;
+        }
+      }
+    }
+
+    if (columna !== "" || linea.length > 0) {
+      linea.push(columna);
+      if (linea.some(col => col.trim() !== "")) lineas.push(linea);
+    }
+
+    if (lineas.length === 0) return [];
+    const cabeceras = lineas[0].map(c => c.trim());
+
+    return lineas.slice(1)
+      .filter(l => l.some(c => c.trim() !== ""))
+      .map(l => Object.fromEntries(
+        cabeceras.map((cab, idx) => [cab, (l[idx] ?? "").trim()])
+      ));
+  }
+
+  // Scraping paginado de participantes en Moodle
+  async function descargarAlumnosCurso() {
+    let pagina = 0;
+    const listadoAlumnos = [];
+    const idsVistos = new Set();
+    const cursoId = systemConfig.urls.curso_id;
+    if (!cursoId) {
+      throw new Error("No se ha configurado el ID del curso (curso_id) en Moodle.");
+    }
+    
+    while (true) {
+      const url = `${window.location.origin}/user/index.php?id=${cursoId}&page=${pagina}&perpage=5000&group=0`;
+      const respuesta = await fetch(url);
+      if (!respuesta.ok) break;
+      
+      const htmlText = await respuesta.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlText, "text/html");
+      
+      const tabla = doc.getElementById("participants");
+      if (!tabla) break;
+      
+      const filas = tabla.querySelectorAll("tbody tr");
+      if (filas.length === 0) break;
+      
+      let nuevosEnPagina = 0;
+      
+      for (let fila of filas) {
+        if (fila.classList.contains("emptyrow")) continue;
+        
+        // REQUISITO EXPLICITO: Solo integrantes del curso cuyo rol sea "Estudiante" o "Profesor"
+        const rolTexto = fila.querySelector(".c3")?.textContent || "";
+        const esEstudiante = rolTexto.includes("Estudiante");
+        const esProfesor = rolTexto.includes("Profesor");
+        if (!esEstudiante && !esProfesor) continue;
+        
+        const celdaEmail = fila.querySelector(".c2");
+        const email = celdaEmail?.textContent?.trim();
+        if (!email) continue;
+        
+        const enlaceNombre = fila.querySelector(".c1 a");
+        let nombreCompleto = "";
+        if (enlaceNombre) {
+          const clon = enlaceNombre.cloneNode(true);
+          clon.querySelectorAll(".userinitials, img, .sr-only").forEach(el => el.remove());
+          nombreCompleto = clon.textContent.trim();
+        }
+        
+        const urlPerfil = enlaceNombre?.getAttribute("href") || "";
+        const matchId = urlPerfil.match(/id=(\d+)/);
+        const idAlumno = matchId ? matchId[1] : null;
+        
+        if (!idAlumno || idsVistos.has(idAlumno)) continue;
+        
+        idsVistos.add(idAlumno);
+        nuevosEnPagina++;
+        
+        const imgEl = fila.querySelector("img.userpicture");
+        const avatarHtml = imgEl 
+          ? `<div class="user-pic-wrapper">${imgEl.outerHTML}</div>` 
+          : `<div class="iniciales-avatar">${escaparHTML(nombreCompleto.substring(0, 2).toUpperCase())}</div>`;
+        
+        listadoAlumnos.push({
+          id: idAlumno,
+          nombre: nombreCompleto,
+          email: email,
+          avatarHtml: avatarHtml,
+          urlPerfil: urlPerfil
+        });
+      }
+      
+      if (nuevosEnPagina === 0) break;
+      pagina++;
+    }
+    return listadoAlumnos;
+  }
+
+  // Descarga y parsea la base de datos de control de cooldowns en Moodle
+  async function descargarRegistrosControl() {
+    const dataid = systemConfig.urls.dataids?.db_control_encuestas;
+    if (!dataid) {
+      throw new Error("No se ha configurado el ID de la base de datos de control de encuestas en Moodle.");
+    }
+    const urlControl = `${window.location.origin}/mod/data/view.php?d=${dataid}&perpage=1000`;
+    const respuesta = await fetch(urlControl);
+    const mapaRegistros = new Map();
+    
+    if (!respuesta.ok) {
+      console.warn("No se pudo descargar registros de control de la base de datos.");
+      return mapaRegistros;
+    }
+    
+    const htmlText = await respuesta.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlText, "text/html");
+    const entradas = Array.from(doc.querySelectorAll(".defaulttemplate-listentry, .defaulttemplate-single"));
+    
+    entradas.forEach(entrada => {
+      // Buscar el ID del registro Moodle (rid) en el enlace de borrar
+      let rid = null;
+      const enlaceBorrar = entrada.querySelector("a[href*='delete=']");
+      if (enlaceBorrar) {
+        const match = enlaceBorrar.getAttribute("href").match(/delete=(\d+)/);
+        if (match) rid = match[1];
+      }
+      
+      let idAlumno = null;
+      let detalle = "";
+      
+      const normalizar = (str) => str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      
+      entrada.querySelectorAll(".row, div").forEach(fila => {
+        const labelEl = fila.querySelector(".font-weight-bold, span");
+        if (labelEl) {
+          const texto = normalizar(labelEl.textContent);
+          let val = "";
+          const valEl = fila.querySelector(".col-8, .col-lg-9, p.mt-2, .data-field-html");
+          if (valEl) val = valEl.textContent.trim();
+          else if (labelEl.nextElementSibling) val = labelEl.nextElementSibling.textContent.trim();
+          
+          if (texto.includes("id_alumno") || texto.includes("id alumno") || texto.includes("alumno")) {
+            idAlumno = val.trim();
+          } else if (texto.includes("detalle")) {
+            detalle = val.trim();
+          }
+        }
+      });
+      
+      const timeEl = entrada.querySelector(".data-timeinfo span[title]");
+      const fechaTexto = timeEl ? timeEl.getAttribute("title") : (entrada.querySelector(".data-timeinfo")?.textContent?.trim() || "");
+      const fechaDate = parsearFechaMoodle(fechaTexto);
+      
+      if (idAlumno) {
+        const existente = mapaRegistros.get(idAlumno);
+        // Mantener el registro más reciente en caso de duplicados
+        if (!existente || fechaDate > existente.fechaDate) {
+          mapaRegistros.set(idAlumno, {
+            rid: rid,
+            idAlumno: idAlumno,
+            detalle: detalle,
+            fechaText: fechaTexto,
+            fechaDate: fechaDate
+          });
+        }
+      }
+    });
+    
+    return mapaRegistros;
+  }
+
+  // Descarga todos los conjuntos de datos en paralelo
+  async function actualizarDatosTablero() {
+    alternarCarga(true, "Descargando datos y encuestas desde Moodle...");
+    try {
+      // Intentar cargar config primero para asegurar cmids y dataids
+      await cargarConfiguracionMoodle();
+
+      const cmidInic = systemConfig.urls.cmids?.encuesta_inicial;
+      const cmidCuat = systemConfig.urls.cmids?.encuesta_cuatrimestral;
+      if (!cmidInic || !cmidCuat) {
+        throw new Error("No se han configurado los IDs de encuesta inicial o cuatrimestral en Moodle.");
+      }
+      
+      const urlCSVInicial = `${window.location.origin}/mod/feedback/show_entries.php?sesskey=${sesskey}&download=csv&id=${cmidInic}`;
+      const urlCSVCuatrimestral = `${window.location.origin}/mod/feedback/show_entries.php?sesskey=${sesskey}&download=csv&id=${cmidCuat}`;
+      
+      // DESCARGA PARALELA MEDIANTE PROMISE.ALL
+      const [alumnos, rawCSVInicial, rawCSVCuat, mapaControl] = await Promise.all([
+        descargarAlumnosCurso(),
+        fetch(urlCSVInicial).then(r => r.text()),
+        fetch(urlCSVCuatrimestral).then(r => r.text()),
+        descargarRegistrosControl()
+      ]);
+      
+      listadoAlumnosCurso = alumnos;
+      registrosControlCooldown = mapaControl;
+      
+      const csvInicial = parsearCSV(rawCSVInicial);
+      const csvCuat = parsearCSV(rawCSVCuat);
+      
+      // Función auxiliar para extraer el email de una fila del CSV de encuestas
+      const obtenerEmailCSV = (fila) => {
+        if (!fila) return "";
+        if (fila["Dirección de correo"]) return fila["Dirección de correo"].trim().toLowerCase();
+        if (fila["email"]) return fila["email"].trim().toLowerCase();
+        if (fila["Dirección de correo electrónico"]) return fila["Dirección de correo electrónico"].trim().toLowerCase();
+        
+        for (let clave of Object.keys(fila)) {
+          const claveNorm = clave.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          if (claveNorm.includes("email") || claveNorm.includes("correo") || claveNorm.includes("mail")) {
+            return fila[clave].trim().toLowerCase();
+          }
+        }
+        return "";
+      };
+
+      // Mapear los CSVs por email para agilizar cruces
+      const inicialPorEmail = new Map();
+      csvInicial.forEach(f => {
+        const correo = obtenerEmailCSV(f);
+        if (correo) inicialPorEmail.set(correo, f);
+      });
+
+      const cuatPorEmail = new Map();
+      csvCuat.forEach(f => {
+        const correo = obtenerEmailCSV(f);
+        if (correo) cuatPorEmail.set(correo, f);
+      });
+
+      // Procesar la información cruzada de cada alumno
+      alumnosCalculados = listadoAlumnosCurso.map(alumno => {
+        const correoKey = alumno.email.trim().toLowerCase();
+        const filaInic = inicialPorEmail.get(correoKey);
+        const filaCuat = cuatPorEmail.get(correoKey);
+        
+        const tieneInicial = filaInic !== undefined;
+        const tieneCuat = filaCuat !== undefined;
+        
+        let esDesertor = false;
+        let fechaCompletaCuat = null;
+        let fechaCompletaCuatText = "";
+        
+        if (tieneCuat) {
+          const fechaRaw = filaCuat["Período de envío"] || filaCuat["Completado"] || filaCuat["Fecha"] || "";
+          if (fechaRaw) {
+            fechaCompletaCuatText = fechaRaw;
+            fechaCompletaCuat = parsearFechaMoodle(fechaRaw);
+            
+            const diffDias = Math.ceil(Math.abs(new Date() - fechaCompletaCuat) / (1000 * 60 * 60 * 24));
+            const diasDesercion = (systemConfig.umbrales.cuatrimestres_desercion || 2) * 180;
+            
+            if (diffDias >= diasDesercion) {
+              esDesertor = true;
+            }
+          }
+        }
+
+        const registroCooldown = registrosControlCooldown.get(alumno.id);
+        
+        return {
+          ...alumno,
+          tieneInicial: tieneInicial,
+          tieneCuat: tieneCuat,
+          esDesertor: esDesertor,
+          fechaCuat: fechaCompletaCuat,
+          fechaCuatText: fechaCompletaCuatText,
+          contacto: registroCooldown || null
+        };
+      });
+
+      // Actualizar fecha en cabecera
+      const hoy = new Date();
+      document.getElementById("texto-actualizacion").textContent = `Última actualización: ${hoy.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: false })}`;
+      
+      // Limpiar selección previa
+      alumnosSeleccionados.clear();
+      
+      // Filtrar y renderizar
+      paginaActual = 1;
+      filtrarYRenderizarLista();
+      
+    } catch (e) {
+      console.error("Error al actualizar datos del tablero:", e);
+      alert(`Error al cargar datos desde Moodle: ${e.message}`);
+    } finally {
+      alternarCarga(false);
+    }
+  }
+
+  // ==========================================================
+  // ★ FILTRADO, RENDERIZADO Y PAGINACIÓN ★
+  // ==========================================================
+
+  function filtrarYRenderizarLista() {
+    const tbody = document.getElementById("tabla-estudiantes-tbody");
+    if (!tbody) return;
+
+    // Normalizar búsqueda
+    const normBuscar = busquedaTexto.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    // Filtrar lista en memoria
+    const alumnosFiltrados = alumnosCalculados.filter(alumno => {
+      // 1. Filtro por Estado de Encuesta
+      if (filtroEstadoEncuesta === "sin-inicial" && alumno.tieneInicial) return false;
+      if (filtroEstadoEncuesta === "sin-cuatrimestral" && alumno.tieneCuat) return false;
+      if (filtroEstadoEncuesta === "sin-ninguna" && (alumno.tieneInicial || alumno.tieneCuat)) return false;
+      if (filtroEstadoEncuesta === "desercion" && !alumno.esDesertor) return false;
+      if (filtroEstadoEncuesta === "completaron-ambas" && (!alumno.tieneInicial || !alumno.tieneCuat)) return false;
+      if (filtroEstadoEncuesta === "inicial-no-cuatrimestral" && (!alumno.tieneInicial || alumno.tieneCuat)) return false;
+      if (filtroEstadoEncuesta === "cuatrimestral-no-inicial" && (!alumno.tieneCuat || alumno.tieneInicial)) return false;
+
+      // 2. Filtro por Cooldown de Contacto
+      if (cooldownActivo && alumno.contacto) {
+        const diffDias = Math.ceil(Math.abs(new Date() - alumno.contacto.fechaDate) / (1000 * 60 * 60 * 24));
+        if (diffDias <= cooldownDias) return false;
+      }
+
+      // 3. Filtro por Búsqueda de Texto
+      if (normBuscar) {
+        const nombreNorm = alumno.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const emailNorm = alumno.email.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if (!nombreNorm.includes(normBuscar) && !emailNorm.includes(normBuscar)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    // Ordenar alfabéticamente por nombre
+    alumnosFiltrados.sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+
+    // Paginación
+    const tamanoPagina = systemConfig.umbrales.page_size_paneles || 30;
+    const totalResultados = alumnosFiltrados.length;
+    const paginasTotales = Math.ceil(totalResultados / tamanoPagina) || 1;
+
+    if (paginaActual > paginasTotales) paginaActual = paginasTotales;
+    if (paginaActual < 1) paginaActual = 1;
+
+    const indexInicio = (paginaActual - 1) * tamanoPagina;
+    const indexFin = Math.min(indexInicio + tamanoPagina, totalResultados);
+    const alumnosPagina = alumnosFiltrados.slice(indexInicio, indexFin);
+
+    // Actualizar Totales del Footer
+    document.getElementById("total-alumnos-tabla").textContent = totalResultados;
+    document.getElementById("total-seleccionados-tabla").textContent = alumnosSeleccionados.size;
+    
+    // Actualizar Botón de Envío
+    const btnMensaje = document.getElementById("btn-abrir-mensaje");
+    btnMensaje.textContent = `Enviar mensaje a seleccionados (${alumnosSeleccionados.size})`;
+    btnMensaje.disabled = alumnosSeleccionados.size === 0;
+
+    // Renderizar cuerpo de la tabla
+    if (alumnosPagina.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 48px; color: #777;">
+            No se encontraron alumnos que coincidan con los filtros aplicados.
+          </td>
+        </tr>
+      `;
+      document.getElementById("paginacion-container").innerHTML = "";
+      return;
+    }
+
+    tbody.innerHTML = alumnosPagina.map(alumno => {
+      const estaSeleccionado = alumnosSeleccionados.has(alumno.id);
+      
+      // Construir Badges de Encuesta
+      let htmlBadges = "";
+      if (alumno.tieneInicial) {
+        htmlBadges += `<span class="badge-estado badge-completado">Inicial: Sí</span>`;
+      } else {
+        htmlBadges += `<span class="badge-estado badge-pendiente">Inicial: No</span>`;
+      }
+
+      if (alumno.tieneCuat) {
+        if (alumno.esDesertor) {
+          htmlBadges += `<span class="badge-estado badge-alerta">Desertor (${Math.ceil(Math.abs(new Date() - alumno.fechaCuat) / (1000 * 60 * 60 * 24))} días sin responder)</span>`;
+        } else {
+          htmlBadges += `<span class="badge-estado badge-completado">Cuatrimestral: Sí</span>`;
+        }
+      } else {
+        htmlBadges += `<span class="badge-estado badge-pendiente">Cuatrimestral: No</span>`;
+      }
+
+      // Último Contacto
+      let infoContacto = `<span style="color:#aaa;">Sin registros</span>`;
+      if (alumno.contacto) {
+        infoContacto = `
+          <div style="font-size: 11px; line-height: 1.3;">
+            <strong style="color: hsl(168, 60%, 25%);">
+              ${(() => {
+                const partes = alumno.contacto.fechaText.split(",");
+                return partes.length >= 2 ? escaparHTML(partes[1].trim()) : escaparHTML(alumno.contacto.fechaText);
+              })()}
+            </strong><br>
+            <span style="color:#666;">${escaparHTML(alumno.contacto.detalle)}</span>
+          </div>
+        `;
+      }
+
+      return `
+        <tr id="tr-alumno-${alumno.id}" class="${estaSeleccionado ? 'table-active' : ''}">
+          <td style="text-align: center;">
+            <input type="checkbox" class="chk-alumno" data-id="${alumno.id}" ${estaSeleccionado ? 'checked' : ''} style="transform: scale(1.15); cursor: pointer;">
+          </td>
+          <td style="text-align: center;">
+            ${alumno.avatarHtml}
+          </td>
+          <td>
+            <a href="${escaparHTML(alumno.urlPerfil)}" target="_blank" style="font-weight: bold; color: hsl(168, 60%, 30%); text-decoration: none;">
+              ${escaparHTML(alumno.nombre.toUpperCase())}
+            </a>
+          </td>
+          <td>${escaparHTML(alumno.email)}</td>
+          <td>${htmlBadges}</td>
+          <td>${infoContacto}</td>
+        </tr>
+      `;
+    }).join("");
+
+    // Vincular Eventos de Checkbox
+    tbody.querySelectorAll(".chk-alumno").forEach(chk => {
+      chk.addEventListener("change", function () {
+        const id = this.getAttribute("data-id");
+        if (this.checked) {
+          alumnosSeleccionados.add(id);
+          document.getElementById(`tr-alumno-${id}`)?.classList.add("table-active");
+        } else {
+          alumnosSeleccionados.delete(id);
+          document.getElementById(`tr-alumno-${id}`)?.classList.remove("table-active");
+        }
+        
+        // Refrescar conteos
+        document.getElementById("total-seleccionados-tabla").textContent = alumnosSeleccionados.size;
+        btnMensaje.textContent = `Enviar mensaje a seleccionados (${alumnosSeleccionados.size})`;
+        btnMensaje.disabled = alumnosSeleccionados.size === 0;
+      });
+    });
+
+    // Renderizar Paginador
+    renderizarPaginador(totalResultados, paginasTotales, indexInicio, indexFin);
+  }
+
+  function renderizarPaginador(totalResultados, paginasTotales, indexInicio, indexFin) {
+    const container = document.getElementById("paginacion-container");
+    if (!container) return;
+
+    let html = `
+      <div style="font-size: 13px; color: #555;">
+        Mostrando <strong>${indexInicio + 1}</strong> a <strong>${indexFin}</strong> de <strong>${totalResultados}</strong> alumnos
+      </div>
+      <div class="botones-paginacion">
+        <button type="button" class="page-btn" id="btn-pag-prev" ${paginaActual === 1 ? 'disabled' : ''}>Anterior</button>
+    `;
+
+    // Generar páginas intermedias de forma inteligente si hay demasiadas
+    for (let i = 1; i <= paginasTotales; i++) {
+      if (paginasTotales > 6) {
+        if (i === 1 || i === paginasTotales || Math.abs(i - paginaActual) <= 1) {
+          html += `<button type="button" class="page-btn ${i === paginaActual ? 'active' : ''}" data-page="${i}">${i}</button>`;
+        } else if (i === 2 && paginaActual > 3) {
+          html += `<span style="padding: 4px 8px; color: #aaa;">...</span>`;
+        } else if (i === paginasTotales - 1 && paginaActual < paginasTotales - 2) {
+          html += `<span style="padding: 4px 8px; color: #aaa;">...</span>`;
+        }
+      } else {
+        html += `<button type="button" class="page-btn ${i === paginaActual ? 'active' : ''}" data-page="${i}">${i}</button>`;
+      }
+    }
+
+    html += `
+        <button type="button" class="page-btn" id="btn-pag-next" ${paginaActual === paginasTotales ? 'disabled' : ''}>Siguiente</button>
+      </div>
+    `;
+
+    container.innerHTML = html;
+
+    // Vincular Eventos
+    container.querySelector("#btn-pag-prev")?.addEventListener("click", () => {
+      if (paginaActual > 1) {
+        paginaActual--;
+        filtrarYRenderizarLista();
+      }
+    });
+
+    container.querySelector("#btn-pag-next")?.addEventListener("click", () => {
+      if (paginaActual < paginasTotales) {
+        paginaActual++;
+        filtrarYRenderizarLista();
+      }
+    });
+
+    container.querySelectorAll(".page-btn[data-page]").forEach(btn => {
+      btn.addEventListener("click", function () {
+        const pag = parseInt(this.getAttribute("data-page"), 10);
+        if (pag && pag !== paginaActual) {
+          paginaActual = pag;
+          filtrarYRenderizarLista();
+        }
+      });
+    });
+  }
+
+  // ==========================================================
+  // ★ GESTIÓN DE VARIABLES Y FORMATO DE MENSAJES ★
+  // ==========================================================
+
+  // Inyecta el span con clase var-badge en la posición actual del cursor dentro del contenteditable
+  function insertarVariableEnCursor(htmlBadge) {
+    const editor = document.getElementById("editor-mensaje");
+    editor.focus();
+
+    const seleccion = window.getSelection();
+    if (seleccion.rangeCount > 0) {
+      const rango = seleccion.getRangeAt(0);
+      
+      // Comprobar que el foco se encuentre realmente dentro de nuestro editor editable
+      if (editor.contains(rango.commonAncestorContainer)) {
+        rango.deleteContents();
+        
+        const contenedorAux = document.createElement("div");
+        contenedorAux.innerHTML = htmlBadge;
+        
+        const fragmento = document.createDocumentFragment();
+        let nodo, ultimoNodo;
+        while ((nodo = contenedorAux.firstChild)) {
+          ultimoNodo = fragmento.appendChild(nodo);
+        }
+        
+        rango.insertNode(fragmento);
+        
+        // Reposicionar el cursor inmediatamente después del badge inyectado
+        if (ultimoNodo) {
+          const nuevoRango = rango.cloneRange();
+          nuevoRango.setStartAfter(ultimoNodo);
+          nuevoRango.collapse(true);
+          seleccion.removeAllRanges();
+          seleccion.addRange(nuevoRango);
+        }
+        return;
+      }
+    }
+    // Fallback: Si no hay foco activo, inyectar el código al final del contenido
+    editor.innerHTML += htmlBadge;
+  }
+
+  // Convierte el contenido enriquecido del contenteditable a texto plano adaptado al alumno
+  function serializarMensajeParaAlumno(editorDiv, nombreCompletoAlumno) {
+    const clon = editorDiv.cloneNode(true);
+    const nombrePila = formatearNombrePila(nombreCompletoAlumno) || "Alumno";
+
+    // Reemplazar todos los badges de variable por el nombre real del estudiante
+    clon.querySelectorAll(".var-badge").forEach(badge => {
+      badge.replaceWith(document.createTextNode(nombrePila));
+    });
+
+    // Recorrer los nodos del DOM para generar los saltos de línea de forma robusta
+    let textoSalida = "";
+    const recorrerNodos = (nodo) => {
+      if (nodo.nodeType === Node.TEXT_NODE) {
+        textoSalida += nodo.nodeValue;
+      } else if (nodo.nodeType === Node.ELEMENT_NODE) {
+        const tag = nodo.tagName.toLowerCase();
+        if (tag === "br") {
+          textoSalida += "\n";
+        } else if (tag === "div" || tag === "p") {
+          if (textoSalida && !textoSalida.endsWith("\n")) {
+            textoSalida += "\n";
+          }
+          Array.from(nodo.childNodes).forEach(recorrerNodos);
+          if (!textoSalida.endsWith("\n")) {
+            textoSalida += "\n";
+          }
+        } else {
+          Array.from(nodo.childNodes).forEach(recorrerNodos);
+        }
+      }
+    };
+
+    Array.from(clon.childNodes).forEach(recorrerNodos);
+    return textoSalida.trim();
+  }
+
+  // ==========================================================
+  // ★ MAPEO DINÁMICO DE CAMPOS EN BD Moodle (COOLDOWN) ★
+  // ==========================================================
+  async function obtenerMapeoCamposControl() {
+    const dataid = systemConfig.urls.dataids?.db_control_encuestas;
+    if (!dataid) {
+      throw new Error("No se ha configurado el ID de la base de datos de control de encuestas en Moodle.");
+    }
+    const urlForm = `${window.location.origin}/mod/data/edit.php?d=${dataid}`;
+    const respuesta = await fetch(urlForm, { credentials: "include" });
+    if (!respuesta.ok) throw new Error("No se pudo descargar el formulario de creación de control de encuestas");
+    
+    const htmlText = await respuesta.text();
+    const docForm = new DOMParser().parseFromString(htmlText, "text/html");
+    const mapeoCampos = { id_alumno: null, detalle: null };
+    const normalizar = (str) => str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    // 1. Intentar mapear a través de las etiquetas "label[for]"
+    docForm.querySelectorAll("label[for]").forEach(label => {
+      const texto = normalizar(label.textContent);
+      const inputEl = docForm.getElementById(label.getAttribute("for")) || docForm.querySelector(`[name="${label.getAttribute("for")}"]`);
+      if (inputEl) {
+        const campoName = inputEl.getAttribute("name");
+        if (campoName) {
+          if (texto.includes("id_alumno") || texto.includes("id alumno") || texto.includes("alumno")) {
+            mapeoCampos.id_alumno = campoName;
+          } else if (texto.includes("detalle")) {
+            mapeoCampos.detalle = campoName;
+          }
+        }
+      }
+    });
+
+    // 2. Intentar mapear mediante la estructura de contenedores fitem/form-group
+    if (!mapeoCampos.id_alumno || !mapeoCampos.detalle) {
+      docForm.querySelectorAll("#defaulttemplate-addentry > div, .form-group, .fitem, .mb-3").forEach(fila => {
+        const label = fila.querySelector(".font-weight-bold, label, .col-form-label");
+        if (label) {
+          const texto = normalizar(label.textContent);
+          const input = fila.querySelector("input[name], textarea[name], select[name]");
+          if (input) {
+            const campoName = input.getAttribute("name");
+            if (campoName) {
+              if (texto.includes("id_alumno") || texto.includes("id alumno") || texto.includes("alumno")) {
+                mapeoCampos.id_alumno = campoName;
+              } else if (texto.includes("detalle")) {
+                mapeoCampos.detalle = campoName;
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Fallbacks duros por si falla el análisis dinámico (acorde al HTML analizado)
+    if (!mapeoCampos.id_alumno) mapeoCampos.id_alumno = "field_86";
+    if (!mapeoCampos.detalle) mapeoCampos.detalle = "field_87";
+
+    return { docForm, mapeoCampos };
+  }
+
+  // Mapea y prepara FormData al estilo nativo de Moodle
+  function construirMoodleFormData(docForm, valoresCampos) {
+    const formData = new FormData();
+    const inputs = docForm.querySelectorAll("input, textarea, select");
+    
+    inputs.forEach(input => {
+      const name = input.getAttribute("name");
+      if (!name) return;
+      if (input.type === "submit" || input.type === "button") return;
+      if ((input.type === "checkbox" || input.type === "radio") && !input.checked) return;
+      const val = input.value || input.getAttribute("value") || "";
+      formData.set(name, val);
+    });
+    
+    for (let key in valoresCampos) {
+      if (valoresCampos[key] !== undefined && valoresCampos[key] !== null) {
+        formData.set(key, valoresCampos[key]);
+      }
+    }
+    
+    const submitBtn = docForm.querySelector('input[type="submit"]');
+    if (submitBtn && submitBtn.name) {
+      formData.set(submitBtn.name, submitBtn.value || "Guardar");
+    } else {
+      formData.set("saveandview", "Guardar");
+    }
+    return formData;
+  }
+
+  // Verifica que el guardado en Moodle haya sido exitoso (no debe retornar el form de edición)
+  async function verificarGuardadoMoodle(response, alumnoNombre) {
+    const textoHtml = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(textoHtml, "text/html");
+    const tieneForm = doc.querySelector('form#mform1, form[action*="edit.php"]') !== null;
+    const errorEl = doc.querySelector('.errormsg, .error, .alert-danger');
+    if (tieneForm) {
+      let mensaje = "El formulario se recargó tras el envío (posible error de firma o validación).";
+      if (errorEl) {
+        mensaje += ` Detalle: ${errorEl.textContent.trim()}`;
+      }
+      console.warn(`[REGISTRO FALLIDO] Guardado en base de datos Moodle falló para ${alumnoNombre}:`, mensaje);
+      return { success: false, error: mensaje };
+    }
+    return { success: true };
+  }
+
+  // ==========================================================
+  // ★ COLA DE ENVÍO DE MENSAJES Y REGISTROS DE COOLDOWN ★
+  // ==========================================================
+  async function iniciarEnvioDeMensajes() {
+    const editor = document.getElementById("editor-mensaje");
+    const divError = document.getElementById("modal-error-mensaje");
+    const btnEnviar = document.getElementById("btn-modal-enviar");
+    const btnCancelar = document.getElementById("btn-modal-cancelar");
+    const seccionProgreso = document.getElementById("seccion-progreso");
+    const barProgreso = document.getElementById("barra-progreso-llenado");
+    const txtProgreso = document.getElementById("texto-progreso-envio");
+    const porcProgreso = document.getElementById("porcentaje-progreso-envio");
+    const detProgreso = document.getElementById("detalle-progreso");
+    
+    divError.style.display = "none";
+    detProgreso.innerHTML = "";
+
+    const htmlContenido = editor.innerHTML.trim();
+    if (!htmlContenido || editor.textContent.trim() === "") {
+      divError.textContent = "Por favor, escribe un mensaje válido.";
+      divError.style.display = "block";
+      return;
+    }
+
+    // Alumnos seleccionados
+    const seleccionados = alumnosCalculados.filter(a => alumnosSeleccionados.has(a.id));
+    if (seleccionados.length === 0) {
+      divError.textContent = "No hay ningún alumno seleccionado para el envío.";
+      divError.style.display = "block";
+      return;
+    }
+
+    // Bloquear controles y mostrar barra de progreso
+    btnEnviar.disabled = true;
+    btnCancelar.disabled = true;
+    seccionProgreso.style.display = "block";
+
+    const totalEnvios = seleccionados.length;
+    let exitos = 0;
+    let fallos = 0;
+
+    const delay = systemConfig.umbrales.historico_delay_ms || 500;
+    const dataid = systemConfig.urls.dataids?.db_control_encuestas;
+    if (!dataid) {
+      throw new Error("No se ha configurado el ID de la base de datos de control de encuestas en Moodle.");
+    }
+
+    try {
+      // 1. Descargar formulario de creación de control una sola vez
+      txtProgreso.textContent = "Preparando estructura del formulario de Moodle...";
+      const { docForm, mapeoCampos } = await obtenerMapeoCamposControl();
+
+      // 2. Loop secuencial de envíos respetando el delay
+      for (let index = 0; index < totalEnvios; index++) {
+        const alumno = seleccionados[index];
+        const porcentaje = Math.round((index / totalEnvios) * 100);
+        
+        txtProgreso.textContent = `Enviando a: ${alumno.nombre} (${index + 1} de ${totalEnvios})`;
+        barProgreso.style.width = `${porcentaje}%`;
+        porcProgreso.textContent = `${porcentaje}%`;
+        
+        // Redactar mensaje personalizado
+        const mensajePersonalizado = serializarMensajeParaAlumno(editor, alumno.nombre);
+
+        let pasoExito = true;
+        let logDetalle = `Alumno: ${alumno.nombre}\n`;
+
+        try {
+          // A) Enviar Mensaje por Chat Interno de Moodle
+          const payload = [{
+            index: 0,
+            methodname: "core_message_send_instant_messages",
+            args: {
+              messages: [{
+                touserid: parseInt(alumno.id, 10),
+                text: mensajePersonalizado
+              }]
+            }
+          }];
+
+          const msgRes = await fetch(`${window.location.origin}/lib/ajax/service.php?sesskey=${sesskey}&info=core_message_send_instant_messages`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            credentials: "include"
+          });
+
+          if (msgRes.ok) {
+            const resJson = await msgRes.json();
+            if (resJson[0] && resJson[0].error) {
+              console.warn("Moodle reportó error de chat interno:", resJson[0].exception);
+              logDetalle += `  ⚠️ Advertencia Chat: ${resJson[0].message || "Fallo interno"}\n`;
+            } else {
+              logDetalle += `  ✓ Mensaje de chat enviado.\n`;
+            }
+          } else {
+            console.warn("Error de red al enviar el mensaje de chat.");
+            logDetalle += `  ⚠️ Advertencia Chat: Fallo de red.\n`;
+          }
+
+          // B) Eliminar Registro previo de Cooldown si existe
+          if (alumno.contacto && alumno.contacto.rid) {
+            const deleteForm = new FormData();
+            deleteForm.append("d", dataid.toString());
+            deleteForm.append("delete", alumno.contacto.rid);
+            deleteForm.append("confirm", "1");
+            deleteForm.append("sesskey", sesskey);
+            
+            await fetch(`${window.location.origin}/mod/data/view.php`, {
+              method: "POST",
+              body: deleteForm,
+              credentials: "include",
+              redirect: "manual"
+            });
+            logDetalle += `  ✓ Registro de cooldown anterior eliminado (rid: ${alumno.contacto.rid}).\n`;
+          }
+
+          // C) Registrar nueva entrada en Base de Datos de Control (Cooldown)
+          const camposValores = {};
+          camposValores[mapeoCampos.id_alumno] = alumno.id;
+          camposValores[mapeoCampos.detalle] = "Mensaje enviado";
+
+          const formDataMoodle = construirMoodleFormData(docForm, camposValores);
+          const postLogRes = await fetch(`${window.location.origin}/mod/data/edit.php`, {
+            method: "POST",
+            body: formDataMoodle,
+            credentials: "include"
+          });
+
+          const testResult = await verificarGuardadoMoodle(postLogRes, alumno.nombre);
+          if (!testResult.success) {
+            throw new Error(`Fallo guardado Moodle: ${testResult.error}`);
+          }
+          logDetalle += `  ✓ Cooldown actualizado correctamente.\n`;
+
+        } catch (errorPaso) {
+          console.error("Fallo durante el proceso para el alumno:", alumno.nombre, errorPaso);
+          pasoExito = false;
+          logDetalle += `  ❌ Error: ${errorPaso.message}\n`;
+        }
+
+        // Registrar detalle en consola visual del modal
+        const logLine = document.createElement("div");
+        logLine.style.marginBottom = "4px";
+        if (pasoExito) {
+          exitos++;
+          logLine.innerHTML = `<span class="text-success">[ÉXITO]</span> ${escaparHTML(alumno.nombre)}`;
+        } else {
+          fallos++;
+          logLine.innerHTML = `<span class="text-danger">[FALLO]</span> ${escaparHTML(alumno.nombre)}`;
+        }
+        detProgreso.appendChild(logLine);
+        detProgreso.scrollTop = detProgreso.scrollHeight;
+
+        // Esperar el delay obligatorio asíncrono
+        if (index < totalEnvios - 1) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+
+      // Finalización del proceso
+      barProgreso.style.width = "100%";
+      porcProgreso.textContent = "100%";
+      txtProgreso.textContent = "Proceso de envío terminado.";
+      
+      const resumenDiv = document.createElement("div");
+      resumenDiv.style.marginTop = "8px";
+      resumenDiv.style.fontWeight = "bold";
+      resumenDiv.innerHTML = `Resultados: <span class="text-success">${exitos} exitosos</span>, <span class="text-danger">${fallos} fallos</span>.`;
+      detProgreso.appendChild(resumenDiv);
+      detProgreso.scrollTop = detProgreso.scrollHeight;
+
+      // Habilitar botón para cerrar el modal
+      btnCancelar.disabled = false;
+      btnCancelar.textContent = "Cerrar";
+      
+    } catch (e) {
+      console.error("Fallo general en la cola de envío:", e);
+      divError.textContent = `Error crítico en el proceso: ${e.message}`;
+      divError.style.display = "block";
+      btnEnviar.disabled = false;
+      btnCancelar.disabled = false;
+    }
+  }
+
+  // ==========================================================
+  // ★ CONTROLADORES DE EVENTOS E INICIALIZACIÓN ★
+  // ==========================================================
+
+  function iniciarTableroControl() {
+    // 1. Vincular los filtros
+    document.getElementById("filtro-estado-encuesta").addEventListener("change", function () {
+      filtroEstadoEncuesta = this.value;
+      
+      // Control de visibilidad del mensaje de deserción según configuración
+      const expDesercion = document.getElementById("explicacion-desercion");
+      if (expDesercion) {
+        if (filtroEstadoEncuesta === "desercion") {
+          const cuatLimit = systemConfig.umbrales.cuatrimestres_desercion || 2;
+          const diasLimit = cuatLimit * 180;
+          document.getElementById("val-cuat-desercion").textContent = cuatLimit;
+          document.getElementById("val-dias-desercion").textContent = diasLimit;
+          expDesercion.style.display = "block";
+        } else {
+          expDesercion.style.display = "none";
+        }
+      }
+      
+      paginaActual = 1;
+      filtrarYRenderizarLista();
+    });
+
+    const chkCooldown = document.getElementById("chk-cooldown");
+    chkCooldown.addEventListener("change", function () {
+      cooldownActivo = this.checked;
+      paginaActual = 1;
+      filtrarYRenderizarLista();
+    });
+
+    const numCooldown = document.getElementById("num-cooldown-dias");
+    numCooldown.addEventListener("input", function () {
+      const val = parseInt(this.value, 10);
+      if (!isNaN(val) && val >= 1) {
+        cooldownDias = val;
+        if (cooldownActivo) {
+          paginaActual = 1;
+          filtrarYRenderizarLista();
+        }
+      }
+    });
+
+    document.getElementById("filtro-buscar").addEventListener("input", function () {
+      busquedaTexto = this.value;
+      paginaActual = 1;
+      filtrarYRenderizarLista();
+    });
+
+    document.getElementById("btn-limpiar-filtros").addEventListener("click", () => {
+      document.getElementById("filtro-estado-encuesta").value = "todos";
+      document.getElementById("chk-cooldown").checked = false;
+      document.getElementById("num-cooldown-dias").value = systemConfig.umbrales.cooldown_control_encuestas_dias || 7;
+      document.getElementById("filtro-buscar").value = "";
+      
+      filtroEstadoEncuesta = "todos";
+      
+      // Ocultar explicación de deserción al limpiar
+      const expDesercion = document.getElementById("explicacion-desercion");
+      if (expDesercion) expDesercion.style.display = "none";
+      
+      cooldownActivo = false;
+      cooldownDias = systemConfig.umbrales.cooldown_control_encuestas_dias || 7;
+      busquedaTexto = "";
+      
+      paginaActual = 1;
+      filtrarYRenderizarLista();
+    });
+
+    // 2. Eventos de Selección
+    document.getElementById("btn-seleccionar-todos").addEventListener("click", () => {
+      // Agregar todos los alumnos actualmente visibles (filtrados) a la selección
+      const normBuscar = busquedaTexto.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      
+      alumnosCalculados.forEach(alumno => {
+        if (filtroEstadoEncuesta === "sin-inicial" && alumno.tieneInicial) return;
+        if (filtroEstadoEncuesta === "sin-cuatrimestral" && alumno.tieneCuat) return;
+        if (filtroEstadoEncuesta === "sin-ninguna" && (alumno.tieneInicial || alumno.tieneCuat)) return;
+        if (filtroEstadoEncuesta === "desercion" && !alumno.esDesertor) return;
+        if (filtroEstadoEncuesta === "completaron-ambas" && (!alumno.tieneInicial || !alumno.tieneCuat)) return;
+        if (filtroEstadoEncuesta === "inicial-no-cuatrimestral" && (!alumno.tieneInicial || alumno.tieneCuat)) return;
+        if (filtroEstadoEncuesta === "cuatrimestral-no-inicial" && (!alumno.tieneCuat || alumno.tieneInicial)) return;
+
+        if (cooldownActivo && alumno.contacto) {
+          const diffDias = Math.ceil(Math.abs(new Date() - alumno.contacto.fechaDate) / (1000 * 60 * 60 * 24));
+          if (diffDias <= cooldownDias) return;
+        }
+
+        if (normBuscar) {
+          const nombreNorm = alumno.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          const emailNorm = alumno.email.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          if (!nombreNorm.includes(normBuscar) && !emailNorm.includes(normBuscar)) return;
+        }
+
+        alumnosSeleccionados.add(alumno.id);
+      });
+      
+      filtrarYRenderizarLista();
+    });
+
+    document.getElementById("btn-deseleccionar-todos").addEventListener("click", () => {
+      // Quitar de la selección todos los alumnos actualmente visibles
+      const normBuscar = busquedaTexto.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      alumnosCalculados.forEach(alumno => {
+        if (filtroEstadoEncuesta === "sin-inicial" && alumno.tieneInicial) return;
+        if (filtroEstadoEncuesta === "sin-cuatrimestral" && alumno.tieneCuat) return;
+        if (filtroEstadoEncuesta === "sin-ninguna" && (alumno.tieneInicial || alumno.tieneCuat)) return;
+        if (filtroEstadoEncuesta === "desercion" && !alumno.esDesertor) return;
+        if (filtroEstadoEncuesta === "completaron-ambas" && (!alumno.tieneInicial || !alumno.tieneCuat)) return;
+        if (filtroEstadoEncuesta === "inicial-no-cuatrimestral" && (!alumno.tieneInicial || alumno.tieneCuat)) return;
+        if (filtroEstadoEncuesta === "cuatrimestral-no-inicial" && (!alumno.tieneCuat || alumno.tieneInicial)) return;
+
+        if (cooldownActivo && alumno.contacto) {
+          const diffDias = Math.ceil(Math.abs(new Date() - alumno.contacto.fechaDate) / (1000 * 60 * 60 * 24));
+          if (diffDias <= cooldownDias) return;
+        }
+
+        if (normBuscar) {
+          const nombreNorm = alumno.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          const emailNorm = alumno.email.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          if (!nombreNorm.includes(normBuscar) && !emailNorm.includes(normBuscar)) return;
+        }
+
+        alumnosSeleccionados.delete(alumno.id);
+      });
+
+      filtrarYRenderizarLista();
+    });
+
+    // 3. Evento de Refresco
+    document.getElementById("btn-actualizar").addEventListener("click", () => {
+      actualizarDatosTablero();
+    });
+
+    // 4. Toggle Moodle navigation visibility
+    const btnToggleMoodle = document.getElementById("btn-toggle-moodle-nav");
+    if (btnToggleMoodle) {
+      btnToggleMoodle.addEventListener("click", function () {
+        const isHidden = document.body.classList.contains("hide-moodle-navigation");
+        if (isHidden) {
+          document.body.classList.remove("hide-moodle-navigation");
+          this.textContent = "Ocultar Configuración de Actividad";
+        } else {
+          document.body.classList.add("hide-moodle-navigation");
+          this.textContent = "Mostrar Configuración de Actividad";
+        }
+      });
+    }
+
+    // ==========================================================
+    // ★ MODAL Y CONTROL DE MENSAJERÍA ★
+    // ==========================================================
+    const modal = document.getElementById("modal-mensaje");
+    const editor = document.getElementById("editor-mensaje");
+    const btnAbrirModal = document.getElementById("btn-abrir-mensaje");
+    const btnCerrarModal = document.getElementById("btn-modal-cerrar");
+    const btnCancelarModal = document.getElementById("btn-modal-cancelar");
+    const btnEnviarModal = document.getElementById("btn-modal-enviar");
+    const btnInsertarVar = document.getElementById("btn-insertar-nombre");
+
+    const abrirModal = () => {
+      const totalSel = alumnosSeleccionados.size;
+      document.getElementById("modal-info-destinatario").textContent = `Se enviará un mensaje personalizado a ${totalSel} alumnos seleccionados.`;
+      
+      // Restablecer interfaz de progreso y errores
+      editor.innerHTML = "";
+      document.getElementById("modal-error-mensaje").style.display = "none";
+      document.getElementById("seccion-progreso").style.display = "none";
+      document.getElementById("barra-progreso-llenado").style.width = "0%";
+      document.getElementById("porcentaje-progreso-envio").textContent = "0%";
+      document.getElementById("texto-progreso-envio").textContent = "Enviando mensajes...";
+      document.getElementById("detalle-progreso").innerHTML = "";
+      
+      btnEnviarModal.disabled = false;
+      btnCancelarModal.disabled = false;
+      btnCancelarModal.textContent = "Cancelar";
+      
+      modal.style.display = "flex";
+    };
+
+    const cerrarModal = () => {
+      modal.style.display = "none";
+      // Si se completó el envío (botón cancelar dice "Cerrar"), refrescamos el tablero
+      if (btnCancelarModal.textContent === "Cerrar") {
+        actualizarDatosTablero();
+      }
+    };
+
+    btnAbrirModal.addEventListener("click", abrirModal);
+    btnCerrarModal.addEventListener("click", cerrarModal);
+    btnCancelarModal.addEventListener("click", cerrarModal);
+
+    btnInsertarVar.addEventListener("click", () => {
+      const htmlBadge = `<span class="var-badge" contenteditable="false">[Nombre Alumno]</span>&nbsp;`;
+      insertarVariableEnCursor(htmlBadge);
+    });
+
+    btnEnviarModal.addEventListener("click", iniciarEnvioDeMensajes);
+
+    // Carga inicial
+    actualizarDatosTablero();
+  }
+</script>

@@ -43,13 +43,36 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div id="tablero">
+<div id="pantalla-falsa">
+  <p style="font-size: 15px; color: #444; line-height: 1.8;"><strong>Página de
+      pruebaa Moodle</strong></p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Lorem ipsum dolor
+    sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+    exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
+    aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+    fugiat nulla pariatur.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Pellentesque
+    habitant morbi tristique senectus et netus et malesuada fames ac turpis
+    egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit
+    amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies
+    mi vitae est, et nunc <span id="btn-oculto"
+      style="cursor: text;">accumsan</span> vehicula nisi. Mauris placerat
+    eleifend leo, quisque sit amet est et sapien ullamcorper pharetra.</p>
+  <p style="font-size: 14px; color: #555; line-height: 1.8;">Curabitur pretium
+    tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis molestie
+    dictum semper, quam quam congue erat, vitae sodales nisi metus a nunc.
+    Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod sodales,
+    sollicitudin vel, wisi.</p>
+</div>
+
+<div id="tablero" style="display: none">
   <div id="dashboard-container">
     
     <div class="dashboard-header">
       <div>
         <h3 style="color: hsl(168, 60%, 35%) !important; margin-top: 0 !important; margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important;">
-          📊 Sistema de Seguimiento Estudiantil - Tablero de Control Principal
+          📊 Sistema de Seguimiento Estudiantil - Tablero de Control General
         </h3>
       </div>
       <div class="header-actions" style="display: flex; gap: 8px; align-items: center;">
@@ -134,14 +157,6 @@
               <option value="todos">Todos</option>
               <option value="si">Se percibe en riesgo</option>
               <option value="no">No se percibe</option>
-            </select>
-          </div>
-          <div class="filter-item">
-            <label for="filter-desertores">Filtro de Desertores</label>
-            <select id="filter-desertores" class="filter-input">
-              <option value="todos">Todos</option>
-              <option value="ocultar">Ocultar desertores</option>
-              <option value="solo">Mostrar solo desertores</option>
             </select>
           </div>
           <div class="filter-item" style="align-self: flex-end; display: flex; gap: 8px;">
@@ -479,25 +494,25 @@
           
           .bg-light-red {
             border-left: 4px solid #e74c3c;
-            background: white;
+            background: linear-gradient(145deg, #ffffff 60%, #fdf2f2 100%);
           }
           .color-red { color: #c0392b; }
           
           .bg-light-yellow {
             border-left: 4px solid #f39c12;
-            background: white;
+            background: linear-gradient(145deg, #ffffff 60%, #fef9eb 100%);
           }
           .color-yellow { color: #d35400; }
           
           .bg-light-green {
             border-left: 4px solid #2ecc71;
-            background: white;
+            background: linear-gradient(145deg, #ffffff 60%, #f4fbf7 100%);
           }
           .color-green { color: #16a085; }
           
           .bg-light-blue {
             border-left: 4px solid #3498db;
-            background: white;
+            background: linear-gradient(145deg, #ffffff 60%, #f4f9fd 100%);
           }
           .color-blue { color: #2980b9; }
           
@@ -654,15 +669,15 @@
             border-radius: 4px;
           }
 
-          .user-link, .user-link:visited {
+          .user-link {
             font-weight: 500;
-            color: #333 !important;
+            color: #333;
             text-decoration: none;
             transition: color 0.15s ease;
           }
           
-          .user-link:hover, .user-link:visited:hover {
-            color: hsl(168, 60%, 35%) !important;
+          .user-link:hover {
+            color: hsl(168, 60%, 35%);
             text-decoration: underline;
           }
           
@@ -995,6 +1010,13 @@
         document.head.appendChild(style);
       })();
 
+      // Revelado del tablero con click en accumsan
+      document.getElementById("btn-oculto").addEventListener("click", function () {
+        document.getElementById("pantalla-falsa").style.display = "none";
+        document.getElementById("tablero").style.display = "block";
+        initDashboard(); // Inicializar el dashboard al revelar
+      });
+
       // ==========================================================
       // ★ HELPERS DE CONEXIÓN CON MOODLE (FORMULARIOS Y FIRMAS) ★
       // ==========================================================
@@ -1034,28 +1056,44 @@
           if (errorEl) {
             errorMsg += ` Detalle: ${errorEl.textContent.trim()}`;
           }
+          console.warn(`[DEBUG] Guardado fallido para ${studentName || "el registro"}:`, errorMsg);
           return { success: false, error: errorMsg };
         }
         return { success: true };
       }
 
+
+
       // ==========================================================
-      // === CONFIGURACION GENERAL DE MOODLE (BASE DE DATOS CONFIG) ===
+      // ★ CONSTANTES DE CONFIGURACIÓN MOODLE (FALLBACK POR DEFECTO) ★
       // ==========================================================
       const CONFIG_DB_CMID = 54785;  // CMID de la base de datos "Db Config"
       const CONFIG_DB_ID = 17;       // DATAID de la base de datos "Db Config"
       const CURSO_ID = 1732;         // ID del aula / curso de Moodle
-      
-      // Constante para pruebas de guardado histórico (ej. "2025-1" o "2025-2"). Si es null, se calcula automáticamente.
-      const TEST_PERIODO_OVERRIDE = null;
 
       // Configuración en memoria con valores por defecto del archivo config_2.md
       let systemConfig = {
         urls: {
           base: window.location.origin,
           curso_id: CURSO_ID,
-          cmids: {},
-          dataids: {}
+          cmids: {
+            encuesta_inicial: 54062,
+            encuesta_cuatrimestral: 54284,
+            db_solicitudes: 54783,
+            db_logs: 54784,
+            db_historico: 54788,
+            db_1er_anio: 54789,
+            db_historico_1er_anio: 54791,
+            db_historico_general: 54862
+          },
+          dataids: {
+            db_solicitudes: 15,
+            db_logs: 16,
+            db_historico: 18,
+            db_1er_anio: 19,
+            db_historico_1er_anio: 20,
+            db_historico_general: 21
+          }
         },
         umbrales: {
           threshold_ird: 40,
@@ -1114,11 +1152,10 @@
         irdMin: null,
         irdMax: null,
         asistencia: "todos",
-        riesgoPerceb: "todos",
-        desertores: "todos"
+        riesgoPerceb: "todos"
       };
       let activeSort = {
-        column: "sePercibeRiesgo",
+        column: "ird",
         direction: "desc"
       };
 
@@ -1135,6 +1172,7 @@
         try {
           return JSON.parse(clean);
         } catch (e) {
+          console.error("Error al parsear JSON:", rawText, e);
           return null;
         }
       }
@@ -1155,37 +1193,9 @@
           const h = parts[3].split(":");
           return new Date(anio, mesIndex, dia, parseInt(h[0], 10), parseInt(h[1], 10)).getTime();
         } catch (e) {
+          console.error("Error al parsear fecha en UI:", str, e);
           return 0;
         }
-      }
-
-      // Formatea un timestamp, objeto Date o string de fecha de Moodle en formato dd/mm/aaaa
-      function formatDateToDMY(dateStrOrTs) {
-        if (!dateStrOrTs) return "—";
-        try {
-          const s = String(dateStrOrTs).trim();
-          if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) {
-            return s;
-          }
-          const ts = parseDate(s);
-          if (ts > 0) {
-            const d = new Date(ts);
-            const day = String(d.getDate()).padStart(2, "0");
-            const month = String(d.getMonth() + 1).padStart(2, "0");
-            const year = d.getFullYear();
-            return `${day}/${month}/${year}`;
-          }
-          const d = new Date(dateStrOrTs);
-          if (!isNaN(d.getTime())) {
-            const day = String(d.getDate()).padStart(2, "0");
-            const month = String(d.getMonth() + 1).padStart(2, "0");
-            const year = d.getFullYear();
-            return `${day}/${month}/${year}`;
-          }
-        } catch (e) {
-          console.error("Error al formatear fecha:", dateStrOrTs, e);
-        }
-        return dateStrOrTs;
       }
 
       // Parsea las entradas HTML de bases de datos
@@ -1199,6 +1209,7 @@
       function parseCSV(text) {
         const trimmedText = text.trimStart();
         if (trimmedText.startsWith("<!DOCTYPE") || trimmedText.startsWith("<html") || trimmedText.startsWith("<HTML")) {
+          console.error("parseCSV: La respuesta es HTML, no CSV. Moodle puede haber redirigido al login o devuelto un error.", trimmedText.substring(0, 300));
           return [];
         }
 
@@ -1318,26 +1329,45 @@
 
             if (foundJson) {
               systemConfig = foundJson;
+              console.log("Configuración cargada de la DB Moodle:", systemConfig);
             } else {
+              console.warn("No se encontró entrada de configuración válida en la DB. Usando fallback.");
               await loadFallbackConfig();
             }
           } else {
+            console.error("Error al obtener la configuración de la DB. Usando fallback.");
             await loadFallbackConfig();
           }
         } catch (e) {
+          console.error("Excepción al cargar config:", e);
           await loadFallbackConfig();
         }
       }
 
       // Carga configuración fallback
-      function loadFallbackConfig() {
+      async function loadFallbackConfig() {
+        try {
+          const response = await fetch(`${window.location.origin}/scripts/config_2.md`);
+          if (response.ok) {
+            let text = await response.text();
+            text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+            const parsed = parseCleanJSON(text);
+            if (parsed) {
+              systemConfig = parsed;
+              return;
+            }
+          }
+        } catch (e) {
+          console.error("No se pudo obtener fallback de config_2.md local, usando hardcodeado:", e);
+        }
+        
         // Configuración mínima hardcodeada
         systemConfig = {
           urls: {
             base: window.location.origin,
             curso_id: CURSO_ID,
-            cmids: {},
-            dataids: {}
+            cmids: { encuesta_inicial: 54062, encuesta_cuatrimestral: 54284, db_solicitudes: 54783, db_logs: 54784, db_historico: 54788, db_historico_general: 54862 },
+            dataids: { db_solicitudes: 15, db_logs: 16, db_historico: 18, db_historico_general: 21 }
           },
           umbrales: { threshold_ird: 40, threshold_ird_red: 80, cooldown_actualizar_seg: 30, quarterly_warning_days: 90, cuatrimestres_desercion: 2, page_size_paneles: 30 },
           encuesta_inicial: {
@@ -1553,22 +1583,14 @@
         const parseMoodleDate = (str) => {
           if (!str) return new Date(0);
           try {
-            // Input examples: "25 jun 2026, 15:30" or "miércoles, 25 de jun. de 2026, 15:30"
-            // After cleanup: "25 jun 2026 15:30" -> parts = ["25","jun","2026","15:30"]
-            const clean = str.replace(/de/g, "").replace(/,/g, "").replace(/\./g, "").replace(/\s+/g, " ").trim();
+            const clean = str.replace(/de/g, "").replace(/,/g, "").replace(/\s+/g, " ");
             const parts = clean.split(" ");
-            // Skip leading day-of-week word if not a number (e.g. "miercoles")
-            let offset = 0;
-            if (isNaN(parseInt(parts[0], 10))) offset = 1;
-            const dia = parseInt(parts[offset], 10);
-            const mesText = (parts[offset + 1] || "").toLowerCase();
-            const anio = parseInt(parts[offset + 2], 10);
-            const timePart = parts[offset + 3] || "0:0";
-            const horaParts = timePart.split(":");
+            const dia = parseInt(parts[1]);
+            const mesText = parts[2].toLowerCase();
+            const anio = parseInt(parts[3]);
+            const horaParts = parts[4].split(":");
             const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-            const mesIdx = meses.indexOf(mesText);
-            if (isNaN(dia) || mesIdx === -1 || isNaN(anio)) return new Date(str);
-            return new Date(anio, mesIdx, dia, parseInt(horaParts[0], 10) || 0, parseInt(horaParts[1], 10) || 0);
+            return new Date(anio, meses.indexOf(mesText), dia, parseInt(horaParts[0]), parseInt(horaParts[1]));
           } catch (e) { return new Date(str); }
         };
 
@@ -1678,16 +1700,27 @@
 
       // Procesa y realiza todos los cálculos
       async function updateDashboardData() {
+        console.log("=== INICIO DE ACTUALIZACIÓN DE DATOS DEL DASHBOARD ===");
+        console.time("Tiempo Total Actualización Dashboard");
         showLoading("Descargando datos del aula Moodle...");
         try {
           // 1. Obtener participantes en paginación
+          console.log("Descargando listado de participantes del aula Moodle...");
+          console.time("Obtención de Participantes Moodle");
           const { estudiantesMap, idToEstudiante } = await fetchParticipantes();
+          console.timeEnd("Obtención de Participantes Moodle");
+          console.log(`Participantes obtenidos: ${estudiantesMap.size} estudiantes.`);
           
           // 2. Realizar llamadas en paralelo
+          console.log("Descargando encuestas de feedback y bases de datos Moodle en paralelo...");
+          console.time("Descargas de Encuestas y DBs en Paralelo");
           const urlInicial = `${window.location.origin}/mod/feedback/show_entries.php?sesskey=${sesskey}&download=csv&id=${systemConfig.urls.cmids.encuesta_inicial}`;
           const urlCuat = `${window.location.origin}/mod/feedback/show_entries.php?sesskey=${sesskey}&download=csv&id=${systemConfig.urls.cmids.encuesta_cuatrimestral}`;
           const urlSolicitudes = `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_solicitudes}&perpage=1000`;
           const urlLogs = `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_logs}&perpage=1000`;
+          
+          console.log("[DEBUG] URL encuesta inicial:", urlInicial);
+          console.log("[DEBUG] URL encuesta cuatrimestral:", urlCuat);
           
           const [resInic, resCuat, resSoli, resLogs] = await Promise.all([
             fetch(urlInicial).then(r => r.text()),
@@ -1695,13 +1728,22 @@
             fetch(urlSolicitudes).then(r => r.text()),
             fetch(urlLogs).then(r => r.text())
           ]);
+          console.timeEnd("Descargas de Encuestas y DBs en Paralelo");
           
           // 3. Parsear
+          console.log("Parseando archivos CSV de encuestas y registros HTML...");
+          console.time("Parseo e Indexación de Datos");
+          // Diagnóstico: mostrar los primeros 300 chars del raw para detectar si Moodle devolvió HTML
+          console.log("[RAW] Inicio respuesta CSV Inicial:", resInic.substring(0, 300));
+          console.log("[RAW] Inicio respuesta CSV Cuatrimestral:", resCuat.substring(0, 300));
+          
           const csvInicial = parseCSV(resInic);
           const csvCuat = parseCSV(resCuat);
           const logsAsistencias = parseLogs(resLogs);
           logsHistorial = parseLogsHistorial(resLogs, idToEstudiante);
           solicitudesPendientes = parseSolicitudes(resSoli, idToEstudiante);
+          console.timeEnd("Parseo e Indexación de Datos");
+          console.log(`CSV Inicial: ${csvInicial.length} respuestas. CSV Cuatrimestral: ${csvCuat.length} respuestas. Logs asistencia: ${logsAsistencias.size} registros. Solicitudes de ayuda: ${solicitudesPendientes.length} pendientes.`);
           
           // Función auxiliar para extraer el email de una fila de encuesta de forma robusta
           function getEmailFromRow(row) {
@@ -1722,6 +1764,8 @@
             return "";
           }
 
+          console.log("Correos de los alumnos obtenidos del scraping de participantes de Moodle:", Array.from(estudiantesMap.keys()));
+
           // Mapear encuestas por email
           const mapInicialByEmail = new Map();
           csvInicial.forEach(row => {
@@ -1735,6 +1779,9 @@
             if (email) mapCuatByEmail.set(email.trim().toLowerCase(), row);
           });
 
+          console.log(`Mapeado de encuesta inicial: ${mapInicialByEmail.size} correos. Algunos ejemplos indexados:`, Array.from(mapInicialByEmail.keys()).slice(0, 5));
+          console.log(`Mapeado de encuesta cuatrimestral: ${mapCuatByEmail.size} correos. Algunos ejemplos indexados:`, Array.from(mapCuatByEmail.keys()).slice(0, 5));
+
           // 4. Calcular Zmax dinámicamente
           let Z_max = 0;
           [...systemConfig.encuesta_inicial.preguntas, ...systemConfig.encuesta_cuatrimestral.preguntas].forEach(p => {
@@ -1746,14 +1793,19 @@
           const computedAlumnos = [];
           
           // Iterar por todos los estudiantes encontrados en el campus
+          console.log("Iniciando procesamiento y cálculo del IRD para cada estudiante...");
+          console.time("Procesamiento de Estudiantes (IRD/Ralentización)");
           for (let [email, est] of estudiantesMap.entries()) {
             const emailKey = email.trim().toLowerCase();
             
             const rowInic = mapInicialByEmail.get(emailKey);
             const rowCuat = mapCuatByEmail.get(emailKey);
             
+            console.log(`Evaluando estudiante: ${est.nombre} (${emailKey}). Encuesta inicial completada: ${rowInic !== undefined}. Encuesta cuatrimestral completada: ${rowCuat !== undefined}`);
+            
             // Condición obligatoria: Debe haber completado ambas encuestas (inicial y cuatrimestral)
             if (!rowInic || !rowCuat) {
+              console.log(`Omitiendo estudiante ${est.nombre} por no haber completado ambas encuestas.`);
               continue;
             }
             
@@ -1972,7 +2024,6 @@
               sePercibeRiesgo: sePercibeRiesgo,
               ralentizacion: ralentizacion,
               anioIngreso: anioIngreso,
-              esDesertor: esDesertor,
               hasSolicitud: solicitudObj !== undefined,
               solicitudRid: solicitudObj ? solicitudObj.rid : null,
               solicitudText: solicitudObj ? solicitudObj.descripcion : "",
@@ -2015,12 +2066,21 @@
           // Actualizar hora de actualización
           lastUpdateDate = new Date();
           const formatDigits = (n) => n < 10 ? "0" + n : n;
-          document.getElementById("txt-last-update").textContent = `Última actualización: ${formatDigits(lastUpdateDate.getHours())}:${formatDigits(lastUpdateDate.getMinutes())}`;
+          document.getElementById("txt-last-update").textContent = `Última actualización: ${formatDigits(lastUpdateDate.getDate())}/${formatDigits(lastUpdateDate.getMonth()+1)}/${lastUpdateDate.getFullYear()} ${formatDigits(lastUpdateDate.getHours())}:${formatDigits(lastUpdateDate.getMinutes())}`;
           
           // Renderizar vistas
+          console.time("Renderizado de Tablero");
           renderDashboard();
+          console.timeEnd("Renderizado de Tablero");
+          
+          console.timeEnd("Procesamiento de Estudiantes (IRD/Ralentización)");
+          console.timeEnd("Tiempo Total Actualización Dashboard");
+          console.log("=== ACTUALIZACIÓN FINALIZADA CON ÉXITO ===");
           hideLoading();
         } catch (e) {
+          console.error("Error al actualizar los datos:", e);
+          try { console.timeEnd("Procesamiento de Estudiantes (IRD/Ralentización)"); } catch(err){}
+          try { console.timeEnd("Tiempo Total Actualización Dashboard"); } catch(err){}
           alert("Error al cargar los datos de Moodle. Por favor, verifica tu sesión o la base de datos.");
           hideLoading();
         }
@@ -2076,13 +2136,13 @@
 
           paginatedSol.forEach(({ req, studentObj }) => {
             const asistTooltip = studentObj && studentObj.ultimaAsistencia ? `${studentObj.ultimaAsistencia} (Por: ${studentObj.ultimoTutor})`.replace(/"/g, '&quot;') : "";
-            const lastAsistText = studentObj && studentObj.ultimaAsistencia ? `<div class="text-ellipsis" title="${asistTooltip}">${formatDateToDMY(studentObj.ultimaAsistencia)}</div>` : "—";
+            const lastAsistText = studentObj && studentObj.ultimaAsistencia ? `<div class="text-ellipsis" title="${asistTooltip}">${studentObj.ultimaAsistencia}</div>` : "—";
 
             reqTbody.innerHTML += `
               <tr>
                 <td>${req.avatarHtml}</td>
                 <td><a href="${window.location.origin}/user/view.php?id=${req.idAlumno}&course=${CURSO_ID}" target="_blank" class="user-link">${req.nombre}</a></td>
-                <td>${formatDateToDMY(req.fechaText)}</td>
+                <td>${req.fechaText}</td>
                 <td>${lastAsistText}</td>
                 <td style="font-style: italic;">"${req.descripcion || 'Sin mensaje adicional'}"</td>
                 <td style="text-align: center;"><button type="button" class="btn-action btn-table" onclick="abrirModalAsistencia('${req.idAlumno}', '${req.nombre}', 'Solicitud')">Asistir</button></td>
@@ -2127,7 +2187,7 @@
               <tr>
                 <td>${log.avatarHtml}</td>
                 <td><a href="${window.location.origin}/user/view.php?id=${log.idAlumno}&course=${CURSO_ID}" target="_blank" class="user-link">${log.nombre}</a></td>
-                <td>${formatDateToDMY(log.fechaText)}</td>
+                <td>${log.fechaText}</td>
                 <td>${log.tutor}</td>
                 <td>${log.origen}</td>
                 <td class="text-ellipsis" title="${msgAlumnoText.replace(/"/g, '&quot;')}">${msgAlumnoText}</td>
@@ -2200,50 +2260,46 @@
         else if (filters.asistencia === "sin_asistir") list = list.filter(a => !a.asistido);
         if (filters.riesgoPerceb === "si") list = list.filter(a => a.sePercibeRiesgo);
         else if (filters.riesgoPerceb === "no") list = list.filter(a => !a.sePercibeRiesgo);
-        if (filters.desertores === "ocultar") list = list.filter(a => !a.esDesertor);
-        else if (filters.desertores === "solo") list = list.filter(a => a.esDesertor);
 
         list.sort((a, b) => {
           const col = activeSort.column;
           const dir = activeSort.direction === "asc" ? 1 : -1;
 
-          // 1. Comparar por la columna seleccionada
+          // 1er criterio: Si se ordena por "sePercibeRiesgo", manda el valor y la dirección seleccionada
           if (col === "sePercibeRiesgo") {
             const riskA = a.sePercibeRiesgo ? 1 : 0;
             const riskB = b.sePercibeRiesgo ? 1 : 0;
             if (riskA !== riskB) {
-              return (riskA - riskB) * dir;
+              return (riskB - riskA) * -dir; // dir = -1 (desc) -> Sí arriba; dir = 1 (asc) -> No arriba
             }
-          } else if (col === "ird") {
+            // Desempate por IRD descendente
+            const irdA = a.IRD !== null ? a.IRD : -1;
+            const irdB = b.IRD !== null ? b.IRD : -1;
+            return irdB - irdA;
+          }
+
+          // Si se ordena por otra columna, el agrupamiento primario fija "Sí" arriba y "No" abajo
+          const riskA = a.sePercibeRiesgo ? 1 : 0;
+          const riskB = b.sePercibeRiesgo ? 1 : 0;
+          if (riskA !== riskB) {
+            return riskB - riskA; // Siempre los "Sí" arriba
+          }
+
+          // 2do criterio: Ordenar por la columna seleccionada
+          if (col === "ird") {
             const irdA = a.IRD !== null ? a.IRD : -1;
             const irdB = b.IRD !== null ? b.IRD : -1;
             if (irdA !== irdB) {
-              return (irdA - irdB) * dir;
-            }
-          } else if (col === "ralentizacion") {
-            const ralA = a.ralentizacion !== null ? a.ralentizacion : -1;
-            const ralB = b.ralentizacion !== null ? b.ralentizacion : -1;
-            if (ralA !== ralB) {
-              return (ralA - ralB) * dir;
-            }
-          } else if (col === "asistencia") {
-            const dateA = a.ultimaAsistencia ? parseDate(a.ultimaAsistencia) : 0;
-            const dateB = b.ultimaAsistencia ? parseDate(b.ultimaAsistencia) : 0;
-            if (dateA !== dateB) {
-              return (dateA - dateB) * dir;
-            }
-          } else if (col === "solicitud") {
-            const dateA = a.solicitudFecha ? parseDate(a.solicitudFecha) : 0;
-            const dateB = b.solicitudFecha ? parseDate(b.solicitudFecha) : 0;
-            if (dateA !== dateB) {
-              return (dateA - dateB) * dir;
+              return (irdA - irdB) * dir; // dir = 1 (asc) -> irdA-irdB; dir = -1 (desc) -> irdB-irdA
             }
           } else {
             let valA = a[col];
             let valB = b[col];
-            if (valA === null || valA === undefined) valA = "";
-            if (valB === null || valB === undefined) valB = "";
-            if (valA !== valB) {
+
+            // Nulos al final en cualquier dirección
+            if ((valA === null || valA === undefined) && (valB !== null && valB !== undefined)) return 1;
+            if ((valB === null || valB === undefined) && (valA !== null && valA !== undefined)) return -1;
+            if (valA !== valB && valA !== null && valA !== undefined && valB !== null && valB !== undefined) {
               if (typeof valA === "string") {
                 return valA.localeCompare(valB) * dir;
               }
@@ -2251,15 +2307,10 @@
             }
           }
 
-          // 2. Primer desempate: IRD descendente
+          // 3er criterio: Desempate universal por IRD descendente
           const irdA = a.IRD !== null ? a.IRD : -1;
           const irdB = b.IRD !== null ? b.IRD : -1;
-          if (irdA !== irdB) {
-            return irdB - irdA;
-          }
-
-          // 3. Segundo desempate: Nombre alfabético
-          return a.nombre.localeCompare(b.nombre);
+          return irdB - irdA;
         });
 
         const pageSize = systemConfig.umbrales.page_size_paneles || 30;
@@ -2299,8 +2350,8 @@
               else if (alumno.ralentizacion >= 40) colorClass = "badge-ralent-yellow";
               ralentText = `<span class="badge-ralent ${colorClass}">${alumno.ralentizacion}%</span>`;
             }
-            const asistText = alumno.ultimaAsistencia ? `<span title="Por ${alumno.ultimoTutor}">${formatDateToDMY(alumno.ultimaAsistencia)}</span>` : "—";
-            const reqText = alumno.solicitudFecha ? `<span title="${alumno.solicitudText}">${formatDateToDMY(alumno.solicitudFecha)}</span>` : "—";
+            const asistText = alumno.ultimaAsistencia ? `<span title="Por ${alumno.ultimoTutor}">${alumno.ultimaAsistencia.substring(0, 16)}</span>` : "—";
+            const reqText = alumno.solicitudFecha ? `<span title="${alumno.solicitudText}">${alumno.solicitudFecha.substring(0, 16)}</span>` : "—";
 
             const defaultOrigen = (alumno.solicitudFecha && (!alumno.ultimaAsistencia || parseDate(alumno.solicitudFecha) > parseDate(alumno.ultimaAsistencia))) ? 'Solicitud' : 'Proactivo';
             let btnAsistir = "";
@@ -2514,33 +2565,8 @@
       }
 
       async function initDashboard() {
-        try {
-          await loadDbConfig();
-          // Validar que se hayan cargado los IDs críticos del sistema
-          if (!systemConfig.urls.cmids || !systemConfig.urls.cmids.encuesta_inicial || !systemConfig.urls.dataids.db_solicitudes) {
-            throw new Error("No se encontraron los IDs de configuración obligatorios (cmids/dataids) en Moodle.");
-          }
-          await updateDashboardData();
-        } catch (error) {
-          showErrorState(error.message);
-        }
-      }
-
-      function showErrorState(message) {
-        hideLoading();
-        const container = document.getElementById("dashboard-container");
-        if (container) {
-          container.innerHTML = `
-            <div style="padding: 32px; text-align: center; color: #c0392b; background: #fdf2f2; border: 1px solid #fadbd8; border-radius: 8px; font-family: sans-serif; margin: 20px 0;">
-              <h3 style="margin-top: 0; color: #c0392b; font-size: 18px;">⚠️ Error de Configuración del Tablero</h3>
-              <p style="font-size: 14px; color: #78281f; margin-bottom: 20px; line-height: 1.5;">${message}</p>
-              <p style="font-size: 13px; color: #555; line-height: 1.5;">
-                Esto puede deberse a que no se pudo acceder o leer correctamente la base de datos de configuración general (Db Config d=17) en Moodle.
-                Por favor, asegúrate de que la actividad de base de datos de configuración exista y contenga el JSON de configuración válido.
-              </p>
-            </div>
-          `;
-        }
+        await loadDbConfig();
+        await updateDashboardData();
       }
 
       document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -2569,7 +2595,6 @@
         filters.irdMax = maxVal !== "" ? parseInt(maxVal) : null;
         filters.asistencia = document.getElementById("filter-asistencia").value;
         filters.riesgoPerceb = document.getElementById("filter-riesgo-perceb").value;
-        filters.desertores = document.getElementById("filter-desertores").value;
         currentPage = 1;
         renderDashboard();
       }
@@ -2579,7 +2604,6 @@
       document.getElementById("filter-ird-max").addEventListener("input", applyFilters);
       document.getElementById("filter-asistencia").addEventListener("change", applyFilters);
       document.getElementById("filter-riesgo-perceb").addEventListener("change", applyFilters);
-      document.getElementById("filter-desertores").addEventListener("change", applyFilters);
 
       document.getElementById("btn-clear-filters").addEventListener("click", () => {
         document.getElementById("filter-search").value = "";
@@ -2587,8 +2611,7 @@
         document.getElementById("filter-ird-max").value = "";
         document.getElementById("filter-asistencia").value = "todos";
         document.getElementById("filter-riesgo-perceb").value = "todos";
-        document.getElementById("filter-desertores").value = "todos";
-        filters = { search: "", irdMin: null, irdMax: null, asistencia: "todos", riesgoPerceb: "todos", desertores: "todos" };
+        filters = { search: "", irdMin: null, irdMax: null, asistencia: "todos", riesgoPerceb: "todos" };
         currentPage = 1;
         currentPageSol = 1;
         currentPageHist = 1;
@@ -2608,7 +2631,7 @@
             clearInterval(timer);
             btn.disabled = false;
             refreshCooldownActive = false;
-            btn.innerHTML = `Actualizar datos`;
+            btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Actualizar datos`;
           } else {
             btn.textContent = `Esperar ${cd}s`;
           }
@@ -2634,6 +2657,7 @@
       // ★ HISTÓRICO DE CUATRIMESTRES ★
       // ==========================================================
       async function guardarHistorico() {
+        console.log("=== INICIANDO GUARDADO DE HISTÓRICO ===");
         showLoading("Sincronizando base de datos histórica...");
         try {
           const urlHist = `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_historico}&perpage=1000`;
@@ -2684,6 +2708,8 @@
             }
           });
           
+          console.log(`Entradas históricas preexistentes cargadas: ${histEntradasMap.size}`);
+          
           const getFormRes = await fetch(`${window.location.origin}/mod/data/edit.php?d=${systemConfig.urls.dataids.db_historico}`);
           if (!getFormRes.ok) throw new Error("No se pudo obtener el formulario de creación histórica");
           const formHtml = await getFormRes.text();
@@ -2729,13 +2755,16 @@
           }
           
           if (!fieldsMapeo.email || !fieldsMapeo.historial) {
+            console.error("Campos mapeados detectados:", fieldsMapeo);
             throw new Error("No se pudo detectar dinámicamente el campo de Email o Historial en la base de datos de Moodle");
           }
 
           const hoy = new Date();
-          const periodoActual = TEST_PERIODO_OVERRIDE || `${hoy.getFullYear()}-${hoy.getMonth() <= 6 ? 1 : 2}`;
+          const periodoActual = `${hoy.getFullYear()}-${hoy.getMonth() <= 6 ? 1 : 2}`;
           
           let guardadosCount = 0, creadosCount = 0, editadosCount = 0;
+          
+          console.log(`Iniciando guardado de datos históricos para el periodo ${periodoActual}...`);
           
           for (let alumno of alumnosCalculados) {
             if (alumno.IRD === null) continue;
@@ -2749,6 +2778,7 @@
                 const parsed = parseCleanJSON(entradaExistente.historialText);
                 if (Array.isArray(parsed)) historial = parsed;
               } catch (e) {
+                console.warn("No se pudo parsear el historial previo del alumno:", emailKey, entradaExistente.historialText);
               }
             }
             
@@ -2763,6 +2793,8 @@
             else historial.push(registroPeriodo);
             
             const historialJsonText = JSON.stringify(historial);
+            
+            console.log(`[DEBUG] Mapeo de campos histórico para ${alumno.nombre}:`, fieldsMapeo);
             
             const formData = new FormData();
             formData.append("d", systemConfig.urls.dataids.db_historico.toString());
@@ -2783,7 +2815,14 @@
               });
             });
             
+            console.log(`[DEBUG LOG] Realizando POST a: ${window.location.origin}/mod/data/edit.php`);
+            console.log(`[DEBUG LOG] Datos enviados en FormData:`);
+            for (let pair of formData.entries()) {
+              console.log(`  - ${pair[0]}: ${typeof pair[1] === "string" ? pair[1].substring(0, 150) : pair[1]}`);
+            }
+            
             const postRes = await fetch(`${window.location.origin}/mod/data/edit.php`, { method: "POST", body: formData, credentials: "include" });
+            console.log(`[DEBUG LOG] Respuesta recibida de POST: Estado = ${postRes.status}, Tipo = ${postRes.type}`);
             const isSuccess = postRes.status === 200 || postRes.status === 303 || postRes.type === "opaqueredirect";
             
             if (!isSuccess) {
@@ -2800,8 +2839,10 @@
             
             await new Promise(r => setTimeout(r, systemConfig.umbrales.historico_delay_ms || 300));
           }
+          console.log(`Sincronización histórica finalizada. Guardados: ${guardadosCount}.`);
           alert(`Histórico guardado correctamente.\nTotal procesados: ${guardadosCount} alumnos (Nuevos: ${creadosCount}, Actualizados: ${editadosCount}) para el periodo ${periodoActual}.`);
         } catch (error) {
+          console.error("Error al guardar el histórico en Moodle:", error);
           alert(`Error al guardar histórico: ${error.message}`);
         } finally {
           hideLoading();
@@ -2809,12 +2850,13 @@
       }
 
       async function guardarHistoricoGeneral() {
+        console.log("=== INICIANDO GUARDADO DE HISTÓRICO GENERAL ===");
         try {
           const parser = new DOMParser();
           const hoy = new Date();
           const anioActual = hoy.getFullYear();
           const cuatActual = hoy.getMonth() <= 6 ? 1 : 2;
-          const periodoActual = TEST_PERIODO_OVERRIDE || `${anioActual}-${cuatActual}`;
+          const periodoActual = `${anioActual}-${cuatActual}`;
           const fechaHoy = `${String(hoy.getDate()).padStart(2, "0")}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${hoy.getFullYear()}`;
           const dataid = (systemConfig.urls.dataids.db_historico_general) || 21;
 
@@ -2844,63 +2886,26 @@
           const docHist = parser.parseFromString(await resHist.text(), "text/html");
 
           let existingRid = null;
-          const entriesList = docHist.querySelectorAll(".defaulttemplate-listentry, .defaulttemplate-single, .card, .generaltable tr");
-
-          entriesList.forEach((entry, idx) => {
-            let rid = null;
-            const actionLinks = entry.querySelectorAll("a[href*='rid='], a[href*='delete='], a[href*='approve=']");
-            for (let link of actionLinks) {
-              const match = link.getAttribute("href").match(/(?:rid|delete|approve)=(\d+)/);
-              if (match) { rid = match[1]; break; }
-            }
-            if (!rid) {
-              const match = entry.innerHTML.match(/[?&](?:rid|delete|approve)=(\d+)/);
-              if (match) rid = match[1];
-            }
-            if (!rid) return;
-
-            let coincidePeriodo = false;
-            const elements = entry.querySelectorAll(".row, div, td, span, p");
-            elements.forEach(el => {
-              const text = el.textContent.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-              if (text.includes("cuatrimestre")) {
-                if (text.includes(periodoActual.toLowerCase())) {
-                  coincidePeriodo = true;
-                } else {
-                  const nextText = el.nextElementSibling ? el.nextElementSibling.textContent.trim() : "";
-                  if (nextText === periodoActual) {
-                    coincidePeriodo = true;
-                  }
+          docHist.querySelectorAll(".defaulttemplate-listentry").forEach(entry => {
+            entry.querySelectorAll(".row").forEach(row => {
+              const lbl = row.querySelector(".font-weight-bold");
+              const val = row.querySelector(".col-8, .col-lg-9");
+              if (lbl && val && lbl.textContent.trim().toLowerCase() === "cuatrimestre" && val.textContent.trim() === periodoActual) {
+                for (let link of entry.querySelectorAll("a[href*='delete=']")) {
+                  const m = link.getAttribute("href").match(/delete=(\d+)/);
+                  if (m) { existingRid = m[1]; break; }
                 }
               }
             });
-
-            if (!coincidePeriodo) {
-              const cleanText = entry.textContent.replace(/\s+/g, " ").trim();
-              if (cleanText.includes(periodoActual)) {
-                const normClean = cleanText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                if (normClean.includes("cuatrimestre") && normClean.includes(periodoActual.toLowerCase())) {
-                  coincidePeriodo = true;
-                }
-              }
-            }
-
-            if (coincidePeriodo) {
-              existingRid = rid;
-            }
           });
 
-          // Always fetch the BLANK form (no rid in query string) to get field names and submit button.
-          // Moodle returns 404 when rid is included in the GET query for edit.php.
-          // The rid for editing is passed only in the FormData body of the POST request.
           const formUrl = `${window.location.origin}/mod/data/edit.php?d=${dataid}`;
-          const formHtmlRes = await fetch(formUrl);
-          if (!formHtmlRes.ok) throw new Error("No se pudo obtener el formulario de edición en " + formUrl);
-          const docForm = parser.parseFromString(await formHtmlRes.text(), "text/html");
+          const docForm = parser.parseFromString(await (await fetch(formUrl)).text(), "text/html");
 
-          let fCuatrimestre = null, fFecha = null, fDatos = null;
+          let fCuatrimestre = null, fFecha = null, fDatos = null, fDatosItemid = null;
           docForm.querySelectorAll('input[name^="field_"], textarea[name^="field_"]').forEach(el => {
             const name = el.getAttribute("name") || "";
+            if (name.endsWith("_itemid")) { fDatosItemid = el.getAttribute("value"); return; }
             if (!/^field_\d+$/.test(name)) return;
             if (el.tagName === "TEXTAREA") { fDatos = name; return; }
             const id = el.getAttribute("id");
@@ -2910,8 +2915,8 @@
               let p = el.parentElement;
               for (let i = 0; i < 5 && p; i++) { const lb = p.querySelector(".font-weight-bold"); if (lb) { labelText = lb.textContent; break; } p = p.parentElement; }
             }
-            const norm = labelText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-            if (norm.includes("cuatrimestre")) fCuatrimestre = name;
+            const norm = labelText.toLowerCase().trim();
+            if (norm === "cuatrimestre") fCuatrimestre = name;
             else if (norm.includes("fecha")) fFecha = name;
           });
 
@@ -2919,49 +2924,21 @@
 
           const formData = new FormData();
           formData.append("d", String(dataid));
-          // rid is sent in the FormData body (not in the query string) to tell Moodle to update the existing entry
           if (existingRid) formData.append("rid", existingRid);
           formData.append("sesskey", sesskey);
+          formData.append("saveandview", "Guardar");
+          formData.append(fCuatrimestre, periodoActual);
+          if (fFecha) formData.append(fFecha, fechaHoy);
+          if (fDatosItemid) formData.append(fDatos + "_itemid", fDatosItemid);
+          formData.append(fDatos, datosJson);
+          formData.append(fDatos + "_content1", "1");
+
+          const postRes = await fetch(`${window.location.origin}/mod/data/edit.php`, { method: "POST", body: formData, credentials: "include", redirect: "manual" });
+          if (!postRes.ok && postRes.type !== "opaqueredirect") throw new Error("Error HTTP al guardar histórico general: " + postRes.status);
           
-          const submitBtn = docForm.querySelector('input[type="submit"]');
-          if (submitBtn) formData.append(submitBtn.name ? submitBtn.name : "saveandview", submitBtn.value || "Guardar");
-          else formData.append("saveandview", "Guardar");
-
-          const camposAEnviar = {
-            [fCuatrimestre]: periodoActual,
-            [fDatos]: datosJson
-          };
-          if (fFecha) camposAEnviar[fFecha] = fechaHoy;
-
-          // Populate the FormData with the fields to submit, including all auxiliary inputs like itemid, format, etc.
-          Object.entries(camposAEnviar).forEach(pair => {
-            formData.append(pair[0], pair[1]);
-            docForm.querySelectorAll('[name^="' + pair[0] + '_"]').forEach(input => {
-              const subName = input.getAttribute("name");
-              if (subName) {
-                formData.append(subName, input.value || "");
-              }
-            });
-          });
-
-          // POST always goes to base edit.php — rid is passed in FormData body (not query string)
-          const postUrl = `${window.location.origin}/mod/data/edit.php`;
-          const postRes = await fetch(postUrl, { method: "POST", body: formData, credentials: "include" });
-          
-          const postText = await postRes.text();
-          const docErr = new DOMParser().parseFromString(postText, "text/html");
-          const errorEl = docErr.querySelector('.errormsg, .error, .alert-danger, .notifyproblem');
-          if (errorEl) {
-            console.error("Error de validación de Moodle detectado en la respuesta HTML:", errorEl.textContent.trim());
-            throw new Error("Moodle devolvió un error de validación: " + errorEl.textContent.trim());
-          }
-
-          if (!postRes.ok && postRes.type !== "opaqueredirect") {
-            throw new Error("Error HTTP al guardar histórico general: " + postRes.status);
-          }
+          console.log(`[Histórico General] ${existingRid ? "Actualizado" : "Creado"} para periodo ${periodoActual}. KPIs: alto=${altoRiesgo}, medio=${medioRiesgo}, bajo=${bajoRiesgo}, solicitudes_atendidas=${solicAtendidas}, asistencias_proactivas=${asistProactivas}`);
         } catch (error) {
-          console.error("Error al guardar histórico general:", error);
-          throw new Error("No se pudo guardar la información del cuatrimestre. Detalle: " + error.message);
+          console.error("Error al guardar el histórico general:", error);
         }
       }
 
@@ -3077,7 +3054,14 @@
             });
           });
 
+          // Agregar logs detallados antes de POST de asistencia
+          console.log("[DEBUG LOG - Asistencia] Registrando en d=" + systemConfig.urls.dataids.db_logs);
+          for (let pair of formData.entries()) {
+            console.log("  - " + pair[0] + ": " + pair[1]);
+          }
+
           const postLogRes = await fetch(window.location.origin + "/mod/data/edit.php", { method: "POST", body: formData, credentials: "include" });
+          console.log("[DEBUG LOG - Asistencia] Respuesta de POST: Estado = " + postLogRes.status + ", Tipo = " + postLogRes.type);
           
           const isSuccessLog = postLogRes.status === 200 || postLogRes.status === 303 || postLogRes.type === "opaqueredirect";
           
@@ -3095,6 +3079,7 @@
           const verify = await verifyMoodlePost(postLogRes, activeStudentName);
           if (!verify.success) throw new Error(verify.error);
 
+          console.log("[DEBUG disapprove] origen:", origen, "| studentObj id:", studentObj?.id, "| solicitudRid:", studentObj?.solicitudRid, "| solicitudesPendientes rids:", solicitudesPendientes.map(s => s.idAlumno + "=" + s.rid));
           if (origen === "Solicitud" && studentObj && studentObj.solicitudRid) {
             showLoading("Borrando solicitud atendida...");
             const deleteForm = new FormData();
@@ -3103,6 +3088,11 @@
             deleteForm.append("confirm", "1");
             deleteForm.append("sesskey", sesskey);
             const deleteRes = await fetch(window.location.origin + "/mod/data/view.php", { method: "POST", body: deleteForm, credentials: "include", redirect: "manual" });
+            if (!deleteRes.ok && deleteRes.type !== "opaqueredirect") {
+              console.warn("[DEBUG disapprove] Error al borrar la solicitud, rid:", studentObj.solicitudRid, "status:", deleteRes.status);
+            } else {
+              console.log("[DEBUG disapprove] Solicitud rid=" + studentObj.solicitudRid + " borrada correctamente.");
+            }
           }
 
           if (mensajeText) {
@@ -3112,7 +3102,12 @@
               method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
             });
             if (msgRes.ok) {
+              const resJson = await msgRes.json();
+              if (resJson[0] && resJson[0].error) {
+                console.warn("Moodle reportó error al enviar mensaje:", resJson[0].exception);
+              }
             } else {
+              console.warn("Fallo de red al enviar el mensaje por chat.");
             }
           }
 
@@ -3142,6 +3137,7 @@
           closeModal();
           renderDashboard();
         } catch (error) {
+          console.error("Error al registrar la asistencia:", error);
           errDiv.textContent = "Error: " + error.message;
           errDiv.style.display = "block";
         } finally {
@@ -3150,9 +3146,6 @@
           hideLoading();
         }
       });
-
-      // Inicializar el tablero una vez que todas las variables y funciones estén declaradas
-      initDashboard();
 
     })();
   </script>

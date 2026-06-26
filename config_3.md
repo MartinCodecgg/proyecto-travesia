@@ -2,10 +2,9 @@
 {
   "_INFO": {
     "version": "1.0",
-    "ultima_revision": "2026-06-13",
-    "descripcion": "Configuracion del sistema. Solo incluye preguntas que aportan al calculo (beta/X) o que el sistema necesita como anclas especiales. El resto de las respuestas de las encuestas se guarda igual, pero no requiere entrada en esta config."
+    "descripcion": "Configuracion del sistema de Indice de Riesgo de Desercion (IRD). Solo incluye preguntas que aportan al calculo (beta/X) o que el sistema necesita como anclas especiales.",
+    "ultima_actualización": "25/06/2026"
   },
-
   "urls": {
     "base": "https://ingenieria.campus.mdp.edu.ar",
     "curso_id": 1732,
@@ -17,7 +16,9 @@
       "db_historico": 54788,
       "db_1er_anio": 54789,
       "db_historico_1er_anio": 54791,
-      "db_historico_general": 54862
+      "db_historico_general": 54862,
+      "db_historial_asistencias": 54864,
+      "db_control_encuestas": 54984
     },
     "dataids": {
       "db_solicitudes": 15,
@@ -25,20 +26,20 @@
       "db_historico": 18,
       "db_1er_anio": 19,
       "db_historico_1er_anio": 20,
-      "db_historico_general": 21
+      "db_historico_general": 21,
+      "db_historial_asistencias": 22,
+      "db_control_encuestas": 24
     }
   },
-
   "umbrales": {
     "threshold_ird": 40,
+    "threshold_ird_red": 80,
     "cooldown_actualizar_seg": 30,
-    "quarterly_warning_days": 90,
     "cuatrimestres_desercion": 2,
     "historico_delay_ms": 500,
-    "results_per_page_moodle": 10,
-    "page_size_paneles": 30
+    "page_size_paneles": 30,
+    "cooldown_control_encuestas_dias": 14
   },
-
   "encuesta_inicial": {
     "cmid": 54062,
     "preguntas": [
@@ -47,10 +48,7 @@
         "tipo": "seleccion_unica",
         "beta": 0.5,
         "max_value": 0.2,
-        "respuestas": {
-          "Técnico": 0,
-          "Bachiller": 0.2
-        }
+        "respuestas": { "Técnico": 0, "Bachiller": 0.2 }
       },
       {
         "id": "¿Cual es el máximo nivel académico alcanzado por alguno de tus Padres/Tutores?",
@@ -69,10 +67,7 @@
         "tipo": "si_no",
         "beta": 0.5,
         "max_value": 0.3,
-        "respuestas": {
-          "Si": 0.3,
-          "No": 0
-        }
+        "respuestas": { "Si": 0.3, "No": 0 }
       },
       {
         "id": "¿Cuántas personas tenes a cargo?",
@@ -80,10 +75,10 @@
         "beta": 2,
         "max_value": 1,
         "respuestas": {
-          "Ninguna": 0,
           "1": 0.25,
           "2": 0.5,
           "3": 0.75,
+          "Ninguna": 0,
           "4 o mas": 1
         }
       },
@@ -102,7 +97,7 @@
             "tipo": "seleccion_unica",
             "condicion": "Sí",
             "respuestas": {
-              "Menos de 5hs": 0.0,
+              "Menos de 5hs": 0,
               "Entre 6hs y 20hs": 0.1,
               "Entre 21hs y 40hs": 0.25,
               "Más de 40hs": 0.45
@@ -131,7 +126,7 @@
         "respuestas": {
           "1 - Muy poco tiempo": 0.9,
           "2 - Poco tiempo": 0.7,
-          "3 - Tiempo regular": 0.0,
+          "3 - Tiempo regular": 0,
           "4 - Tiempo suficiente": -0.2,
           "5 - Mucho tiempo": -0.5
         }
@@ -174,7 +169,6 @@
       }
     ]
   },
-
   "encuesta_cuatrimestral": {
     "cmid": 54284,
     "preguntas": [
@@ -192,7 +186,6 @@
             "id": "¿Cuantas materias dejó este cuatrimestre?",
             "tipo": "numerico",
             "condicion": "Si",
-            "max_value": 1,
             "respuestas": null
           }
         ]
@@ -254,17 +247,14 @@
         "tipo": "si_no",
         "beta": 1,
         "max_value": 0.4,
-        "respuestas": {
-          "Sí": -0.1,
-          "No": 0.4
-        }
+        "respuestas": { "Sí": -0.1, "No": 0.4 }
       }
     ]
   },
-
   "preguntas_especiales": {
     "id_percepcion_riesgo": "(ABANDONAR_CARRERA) ¿Crees que estás en riesgo de abandonar la carrera?",
     "id_anio_ingreso": "¿En qué año ingresaste a la carrera? (Primer cuatrimestre cursado)",
+    "id_cuat_ingreso": "¿En qué cuatrimestre?",
     "id_egreso": "(EGRESO) ¿Ha egresado?"
   }
 }
