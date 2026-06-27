@@ -144,8 +144,8 @@
               <option value="solo">Mostrar solo desertores</option>
             </select>
           </div>
-          <div class="filter-item" style="align-self: flex-end; display: flex; gap: 8px;">
-            <button type="button" id="btn-clear-filters" class="btn-action">Limpiar</button>
+          <div class="filter-item" style="align-self: flex-end; display: flex; gap: 8px; flex: 0 0 auto;">
+            <button type="button" id="btn-clear-filters" class="btn-action" style="width: fit-content; padding-left: 20px; padding-right: 20px;">Limpiar</button>
           </div>
         </div>
 
@@ -1088,8 +1088,8 @@
         cuat7: 37,
         cuat8: 42,
         cuat9: 47,
-        cuat10: 50
-    };
+        cuat10: 52
+      };
 
       // Estado en memoria
       let alumnosCalculados = [];
@@ -1135,6 +1135,46 @@
         } catch (e) {
           return null;
         }
+      }
+
+      // Normaliza texto para comparación tolerante: minúsculas, sin acentos, sin espacios extras
+      function normalizeText(str) {
+        if (!str) return "";
+        var s = str.toString().toLowerCase().normalize("NFD").trim();
+        var out = "";
+        for (var i = 0; i < s.length; i++) {
+          var c = s.charCodeAt(i);
+          if (c < 768 || c > 879) { out += s.charAt(i); }
+        }
+        while (out.indexOf("  ") !== -1) { out = out.split("  ").join(" "); }
+        return out.trim();
+      }
+
+      // Busca un valor en una fila CSV usando clave normalizada
+      function getRowValueByNormalizedKey(row, key, silent) {
+        if (!row) return undefined;
+        var normKey = normalizeText(key);
+        var keys = Object.keys(row);
+        for (var i = 0; i < keys.length; i++) {
+          if (normalizeText(keys[i]) === normKey) { return row[keys[i]]; }
+        }
+        if (!silent) {
+          console.warn("[IRD] Clave no encontrada en fila CSV:", JSON.stringify(key), "| Normalizada:", normKey, "| Claves disponibles:", keys.join(" | "));
+        }
+        return undefined;
+      }
+
+      // Busca un valor en un objeto de respuestas usando clave normalizada
+      function getResponseValue(respuestas, valText) {
+        if (!respuestas) return undefined;
+        if (valText === undefined || valText === null || valText === "") return undefined;
+        var normVal = normalizeText(valText);
+        var keys = Object.keys(respuestas);
+        for (var i = 0; i < keys.length; i++) {
+          if (normalizeText(keys[i]) === normVal) { return respuestas[keys[i]]; }
+        }
+        console.warn("[IRD] Respuesta no encontrada en config:", JSON.stringify(valText), "| Normalizada:", normVal, "| Opciones config:", keys.join(" | "));
+        return undefined;
       }
 
       // Parsea de manera tolerante y robusta los formatos de fecha de Moodle y en caliente
@@ -1317,58 +1357,14 @@
             if (foundJson) {
               systemConfig = foundJson;
             } else {
-              await loadFallbackConfig();
+              throw new Error("No se encontró ningún JSON de configuración válido en la base de datos 'Db Config'.");
             }
           } else {
-            await loadFallbackConfig();
+            throw new Error(`Error de red al cargar la base de datos de configuración (HTTP ${response.status})`);
           }
         } catch (e) {
-          await loadFallbackConfig();
+          throw new Error("Fallo al inicializar la configuración del sistema: " + e.message);
         }
-      }
-
-      // Carga configuración fallback
-      function loadFallbackConfig() {
-        // Configuración mínima hardcodeada
-        systemConfig = {
-          urls: {
-            base: window.location.origin,
-            curso_id: null,
-            cmids: {},
-            dataids: {}
-          },
-          umbrales: { threshold_ird: 40, threshold_ird_red: 80, cooldown_actualizar_seg: 30, quarterly_warning_days: 90, cuatrimestres_desercion: 2, page_size_paneles: 30 },
-          encuesta_inicial: {
-            preguntas: [
-              { id: "Orientación de tu colegio secundario", tipo: "seleccion_unica", beta: 0.5, max_value: 0.2, respuestas: { "Técnico": 0, "Bachiller": 0.2 } },
-              { id: "¿Cual es el máximo nivel académico alcanzado por alguno de tus Padres/Tutores?", tipo: "seleccion_unica", beta: 1, max_value: 0.8, respuestas: { "No posee": 0.8, "Primario completo": 0.6, "Secundario completo": 0.3, "Terciario - Universitario completo": 0.1 } },
-              { id: "(CARRERA) ¿Es tu primera carrera universitaria dentro de la facultad?", tipo: "si_no", beta: 0.5, max_value: 0.3, respuestas: { "Si": 0.3, "No": 0 } },
-              { id: "¿Cuántas personas tenes a cargo?", tipo: "seleccion_unica", beta: 2, max_value: 1, respuestas: { "Ninguna": 0, "1": 0.25, "2": 0.5, "3": 0.75, "4 o mas": 1 } },
-              { id: "(TRABAJO) ¿Trabaja actualmente?", tipo: "si_no", beta: 1.5, max_value: 0.45, respuestas: { "No": 0, "Sí": "calculado" }, subpreguntas: [{ id: "¿Cuántas horas semanales trabajas?", tipo: "seleccion_unica", respuestas: { "Menos de 5hs": 0, "Entre 6hs y 20hs": 0.1, "Entre 21hs y 40hs": 0.25, "Más de 40hs": 0.45 } }] },
-              { id: "Situación económica", tipo: "seleccion_unica", beta: 2, max_value: 1, respuestas: { "1 - Muy mala": 1, "2 - Mala": 0.5, "3 - Regular": 0.2, "4 - Buena": -0.2, "5 - Muy buena": -0.5 } },
-              { id: "¿Con cuánta disponibilidad de tiempo posees para estudiar?", tipo: "seleccion_unica", beta: 2.5, max_value: 0.9, respuestas: { "1 - Muy poco tiempo": 0.9, "2 - Poco tiempo": 0.7, "3 - Tiempo regular": 0, "4 - Tiempo suficiente": -0.2, "5 - Mucho tiempo": -0.5 } },
-              { id: "¿Cuánto tiempo tardas en llegar a la facultad? ", tipo: "seleccion_unica", beta: 1, max_value: 0.25, respuestas: { "Menos de 20 minutos": 0, "Entre 20 y 40 minutos": 0.08, "Entre 41 y 60 minutos": 0.156, "Más de 60 minutos": 0.25 } },
-              { id: "¿Cómo financiás económicamente tus estudios?", tipo: "seleccion_unica", beta: 1.8, max_value: 1, respuestas: { "Beca Estudiantil": -1, "Financiamiento Familiar": 0, "Financiamiento Propio": 0.5, "Otros": 0 } },
-              { id: "¿Por qué eligió la carrera?", tipo: "seleccion_unica", beta: 0.5, max_value: 0.6, respuestas: { "Vocación": 0.2, "Salida Laboral": 0.6, "Recomendación": 0.4, "Otro": 0 } }
-            ]
-          },
-          encuesta_cuatrimestral: {
-            preguntas: [
-              { id: "(ABANDONAR_MATERIAS) En este cuatrimestre ¿Abandonó alguna materia?", tipo: "si_no", beta: 2, max_value: 1, respuestas: { "No": 0, "Si": "calculado" }, subpreguntas: [{ id: "¿Cuantas materias dejó este cuatrimestre?", tipo: "numerico", max_value: 1, respuestas: null }] },
-              { id: "Satisfacción con respecto al cuatrimestre cursado", tipo: "seleccion_unica", beta: 1, max_value: 1, respuestas: { "1 - No satisfactorio": 1, "2 - Poco satisfactorio": 0.5, "3 - Regular": 0, "4 - Satisfactorio": -0.5, "5 - Muy satisfactorio": -1 } },
-              { id: "Nivel de estrés que sufrió durante el cuatrimestre", tipo: "seleccion_unica", beta: 1.5, max_value: 0.7, respuestas: { "1 - Sin estrés": 0, "2 - Estrés bajo": 0.2, "3 - Estrés moderado": 0.35, "4 - Estrés medio": 0.5, "5 - Estrés elevado": 0.7 } },
-              { id: "¿Qué tan motivado está a continuar la carrera?", tipo: "seleccion_unica", beta: 2.5, max_value: 1, respuestas: { "1 - No estoy motivado": 1, "2 - Motivación baja": 0.5, "3 - Motivación moderada": 0, "4 - Motivación alta": -0.5, "5 - Muy motivado": -1 } },
-              { id: "¿Qué tan al día estás con el plan de estudios?", tipo: "seleccion_unica", beta: 1.5, max_value: 0.8, respuestas: { "1 - Adelantado": -1, "2 - Al día": 0, "3 - Atrasado un cuatrimestre": 0.25, "4 - Atrasado un año": 0.5, "5 - Atrasado más de un año": 0.8 } },
-              { id: "¿Tenés grupo de estudio/compañeros con los que estudiar?", tipo: "si_no", beta: 1, max_value: 0.4, respuestas: { "Sí": -0.1, "No": 0.4 } }
-            ]
-          },
-          preguntas_especiales: {
-            id_percepcion_riesgo: "(ABANDONAR_CARRERA) ¿Crees que estás en riesgo de abandonar la carrera?",
-            id_anio_ingreso: "¿En qué año ingresaste a la carrera? (Primer cuatrimestre cursado)",
-            id_cuat_ingreso: "¿En qué cuatrimestre?",
-            id_egreso: "(EGRESO) ¿Ha egresado?"
-          }
-        };
       }
 
       // Scraping paginado de participantes en Moodle
@@ -1619,12 +1615,13 @@
         Object.keys(rowCuat).forEach(key => {
           let type = "";
           let materiaName = "";
-          if (key.endsWith(": Nota")) {
+          const normKey = normalizeText(key);
+          if (normKey.endsWith(": nota")) {
             type = "nota";
-            materiaName = key.slice(0, -6).trim();
-          } else if (key.endsWith(": Condición")) {
+            materiaName = key.slice(0, key.length - 6).trim();
+          } else if (normKey.endsWith(": condicion")) {
             type = "condicion";
-            materiaName = key.slice(0, -11).trim();
+            materiaName = key.slice(0, key.length - 11).trim();
           }
           if (type && materiaName) {
             if (!materiasMap.has(materiaName)) {
@@ -1712,11 +1709,12 @@
             
             // Si no, buscar dinámicamente cualquier columna que tenga relación con correo/email
             for (let key of keys) {
-              const normKey = key.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const normKey = normalizeText(key);
               if (normKey.includes("email") || normKey.includes("correo") || normKey.includes("mail")) {
                 return row[key];
               }
             }
+            console.warn("[IRD] No se encontró columna de email en fila CSV. Columnas disponibles:", keys.join(" | "));
             return "";
           }
 
@@ -1770,9 +1768,9 @@
             let cuatIngreso = 1;
             if (rowInic) {
               const keyAnio = systemConfig.preguntas_especiales.id_anio_ingreso;
-              anioIngreso = parseInt(rowInic[keyAnio]) || null;
-              const keyCuat = systemConfig.preguntas_especiales.id_cuat_ingreso || "¿En qué cuatrimestre?";
-              const parsedCuat = parseInt(rowInic[keyCuat]);
+              anioIngreso = parseInt(getRowValueByNormalizedKey(rowInic, keyAnio)) || null;
+              const keyCuat = systemConfig.preguntas_especiales.id_cuat_ingreso || "En que cuatrimestre";
+              const parsedCuat = parseInt(getRowValueByNormalizedKey(rowInic, keyCuat));
               if (parsedCuat === 1 || parsedCuat === 2) {
                 cuatIngreso = parsedCuat;
               }
@@ -1782,8 +1780,8 @@
             let sePercibeRiesgo = false;
             if (rowCuat) {
               const keyRiesgo = systemConfig.preguntas_especiales.id_percepcion_riesgo;
-              const valRiesgo = rowCuat[keyRiesgo] || "";
-              if (valRiesgo.toLowerCase().includes("sí") || valRiesgo.toLowerCase().includes("si")) {
+              const valRiesgo = getRowValueByNormalizedKey(rowCuat, keyRiesgo) || "";
+              if (normalizeText(valRiesgo) === "si") {
                 sePercibeRiesgo = true;
               }
             }
@@ -1792,8 +1790,8 @@
             let esEgresado = false;
             if (rowCuat) {
               const keyEgreso = systemConfig.preguntas_especiales.id_egreso;
-              const valEgreso = rowCuat[keyEgreso] || "";
-              if (valEgreso.toLowerCase().includes("sí") || valEgreso.toLowerCase().includes("si")) {
+              const valEgreso = getRowValueByNormalizedKey(rowCuat, keyEgreso) || "";
+              if (normalizeText(valEgreso) === "si") {
                 esEgresado = true;
               }
             }
@@ -1802,9 +1800,9 @@
             let esDesertor = false;
             let fechaCuat = null;
             if (rowCuat) {
-              // El campo de fecha en el CSV exportado de Moodle es "Período de envío" o "Completado"
-              // Se prueba ambos nombres posibles
-              const fechaRawCuat = rowCuat["Período de envío"] || rowCuat["Completado"] || rowCuat["Fecha"] || "";
+              // El campo de fecha en el CSV exportado de Moodle es "Fecha" (confirmado por log)
+              // Se prueban nombres alternativos como fallback por si cambia en el futuro
+              const fechaRawCuat = getRowValueByNormalizedKey(rowCuat, "Fecha", true) || getRowValueByNormalizedKey(rowCuat, "Periodo de envio", true) || getRowValueByNormalizedKey(rowCuat, "Completado", true) || "";
               if (fechaRawCuat) {
                 try {
                   // Formato de fecha de Moodle en exportación: "sábado, 13 de junio de 2026, 13:47"
@@ -1842,7 +1840,7 @@
               // Evaluar preguntas iniciales
               systemConfig.encuesta_inicial.preguntas.forEach(p => {
                 let X = 0;
-                let valText = rowInic[p.id];
+                let valText = getRowValueByNormalizedKey(rowInic, p.id);
                 if (valText !== undefined && valText !== null) {
                   valText = valText.trim();
                   if (valText.toLowerCase() === "otros" || valText.toLowerCase() === "otro") {
@@ -1853,20 +1851,25 @@
                     else if (n === 1) X = p.respuestas["1"] || 0;
                     else if (n === 2) X = p.respuestas["2"] || 0;
                     else if (n === 3) X = p.respuestas["3"] || 0;
-                    else if (n >= 4) X = p.respuestas["4 o mas"] !== undefined ? p.respuestas["4 o mas"] : (p.respuestas["4 o más"] || 1);
+                    else if (n >= 4) { var x4ini = getResponseValue(p.respuestas, "4 o mas"); X = x4ini !== undefined ? x4ini : 1; }
                   } else if (p.tipo === "si_no") {
-                    if (valText.toLowerCase() === "si" || valText.toLowerCase() === "sí") {
+                    if (normalizeText(valText) === "si") {
                       if (p.subpreguntas && p.subpreguntas.length > 0) {
                         const sub = p.subpreguntas[0];
-                        X = sub.respuestas[(rowInic[sub.id] || "").trim()] || 0;
+                        const subVal = (getRowValueByNormalizedKey(rowInic, sub.id) || "").trim();
+                        const xSub = getResponseValue(sub.respuestas, subVal);
+                        X = xSub !== undefined ? xSub : 0;
                       } else {
-                        X = p.respuestas["Si"] !== undefined ? p.respuestas["Si"] : (p.respuestas["Sí"] || 0.3);
+                        const xSi = getResponseValue(p.respuestas, "Si");
+                        X = xSi !== undefined ? xSi : 0.3;
                       }
                     } else {
-                      X = p.respuestas["No"] || 0;
+                      const xNo = getResponseValue(p.respuestas, "No");
+                      X = xNo !== undefined ? xNo : 0;
                     }
                   } else {
-                    X = p.respuestas[valText] !== undefined ? p.respuestas[valText] : 0;
+                    const xDirect = getResponseValue(p.respuestas, valText);
+                    X = xDirect !== undefined ? xDirect : 0;
                   }
                 }
                 const aporte = (p.beta || 0) * X;
@@ -1877,22 +1880,26 @@
               // Evaluar preguntas cuatrimestrales
               systemConfig.encuesta_cuatrimestral.preguntas.forEach(p => {
                 let X = 0;
-                let valText = rowCuat[p.id];
+                let valText = getRowValueByNormalizedKey(rowCuat, p.id);
                 if (valText !== undefined && valText !== null) {
                   valText = valText.trim();
                   if (valText.toLowerCase() === "otros" || valText.toLowerCase() === "otro") {
                     X = 0;
                   } else if (p.tipo === "si_no") {
-                    if (valText.toLowerCase() === "si" || valText.toLowerCase() === "sí") {
+                    if (normalizeText(valText) === "si") {
                       if (p.subpreguntas && p.subpreguntas.length > 0) {
                         const sub = p.subpreguntas[0];
-                        const nSub = parseInt(rowCuat[sub.id] || 0) || 0;
+                        const subRaw = getRowValueByNormalizedKey(rowCuat, sub.id);
+                        const nSub = parseInt(subRaw || 0) || 0;
                         if (sub.respuestas) {
-                          if (nSub === 0) X = sub.respuestas["0"] || 0;
-                          else if (nSub === 1) X = sub.respuestas["1"] || 0;
-                          else if (nSub === 2) X = sub.respuestas["2"] || 0;
-                          else if (nSub === 3) X = sub.respuestas["3"] || 0;
-                          else if (nSub >= 4) X = sub.respuestas["4 o mas"] || sub.respuestas["4 o más"] || 1;
+                          if (nSub === 0) X = sub.respuestas["0"] !== undefined ? sub.respuestas["0"] : 0;
+                          else if (nSub === 1) X = sub.respuestas["1"] !== undefined ? sub.respuestas["1"] : 0;
+                          else if (nSub === 2) X = sub.respuestas["2"] !== undefined ? sub.respuestas["2"] : 0;
+                          else if (nSub === 3) X = sub.respuestas["3"] !== undefined ? sub.respuestas["3"] : 0;
+                          else if (nSub >= 4) {
+                            const x4 = getResponseValue(sub.respuestas, "4 o mas");
+                            X = x4 !== undefined ? x4 : 1;
+                          }
                         } else {
                           // Mapeo directo para valor numérico puro
                           if (nSub === 0) X = 0;
@@ -1902,13 +1909,16 @@
                           else if (nSub >= 4) X = 1.0;
                         }
                       } else {
-                        X = p.respuestas["Si"] !== undefined ? p.respuestas["Si"] : (p.respuestas["Sí"] || 1);
+                        const xSi = getResponseValue(p.respuestas, "Si");
+                        X = xSi !== undefined ? xSi : 1;
                       }
                     } else {
-                      X = p.respuestas["No"] || 0;
+                      const xNo = getResponseValue(p.respuestas, "No");
+                      X = xNo !== undefined ? xNo : 0;
                     }
                   } else {
-                    X = p.respuestas[valText] !== undefined ? p.respuestas[valText] : 0;
+                    const xDirect = getResponseValue(p.respuestas, valText);
+                    X = xDirect !== undefined ? xDirect : 0;
                   }
                 }
                 const aporte = (p.beta || 0) * X;
@@ -1931,7 +1941,7 @@
               if (cuatEnCarrera >= 2) {
                 // Contar materias con nota >= 5
                 Object.keys(rowCuat).forEach(key => {
-                  if (key.endsWith(": Nota")) {
+                  if (normalizeText(key).endsWith(": nota")) {
                     const notaVal = parseInt(rowCuat[key]);
                     if (!isNaN(notaVal) && notaVal >= 5) {
                       materiasAprobadas++;
@@ -2632,14 +2642,23 @@
       // ★ HISTÓRICO DE CUATRIMESTRES ★
       // ==========================================================
       async function guardarHistorico() {
-        showLoading("Sincronizando base de datos histórica...");
+        showLoading("Preparando guardado histórico...");
         try {
-          const urlHist = `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_historico}&perpage=1000`;
-          const resHist = await fetch(urlHist);
-          if (!resHist.ok) throw new Error("No se pudo conectar con la base de datos histórica de Moodle");
-          const htmlHist = await resHist.text();
-          
           const parser = new DOMParser();
+          const urlHist = `${window.location.origin}/mod/data/view.php?d=${systemConfig.urls.dataids.db_historico}&perpage=1000`;
+          const urlForm = `${window.location.origin}/mod/data/edit.php?d=${systemConfig.urls.dataids.db_historico}`;
+
+          // Optimización: ambos GETs pre-loop en paralelo (antes eran secuenciales)
+          const [resHist, resForm] = await Promise.all([
+            fetch(urlHist),
+            fetch(urlForm)
+          ]);
+          if (!resHist.ok) throw new Error("No se pudo conectar con la base de datos histórica de Moodle");
+          if (!resForm.ok) throw new Error("No se pudo obtener el formulario de creación histórica");
+
+          const [htmlHist, formHtml] = await Promise.all([resHist.text(), resForm.text()]);
+
+          // Parsear registros existentes
           const docHist = parser.parseFromString(htmlHist, "text/html");
           const entriesList = docHist.querySelectorAll(".defaulttemplate-listentry, .defaulttemplate-single, .card, .generaltable tr");
           const histEntradasMap = new Map();
@@ -2681,12 +2700,9 @@
               histEntradasMap.set(emailVal.trim().toLowerCase(), { rid: rid, nombre: nombreVal, historialText: historialVal });
             }
           });
-          
-          const getFormRes = await fetch(`${window.location.origin}/mod/data/edit.php?d=${systemConfig.urls.dataids.db_historico}`);
-          if (!getFormRes.ok) throw new Error("No se pudo obtener el formulario de creación histórica");
-          const formHtml = await getFormRes.text();
-          const docForm = parser.parseFromString(formHtml, "text/html");
 
+          // Parsear mapeo de campos del formulario
+          const docForm = parser.parseFromString(formHtml, "text/html");
           const fieldsMapeo = {};
           const inputsDB = docForm.querySelectorAll('input[name^="field_"], textarea[name^="field_"]');
           inputsDB.forEach(input => {
@@ -2732,12 +2748,19 @@
 
           const hoy = new Date();
           const periodoActual = TEST_PERIODO_OVERRIDE || `${hoy.getFullYear()}-${hoy.getMonth() <= 6 ? 1 : 2}`;
-          
+          const alumnosAGuardar = alumnosCalculados.filter(a => a.IRD !== null);
+          const totalAGuardar = alumnosAGuardar.length;
           let guardadosCount = 0, creadosCount = 0, editadosCount = 0;
-          
-          for (let alumno of alumnosCalculados) {
-            if (alumno.IRD === null) continue;
-            
+          const loadingTextEl = document.getElementById("loading-text");
+
+          for (let i = 0; i < alumnosAGuardar.length; i++) {
+            const alumno = alumnosAGuardar[i];
+
+            // Feedback de progreso en el overlay
+            if (loadingTextEl) {
+              loadingTextEl.textContent = `Guardando histórico: ${alumno.nombre || alumno.email} (${i + 1} de ${totalAGuardar})...`;
+            }
+
             const emailKey = alumno.email.trim().toLowerCase();
             const entradaExistente = histEntradasMap.get(emailKey);
             
@@ -2837,9 +2860,16 @@
             cohortes: cohortesStats, pesos_preguntas: pesosPreguntasGlobal
           });
 
-          const resHist = await fetch(`${window.location.origin}/mod/data/view.php?d=${dataid}&perpage=1000`);
+          // Optimización: el GET del view y el GET del formulario blank son independientes — se ejecutan en paralelo.
+          // El rid extraído del view solo se necesita en el body del POST, no para el GET del form.
+          const viewUrl = `${window.location.origin}/mod/data/view.php?d=${dataid}&perpage=1000`;
+          const formUrl = `${window.location.origin}/mod/data/edit.php?d=${dataid}`;
+          const [resHist, formHtmlRes] = await Promise.all([fetch(viewUrl), fetch(formUrl)]);
           if (!resHist.ok) throw new Error("No se pudo conectar con db_historico_general");
-          const docHist = parser.parseFromString(await resHist.text(), "text/html");
+          if (!formHtmlRes.ok) throw new Error("No se pudo obtener el formulario de edición en " + formUrl);
+          const [histText, formHtmlText] = await Promise.all([resHist.text(), formHtmlRes.text()]);
+          const docHist = parser.parseFromString(histText, "text/html");
+          const docForm = parser.parseFromString(formHtmlText, "text/html");
 
           let existingRid = null;
           const entriesList = docHist.querySelectorAll(".defaulttemplate-listentry, .defaulttemplate-single, .card, .generaltable tr");
@@ -2887,14 +2917,6 @@
               existingRid = rid;
             }
           });
-
-          // Always fetch the BLANK form (no rid in query string) to get field names and submit button.
-          // Moodle returns 404 when rid is included in the GET query for edit.php.
-          // The rid for editing is passed only in the FormData body of the POST request.
-          const formUrl = `${window.location.origin}/mod/data/edit.php?d=${dataid}`;
-          const formHtmlRes = await fetch(formUrl);
-          if (!formHtmlRes.ok) throw new Error("No se pudo obtener el formulario de edición en " + formUrl);
-          const docForm = parser.parseFromString(await formHtmlRes.text(), "text/html");
 
           let fCuatrimestre = null, fFecha = null, fDatos = null;
           docForm.querySelectorAll('input[name^="field_"], textarea[name^="field_"]').forEach(el => {

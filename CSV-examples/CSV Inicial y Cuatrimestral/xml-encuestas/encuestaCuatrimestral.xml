@@ -1,0 +1,4375 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FEEDBACK VERSION="200701" COMMENT="XML-Importfile for mod/feedback">
+     <ITEMS>
+          <ITEM TYPE="label" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5819]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[label]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[<h4><strong>Cuatrimestre Actual</strong></h4>]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="1">
+               <ITEMID>
+                    <![CDATA[5542]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[¿Crees que estás en riesgo de abandonar la carrera?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[ABANDONAR_CARRERA]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Sí|No]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="pagebreak" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5550]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5544]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[¿Porque crees que estás en riesgo de abandonar la carrera? ]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|15]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[5542]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[Sí]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="1">
+               <ITEMID>
+                    <![CDATA[5551]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[En este cuatrimestre ¿Abandonó alguna materia?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[ABANDONAR_MATERIAS]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Si|No]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="pagebreak" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5555]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5552]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[¿Cuáles y por qué?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[5551]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[Si]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="1">
+               <ITEMID>
+                    <![CDATA[5549]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[¿Cuantas materias dejó este cuatrimestre?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|20]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[5551]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[Si]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="1">
+               <ITEMID>
+                    <![CDATA[5553]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[¿Cuantos finales rindio desde la ultima encuesta?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|30]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="1">
+               <ITEMID>
+                    <![CDATA[5554]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[¿Cuantos finales aprobó?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|30]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="1">
+               <ITEMID>
+                    <![CDATA[5726]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[¿Cuantos finales debe?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|30]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="pagebreak" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5820]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="label" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5760]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[label]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[<h4><strong>Experiencia con el cuatrimestre</strong></h4>]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="1">
+               <ITEMID>
+                    <![CDATA[5543]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Satisfacción con respecto al cuatrimestre cursado]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>1 - No satisfactorio|2 - Poco satisfactorio|3 - Regular|4 - Satisfactorio|5 - Muy satisfactorio]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="1">
+               <ITEMID>
+                    <![CDATA[5545]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Nivel de estrés que sufrió durante el cuatrimestre]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>1 - Nada|2 - Estrés bajo|3 - Estrés moderado|4 - Estrés considerable|5 - Estrés elevado]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="1">
+               <ITEMID>
+                    <![CDATA[5546]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[¿Qué tan motivado está a continuar la carrera?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>1 - No estoy motivado |2 - Motivación baja|3 - Motivación moderada|4 - Motivación alta|5 - Motivación muy alta]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="1">
+               <ITEMID>
+                    <![CDATA[5547]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[¿Qué tan al día estás con el plan de estudios?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>1 - Adelantado|2 - Al día|3 - Atrasado un cuatrimestre|4 - Atrasado un año|5 - Atrasado más de un año]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5822]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[¿Tenés grupo de estudio/compañeros con los que estudiar?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Sí|No]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5548]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Comentarios (Opiniones acerca del plan de estudios, de algún aspecto en particular de la facultad o el cuatrimestre)]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="pagebreak" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5557]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="label" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5594]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[label]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[<h3>Materias de <strong>1er año</strong></h3>]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5556]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Análisis Matemático I: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5558]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Análisis Matemático I: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5559]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Análisis Matemático I: Opinión de la materia y profesores.]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5560]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Álgebra I-B: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5561]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Álgebra I-B: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5562]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Álgebra I-B: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5563]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Fundamentos de Química: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5564]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Fundamentos de Química: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5565]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Fundamentos de Química: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5566]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Análisis Matemático II: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5567]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Análisis Matemático II: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5568]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Análisis Matemático II: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5569]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Álgebra II: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5570]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Álgebra II: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5571]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Álgebra II: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5572]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Física A: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5573]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Física A: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5574]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Física A: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5575]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Fundamentos de la Programación: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5576]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Fundamentos de la Programación: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5584]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Fundamentos de la Programación: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="pagebreak" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5577]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="label" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5595]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[label]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[<h3>Materias de <strong>2do año</strong></h3>]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5578]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Análisis Matemático III: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5583]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Análisis Matemático III: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[6013]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Análisis Matemático III: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5580]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Probabilidad y Estadística: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5581]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Probabilidad y Estadística: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5582]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Probabilidad y Estadística: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5585]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Mecánica del Sólido: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5586]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Mecánica del Sólido: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5587]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Mecánica del Sólido: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5588]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Física B-II: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5589]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Física B-II: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5590]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Física B-II: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5591]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés I: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5592]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés I: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5593]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés I: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5596]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Administración Estratégica: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5597]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Administración Estratégica: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5598]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Administración Estratégica: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5599]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Conceptos de Economía Industrial: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5600]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Conceptos de Economía Industrial: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5601]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Conceptos de Economía Industrial: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5602]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Máquinas y Equipos Industriales I: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5603]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Máquinas y Equipos Industriales I: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5604]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Máquinas y Equipos Industriales I: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5605]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Termodinámica Industrial: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5606]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Termodinámica Industrial: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5607]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Termodinámica Industrial: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5608]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés II: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5609]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés II: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5610]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés II: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5611]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial I: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5612]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial I: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5613]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial I: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="pagebreak" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5614]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="label" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5615]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[label]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[<h3>Materias de <strong>3er año</strong></h3>]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5620]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Administración de Operaciones: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5621]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Administración de Operaciones: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5622]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Administración de Operaciones: Comentarios de la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5623]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Investigación Operativa A: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5624]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Investigación Operativa A: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5625]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Investigación Operativa A: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5626]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión de la Tecnología y la Innovación: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5627]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión de la Tecnología y la Innovación: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5628]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión de la Tecnología y la Innovación: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5629]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Tecnología de los Materiales: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5630]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Tecnología de los Materiales: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5631]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Tecnología de los Materiales: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5632]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Ética, Legislación y Propiedad Intelectual en el Ejercicio Profesional: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5633]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Ética, Legislación y Propiedad Intelectual en el Ejercicio Profesional: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5634]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Ética, Legislación y Propiedad Intelectual en el Ejercicio Profesional: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5635]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Mecánica de Fluidos: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5636]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Mecánica de Fluidos: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5637]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Mecánica de Fluidos: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5638]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Planificación y Control de la Producción: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5639]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Planificación y Control de la Producción: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[-|-]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5640]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Planificación y Control de la Producción: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5641]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sistemas de Representación para Ingeniería: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5642]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sistemas de Representación para Ingeniería: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5643]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sistemas de Representación para Ingeniería: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5644]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Física Experimental A: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5645]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Física Experimental A: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5646]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Física Experimental A: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5647]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión de la Logística Integral y Cadena de Suministros: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5648]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión de la Logística Integral y Cadena de Suministros: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5649]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión de la Logística Integral y Cadena de Suministros: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textfield" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5683]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva I: ¿Cual materia eligió?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|255]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5650]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva I: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5651]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva I: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5652]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva I: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5653]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial II: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5654]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial II: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5655]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial II: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="pagebreak" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5619]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="label" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5616]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[label]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[<h3>Materias de <strong>4to año</strong></h3>]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5656]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Diseño de Instalaciones y Procesos: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5657]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Diseño de Instalaciones y Procesos: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5658]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Diseño de Instalaciones y Procesos: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5660]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sistemas de Gestión y Mejora Continua: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5661]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sistemas de Gestión y Mejora Continua: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5659]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sistemas de Gestión y Mejora Continua: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5662]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Comportamiento Organizacional y Relaciones del Trabajo: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5663]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Comportamiento Organizacional y Relaciones del Trabajo: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5664]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Comportamiento Organizacional y Relaciones del Trabajo: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5665]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Introducción a los Procesos de Fabricación: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5666]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Introducción a los Procesos de Fabricación: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5667]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Introducción a los Procesos de Fabricación: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5668]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés Profesional A: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5669]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés Profesional A: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5670]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés Profesional A: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5671]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Formulación y Evaluación de Proyectos: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5672]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Formulación y Evaluación de Proyectos: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5673]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Formulación y Evaluación de Proyectos: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5674]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión Comercial de las Organizaciones: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5675]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión Comercial de las Organizaciones: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5676]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión Comercial de las Organizaciones: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5677]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Tecnología de Control: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5678]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Tecnología de Control: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5679]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Tecnología de Control: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textfield" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5684]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva II: ¿Cual materia eligió?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|255]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5680]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva II: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5681]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva II: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5682]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva II: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5689]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés Profesional B: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5690]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés Profesional B: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5691]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Inglés Profesional B: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5692]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial III: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5693]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial III: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5694]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial III: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="pagebreak" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5618]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="label" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5617]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[label]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[<h3>Materias de <strong>5to año</strong></h3>]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5695]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sustentabilidad, Higiene y Seguridad: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5696]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sustentabilidad, Higiene y Seguridad: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5697]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sustentabilidad, Higiene y Seguridad: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5698]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Desarrollo Económico y Comercio Internacional: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5699]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Desarrollo Económico y Comercio Internacional: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5700]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Desarrollo Económico y Comercio Internacional: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5701]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sistemas Informáticos de Gestión: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5702]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sistemas Informáticos de Gestión: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5703]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Sistemas Informáticos de Gestión: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textfield" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5685]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva III: ¿Cual materia eligió?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|255]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5704]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva III: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5705]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva III: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5706]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva III: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5707]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión Integral del Mantenimiento: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5708]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión Integral del Mantenimiento: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5709]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Gestión Integral del Mantenimiento: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5710]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Empresas y Servicios Basadas en el Conocimiento: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5711]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Empresas y Servicios Basadas en el Conocimiento: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5712]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Empresas y Servicios Basadas en el Conocimiento: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textfield" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5686]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva IV: ¿Cual materia eligió?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|255]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5713]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva IV: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5714]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva IV: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5715]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Electiva IV: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textfield" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5687]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Optativa I: ¿Cual materia eligió?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|255]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5716]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Optativa I: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5717]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Optativa I: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5718]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Optativa I: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textfield" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5688]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Optativa II: ¿Cual materia eligió?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|255]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5719]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Optativa II: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5720]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Optativa II: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5721]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Optativa II: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5722]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial IV: Condición]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[d>>>>>Aprobado|Habilitado (debe final)|Desaprobado (cursó/empezó a cursar y desaprobó)]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="numeric" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5723]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial IV: Nota]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[0|10]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5724]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Proyecto de Ingeniería Industrial IV: Comentarios sobre la materia y docentes]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="textarea" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5725]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[Información acerca del Trabajo Final/Tesis: Dificultad para hacerlo, Motivación, o Lo que espera]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[30|5]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+          <ITEM TYPE="multichoice" REQUIRED="0">
+               <ITEMID>
+                    <![CDATA[5727]]>
+               </ITEMID>
+               <ITEMTEXT>
+                    <![CDATA[¿Ha egresado?]]>
+               </ITEMTEXT>
+               <ITEMLABEL>
+                    <![CDATA[EGRESO]]>
+               </ITEMLABEL>
+               <PRESENTATION>
+                    <![CDATA[r>>>>>Si|No]]>
+               </PRESENTATION>
+               <OPTIONS>
+                    <![CDATA[h]]>
+               </OPTIONS>
+               <DEPENDITEM>
+                    <![CDATA[0]]>
+               </DEPENDITEM>
+               <DEPENDVALUE>
+                    <![CDATA[]]>
+               </DEPENDVALUE>
+          </ITEM>
+     </ITEMS>
+</FEEDBACK>

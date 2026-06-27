@@ -126,9 +126,9 @@
         "respuestas": {
           "1 - Muy poco tiempo": 0.9,
           "2 - Poco tiempo": 0.7,
-          "3 - Tiempo regular": 0,
+          "3 - Regular": 0,
           "4 - Tiempo suficiente": -0.2,
-          "5 - Mucho tiempo": -0.5
+          "5 - Disponibilidad total": -0.5
         }
       },
       {
@@ -164,7 +164,7 @@
           "Vocación": 0.2,
           "Salida Laboral": 0.6,
           "Recomendación": 0.4,
-          "Otro": null
+          "Otros": null
         }
       }
     ]
@@ -209,10 +209,10 @@
         "beta": 1.5,
         "max_value": 0.7,
         "respuestas": {
-          "1 - Sin estrés": 0,
+          "1 - Nada": 0,
           "2 - Estrés bajo": 0.2,
           "3 - Estrés moderado": 0.35,
-          "4 - Estrés medio": 0.5,
+          "4 - Estrés considerable": 0.5,
           "5 - Estrés elevado": 0.7
         }
       },
@@ -226,7 +226,7 @@
           "2 - Motivación baja": 0.5,
           "3 - Motivación moderada": 0,
           "4 - Motivación alta": -0.5,
-          "5 - Muy motivado": -1
+          "5 - Motivación muy alta": -1
         }
       },
       {

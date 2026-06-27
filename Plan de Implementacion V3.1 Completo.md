@@ -6,13 +6,13 @@ El sistema se implementa como bloques de código (HTML + CSS + JS) incrustados e
 
 ### 1.1 Usuarios y accesos
 
-|Usuario|Página / Actividad|Puede hacer|
-|---|---|---|
-|Tutor / Profesor|Dashboard principal (Paneles 1 y 2)|Ver IRD de todos los alumnos, asistir alumnos, ver solicitudes pendientes|
-|Tutor / Profesor|Panel Histórico|Guardar snapshots, buscar y filtrar alumnos, exportar CSV|
-|Tutor / Profesor|Panel 1er Año|Subir CSV de alumnos y notas, ver alargamiento, exportar|
-|Tutor / Profesor|Configuración (pestaña oculta)|Modificar parámetros del sistema sin editar código|
-|Alumno|Panel del alumno (actividad separada)|Ver su propio IRD, solicitar asistencia|
+| Usuario          | Página / Actividad                    | Puede hacer                                                               |
+| ---------------- | ------------------------------------- | ------------------------------------------------------------------------- |
+| Tutor / Profesor | Dashboard principal (Paneles 1 y 2)   | Ver IRD de todos los alumnos, asistir alumnos, ver solicitudes pendientes |
+| Tutor / Profesor | Panel Histórico                       | Guardar snapshots, buscar y filtrar alumnos, exportar CSV                 |
+| Tutor / Profesor | Panel 1er Año                         | Subir CSV de alumnos y notas, ver alargamiento, exportar                  |
+| Tutor / Profesor | Configuración (pestaña oculta)        | Modificar parámetros del sistema sin editar código                        |
+| Alumno           | Panel del alumno (actividad separada) | Ver su propio IRD, solicitar asistencia                                   |
 
 ### 1.2 Acceso al dashboard
 
@@ -25,9 +25,9 @@ Protegido por una pantalla falsa (seguridad por oscuridad). El tutor accede haci
 </div>
 <div id="tablero" style="display:none;"><!-- panel real --></div>
 <script>
-  document.getElementById('btn-oculto').addEventListener('click', function() {
-    document.getElementById('pantalla-falsa').style.display = 'none';
-    document.getElementById('tablero').style.display = 'block';
+  document.getElementById("btn-oculto").addEventListener("click", function () {
+    document.getElementById("pantalla-falsa").style.display = "none";
+    document.getElementById("tablero").style.display = "block";
   });
 </script>
 ```
@@ -35,7 +35,7 @@ Protegido por una pantalla falsa (seguridad por oscuridad). El tutor accede haci
 El título de la actividad Página se oculta con:
 
 ```javascript
-document.querySelector('.page-header-headings').style.display = 'none';
+document.querySelector(".page-header-headings").style.display = "none";
 ```
 
 ---
@@ -54,19 +54,19 @@ document.querySelector('.page-header-headings').style.display = 'none';
 
 ### 2.2 Actividades del sistema (resumen)
 
-|Actividad Moodle|Tipo|Propósito|
-|---|---|---|
-|Dashboard principal|Página|Feature 1 — Paneles IRD y Solicitudes|
-|Panel del alumno|Página|Feature 2 — Vista individual del alumno|
-|Panel Histórico|Página|Feature 3 — Snapshots y análisis histórico|
-|Panel 1er Año|Página|Feature 4 — Gestión de alumnos ingresantes|
-|Config (pestaña)|BD Moodle|Parámetros configurables sin editar código|
-|DB Solicitudes|BD Moodle|Solicitudes de ayuda enviadas por alumnos|
-|DB Logs asistencias|BD Moodle|Registro de asistencias realizadas por tutores|
-|DB Histórico|BD Moodle|Snapshots cuatrimestrales de todos los alumnos|
-|DB Histórico 1er Año|BD Moodle|Snapshots del alargamiento de alumnos de 1er año|
-|DB 1er Año|BD Moodle|Estado actual de alumnos ingresantes (CSV)|
-|DB Config|BD Moodle|Parámetros del sistema modificables por el tutor|
+| Actividad Moodle     | Tipo      | Propósito                                        |
+| -------------------- | --------- | ------------------------------------------------ |
+| Dashboard principal  | Página    | Feature 1 — Paneles IRD y Solicitudes            |
+| Panel del alumno     | Página    | Feature 2 — Vista individual del alumno          |
+| Panel Histórico      | Página    | Feature 3 — Snapshots y análisis histórico       |
+| Panel 1er Año        | Página    | Feature 4 — Gestión de alumnos ingresantes       |
+| Config (pestaña)     | BD Moodle | Parámetros configurables sin editar código       |
+| DB Solicitudes       | BD Moodle | Solicitudes de ayuda enviadas por alumnos        |
+| DB Logs asistencias  | BD Moodle | Registro de asistencias realizadas por tutores   |
+| DB Histórico         | BD Moodle | Snapshots cuatrimestrales de todos los alumnos   |
+| DB Histórico 1er Año | BD Moodle | Snapshots del alargamiento de alumnos de 1er año |
+| DB 1er Año           | BD Moodle | Estado actual de alumnos ingresantes (CSV)       |
+| DB Config            | BD Moodle | Parámetros del sistema modificables por el tutor |
 
 ### 2.3 Flujo general de datos — Dashboard principal
 
@@ -122,28 +122,28 @@ Cada fuente puede estar paginada. Estrategia:
 
 ### 3.1 Fuentes de lectura (scraping vía GET)
 
-|#|Fuente|URL patrón|Datos obtenidos|
-|---|---|---|---|
-|1|Encuesta inicial|`/mod/feedback/show_entries.php?id=[CMID_INICIAL]&page=N`|Respuestas estáticas por alumno (nombre, foto, respuestas)|
-|2|Encuesta cuatrimestral|`/mod/feedback/show_entries.php?id=[CMID_CUATRIMESTRAL]&page=N`|Respuestas dinámicas + fecha de última entrega|
-|3|DB Solicitudes de ayuda|`/mod/data/view.php?id=[CMID_DB_SOLICITUDES]&page=N`|Solicitudes pendientes y atendidas|
-|4|DB Log de asistencias|`/mod/data/view.php?id=[CMID_DB_LOGS]&page=N`|Historial de asistencias por tutor|
-|5|DB Config|`/mod/data/view.php?id=[CMID_DB_CONFIG]&page=0`|Parámetros del sistema|
-|6|DB Histórico|`/mod/data/view.php?id=[CMID_DB_HISTORICO]&page=N`|Snapshots cuatrimestrales de todos los alumnos|
-|7|DB Histórico 1er Año|`/mod/data/view.php?id=[CMID_DB_HIST_1ER_ANIO]&page=N`|Snapshots del alargamiento por cuatrimestre|
-|8|DB 1er Año|`/mod/data/view.php?id=[CMID_DB_1ER_ANIO]&page=N`|Estado actual de materias y alargamiento|
+| #   | Fuente                  | URL patrón                                                      | Datos obtenidos                                            |
+| --- | ----------------------- | --------------------------------------------------------------- | ---------------------------------------------------------- |
+| 1   | Encuesta inicial        | `/mod/feedback/show_entries.php?id=[CMID_INICIAL]&page=N`       | Respuestas estáticas por alumno (nombre, foto, respuestas) |
+| 2   | Encuesta cuatrimestral  | `/mod/feedback/show_entries.php?id=[CMID_CUATRIMESTRAL]&page=N` | Respuestas dinámicas + fecha de última entrega             |
+| 3   | DB Solicitudes de ayuda | `/mod/data/view.php?id=[CMID_DB_SOLICITUDES]&page=N`            | Solicitudes pendientes y atendidas                         |
+| 4   | DB Log de asistencias   | `/mod/data/view.php?id=[CMID_DB_LOGS]&page=N`                   | Historial de asistencias por tutor                         |
+| 5   | DB Config               | `/mod/data/view.php?id=[CMID_DB_CONFIG]&page=0`                 | Parámetros del sistema                                     |
+| 6   | DB Histórico            | `/mod/data/view.php?id=[CMID_DB_HISTORICO]&page=N`              | Snapshots cuatrimestrales de todos los alumnos             |
+| 7   | DB Histórico 1er Año    | `/mod/data/view.php?id=[CMID_DB_HIST_1ER_ANIO]&page=N`          | Snapshots del alargamiento por cuatrimestre                |
+| 8   | DB 1er Año              | `/mod/data/view.php?id=[CMID_DB_1ER_ANIO]&page=N`               | Estado actual de materias y alargamiento                   |
 
 ### 3.2 Escritura (POST simulando acciones del usuario)
 
-|Acción|URL|
-|---|---|
-|Tutor agrega entrada al log de asistencias|`/mod/data/edit.php?d=[DATAID_DB_LOGS]`|
-|Tutor aprueba solicitud de alumno|`/mod/data/view.php` + parámetros a descubrir|
-|Alumno envía solicitud de ayuda|`/mod/data/edit.php?d=[DATAID_DB_SOLICITUDES]`|
-|Guardar snapshot histórico|`/mod/data/edit.php?d=[DATAID_DB_HISTORICO]`|
-|Guardar snapshot histórico 1er año|`/mod/data/edit.php?d=[DATAID_DB_HIST_1ER_ANIO]`|
-|Guardar/actualizar alumno en DB 1er Año|`/mod/data/edit.php?d=[DATAID_DB_1ER_ANIO]`|
-|Guardar config|`/mod/data/edit.php?d=[DATAID_DB_CONFIG]`|
+| Acción                                     | URL                                              |
+| ------------------------------------------ | ------------------------------------------------ |
+| Tutor agrega entrada al log de asistencias | `/mod/data/edit.php?d=[DATAID_DB_LOGS]`          |
+| Tutor aprueba solicitud de alumno          | `/mod/data/view.php` + parámetros a descubrir    |
+| Alumno envía solicitud de ayuda            | `/mod/data/edit.php?d=[DATAID_DB_SOLICITUDES]`   |
+| Guardar snapshot histórico                 | `/mod/data/edit.php?d=[DATAID_DB_HISTORICO]`     |
+| Guardar snapshot histórico 1er año         | `/mod/data/edit.php?d=[DATAID_DB_HIST_1ER_ANIO]` |
+| Guardar/actualizar alumno en DB 1er Año    | `/mod/data/edit.php?d=[DATAID_DB_1ER_ANIO]`      |
+| Guardar config                             | `/mod/data/edit.php?d=[DATAID_DB_CONFIG]`        |
 
 ### 3.3 CSRF — Sesskey
 
@@ -171,9 +171,9 @@ Disponible en cualquier página Moodle. No requiere fetch adicional.
 
 **Campos:**
 
-|Campo|Tipo en Moodle|Obligatorio|Descripción|
-|---|---|---|---|
-|`descripcion`|Área de texto|No|Mensaje opcional del alumno|
+| Campo         | Tipo en Moodle | Obligatorio | Descripción                 |
+| ------------- | -------------- | ----------- | --------------------------- |
+| `descripcion` | Área de texto  | No          | Mensaje opcional del alumno |
 
 Moodle provee automáticamente: ID de entrada, nombre completo, foto, fecha de envío, estado de aprobación.
 
@@ -186,13 +186,13 @@ Moodle provee automáticamente: ID de entrada, nombre completo, foto, fecha de e
 
 **Campos:**
 
-|Campo|Tipo en Moodle|Obligatorio|Descripción|
-|---|---|---|---|
-|`nombre_alumno`|Texto corto|Sí|Nombre completo del alumno asistido|
-|`id_alumno`|Texto corto|Sí|ID Moodle del alumno (para cruzar datos)|
-|`nombre_tutor`|Texto corto|Sí|Nombre del tutor (evita fetch adicional al parsear)|
-|`origen`|Menú desplegable|Sí|`Proactivo` / `Solicitud`|
-|`mensaje`|Área de texto|No|Mensaje enviado al alumno al asistirlo|
+| Campo           | Tipo en Moodle   | Obligatorio | Descripción                                         |
+| --------------- | ---------------- | ----------- | --------------------------------------------------- |
+| `nombre_alumno` | Texto corto      | Sí          | Nombre completo del alumno asistido                 |
+| `id_alumno`     | Texto corto      | Sí          | ID Moodle del alumno (para cruzar datos)            |
+| `nombre_tutor`  | Texto corto      | Sí          | Nombre del tutor (evita fetch adicional al parsear) |
+| `origen`        | Menú desplegable | Sí          | `Proactivo` / `Solicitud`                           |
+| `mensaje`       | Área de texto    | No          | Mensaje enviado al alumno al asistirlo              |
 
 Moodle provee automáticamente: fecha de la entrada, ID de entrada, autor.
 
@@ -207,17 +207,17 @@ Moodle provee automáticamente: fecha de la entrada, ID de entrada, autor.
 
 **Campos:**
 
-|Campo|Tipo en Moodle|Descripción|
-|---|---|---|
-|`id_alumno`|Texto corto|ID Moodle del alumno|
-|`nombre_alumno`|Texto corto|Nombre completo|
-|`fecha_snapshot`|Texto corto|Fecha en formato `YYYY-MM-DD` de cuando se guardó el snapshot|
-|`cuatrimestre`|Texto corto|Ej: `2025-1` o `2025-2`|
-|`ird`|Número|IRD calculado en ese momento|
-|`se_percibe_riesgo`|Menú/texto|`si` / `no` / `sin_dato`|
-|`respuestas_json`|Área de texto|JSON con todas las respuestas de ambas encuestas en ese momento|
-|`materias_json`|Área de texto|JSON con materias y notas reportadas en la encuesta cuatrimestral|
-|`anio_ingreso`|Texto corto|Año de ingreso a la carrera (para separar cohortes)|
+| Campo               | Tipo en Moodle | Descripción                                                       |
+| ------------------- | -------------- | ----------------------------------------------------------------- |
+| `id_alumno`         | Texto corto    | ID Moodle del alumno                                              |
+| `nombre_alumno`     | Texto corto    | Nombre completo                                                   |
+| `fecha_snapshot`    | Texto corto    | Fecha en formato `YYYY-MM-DD` de cuando se guardó el snapshot     |
+| `cuatrimestre`      | Texto corto    | Ej: `2025-1` o `2025-2`                                           |
+| `ird`               | Número         | IRD calculado en ese momento                                      |
+| `se_percibe_riesgo` | Menú/texto     | `si` / `no` / `sin_dato`                                          |
+| `respuestas_json`   | Área de texto  | JSON con todas las respuestas de ambas encuestas en ese momento   |
+| `materias_json`     | Área de texto  | JSON con materias y notas reportadas en la encuesta cuatrimestral |
+| `anio_ingreso`      | Texto corto    | Año de ingreso a la carrera (para separar cohortes)               |
 
 ### 4.4 DB 1er Año (estado actual)
 
@@ -227,12 +227,12 @@ Moodle provee automáticamente: fecha de la entrada, ID de entrada, autor.
 
 **Campos:**
 
-|Campo|Tipo en Moodle|Descripción|
-|---|---|---|
-|`id_alumno`|Texto corto|Identificador arbitrario del alumno (recomendado: DNI)|
-|`materias`|Área de texto|`"Física 1:8,Matemática 2:4"` — pares materia:nota|
-|`aprobadas`|Número|Contador de materias con nota >= 6|
-|`alargamiento`|Número|Indicador calculado al momento de cargar el CSV|
+| Campo          | Tipo en Moodle | Descripción                                            |
+| -------------- | -------------- | ------------------------------------------------------ |
+| `id_alumno`    | Texto corto    | Identificador arbitrario del alumno (recomendado: DNI) |
+| `materias`     | Área de texto  | `"Física 1:8,Matemática 2:4"` — pares materia:nota     |
+| `aprobadas`    | Número         | Contador de materias con nota >= 6                     |
+| `alargamiento` | Número         | Indicador calculado al momento de cargar el CSV        |
 
 > **Sobre `id_alumno`:** es un identificador arbitrario definido por el profesor al subir el CSV. En la práctica se recomienda el DNI por ser único y estable, pero el sistema no impone ninguna restricción al respecto. No se usa scraping de Moodle para alumnos de 1er año.
 
@@ -244,13 +244,13 @@ Moodle provee automáticamente: fecha de la entrada, ID de entrada, autor.
 
 **Campos:**
 
-|Campo|Tipo en Moodle|Descripción|
-|---|---|---|
-|`id_alumno`|Texto corto|Identificador del alumno|
-|`fecha_snapshot`|Texto corto|Fecha `YYYY-MM-DD` de la carga del CSV|
-|`cuatrimestre`|Texto corto|Ej: `2026-1`|
-|`aprobadas`|Número|Materias aprobadas en ese momento|
-|`alargamiento`|Número|Indicador calculado en ese momento|
+| Campo            | Tipo en Moodle | Descripción                            |
+| ---------------- | -------------- | -------------------------------------- |
+| `id_alumno`      | Texto corto    | Identificador del alumno               |
+| `fecha_snapshot` | Texto corto    | Fecha `YYYY-MM-DD` de la carga del CSV |
+| `cuatrimestre`   | Texto corto    | Ej: `2026-1`                           |
+| `aprobadas`      | Número         | Materias aprobadas en ese momento      |
+| `alargamiento`   | Número         | Indicador calculado en ese momento     |
 
 Se escribe un registro por alumno cada vez que el tutor ejecuta "Guardar histórico 1er año".
 
@@ -263,13 +263,13 @@ Se escribe un registro por alumno cada vez que el tutor ejecuta "Guardar histór
 
 **Campos:**
 
-|Campo|Tipo en Moodle|Default|Descripción|
-|---|---|---|---|
-|`threshold_ird`|Número|40|IRD mínimo para mostrar botón "Asistir"|
-|`cooldown_actualizar_seg`|Número|30|Segundos de espera entre clicks en "Actualizar"|
-|`quarterly_warning_days`|Número|90|Días sin encuesta cuatrimestral antes de mostrar advertencia|
-|`cuatrimestres_desercion`|Número|2|Cuatrimestres sin completar encuesta para considerar al alumno desertor|
-|`beta_values_json`|Área de texto|—|JSON con overrides de β por pregunta (si está vacío, usa los del código)|
+| Campo                     | Tipo en Moodle | Default | Descripción                                                              |
+| ------------------------- | -------------- | ------- | ------------------------------------------------------------------------ |
+| `threshold_ird`           | Número         | 40      | IRD mínimo para mostrar botón "Asistir"                                  |
+| `cooldown_actualizar_seg` | Número         | 30      | Segundos de espera entre clicks en "Actualizar"                          |
+| `quarterly_warning_days`  | Número         | 90      | Días sin encuesta cuatrimestral antes de mostrar advertencia             |
+| `cuatrimestres_desercion` | Número         | 2       | Cuatrimestres sin completar encuesta para considerar al alumno desertor  |
+| `beta_values_json`        | Área de texto  | —       | JSON con overrides de β por pregunta (si está vacío, usa los del código) |
 
 > **Carga de config:** se realiza al abrir cualquier panel, antes del `Promise.all` principal. Agrega aproximadamente 300ms al tiempo de carga inicial. Si la DB Config está vacía o el fetch falla, el sistema usa los valores hardcodeados como fallback sin interrumpir la carga.
 
@@ -307,13 +307,13 @@ Z_max = Σ (βᵢ × valor_máximo_i)
 
 ### 5.2 Escala de pesos β
 
-|Importancia|β|
-|---|---|
-|Muy baja|0.5|
-|Baja|1.0|
-|Media|1.5|
-|Alta|2.0|
-|Muy alta|2.5|
+| Importancia | β   |
+| ----------- | --- |
+| Muy baja    | 0.5 |
+| Baja        | 1.0 |
+| Media       | 1.5 |
+| Alta        | 2.0 |
+| Muy alta    | 2.5 |
 
 ### 5.3 Ejemplo de preguntas con sus pesos
 
@@ -333,12 +333,12 @@ Z_max = Σ (βᵢ × valor_máximo_i)
 
 ### 5.4 Colores y umbral del IRD
 
-|Rango IRD|Color|Descripción|Botón "Asistir" en Panel 1|
-|---|---|---|---|
-|80 – 100|🔴 Rojo|Intervención inmediata|Visible (si cumple condición)|
-|40 – 79|🟡 Amarillo|Seguimiento y tutoría|Visible (si cumple condición)|
-|0 – 39|🟢 Verde|Sin riesgo|No visible|
-|Sin datos|—|Encuestas incompletas|No visible|
+| Rango IRD | Color       | Descripción            | Botón "Asistir" en Panel 1    |
+| --------- | ----------- | ---------------------- | ----------------------------- |
+| 80 – 100  | 🔴 Rojo     | Intervención inmediata | Visible (si cumple condición) |
+| 40 – 79   | 🟡 Amarillo | Seguimiento y tutoría  | Visible (si cumple condición) |
+| 0 – 39    | 🟢 Verde    | Sin riesgo             | No visible                    |
+| Sin datos | —           | Encuestas incompletas  | No visible                    |
 
 **Umbral configurable:** `THRESHOLD_IRD = 40`.
 
@@ -542,7 +542,7 @@ const PLAN_DE_ESTUDIOS = {
   anio2: 14,
   anio3: 21,
   // completar según plan real
-}
+};
 ```
 
 Se muestra como columna adicional en el Panel 1:
@@ -568,11 +568,11 @@ Se calculan sobre los datos actuales. No requieren histórico para mostrarse, pe
 - **Egresado:** alumno que respondió `Sí` a la pregunta de egreso en la encuesta cuatrimestral.
 - **Activo:** ninguna de las anteriores condiciones.
 
-|Indicador|Fórmula|
-|---|---|
-|Deserción total|(desertores / ingresantes de la cohorte) × 100%|
-|Alumnos activos|(activos / ingresantes de la cohorte) × 100%|
-|Eficiencia terminal|(egresados / ingresantes de la cohorte) × 100%|
+| Indicador           | Fórmula                                         |
+| ------------------- | ----------------------------------------------- |
+| Deserción total     | (desertores / ingresantes de la cohorte) × 100% |
+| Alumnos activos     | (activos / ingresantes de la cohorte) × 100%    |
+| Eficiencia terminal | (egresados / ingresantes de la cohorte) × 100%  |
 
 > Los tres suman 100% de la cohorte.
 
@@ -673,15 +673,15 @@ Durante el cálculo del IRD de todos los alumnos, se acumula en paralelo el peso
 
 **Columnas y ordenamiento:**
 
-|Columna|Ordenable|
-|---|---|
-|Foto|No|
-|Nombre|No|
-|Apellido|No|
-|IRD|Sí ↕ (default: descendente)|
-|Última asistencia|Sí ↕|
-|Última solicitud|Sí ↕|
-|Acción|No|
+| Columna           | Ordenable                   |
+| ----------------- | --------------------------- |
+| Foto              | No                          |
+| Nombre            | No                          |
+| Apellido          | No                          |
+| IRD               | Sí ↕ (default: descendente) |
+| Última asistencia | Sí ↕                        |
+| Última solicitud  | Sí ↕                        |
+| Acción            | No                          |
 
 ### Panel 2 — Solicitudes de Ayuda Pendientes
 
@@ -890,14 +890,14 @@ La configuración se expone en una pestaña no principal de Moodle (usando el si
 
 ### 10.2 Qué se puede configurar
 
-|Parámetro|Descripción|
-|---|---|
-|`THRESHOLD_IRD`|IRD mínimo para mostrar el botón "Asistir"|
-|`COOLDOWN_ACTUALIZAR_SEG`|Segundos de cooldown del botón Actualizar|
-|`QUARTERLY_WARNING_DAYS`|Días sin encuesta antes de mostrar advertencia|
-|`CUATRIMESTRES_DESERCION`|Cuatrimestres sin encuesta para considerar al alumno desertor|
-|Valores β por pregunta|Override de los pesos de cada pregunta sin editar el código|
-|Valores X por respuesta|Override del valor numérico de cada opción de respuesta|
+| Parámetro                 | Descripción                                                   |
+| ------------------------- | ------------------------------------------------------------- |
+| `THRESHOLD_IRD`           | IRD mínimo para mostrar el botón "Asistir"                    |
+| `COOLDOWN_ACTUALIZAR_SEG` | Segundos de cooldown del botón Actualizar                     |
+| `QUARTERLY_WARNING_DAYS`  | Días sin encuesta antes de mostrar advertencia                |
+| `CUATRIMESTRES_DESERCION` | Cuatrimestres sin encuesta para considerar al alumno desertor |
+| Valores β por pregunta    | Override de los pesos de cada pregunta sin editar el código   |
+| Valores X por respuesta   | Override del valor numérico de cada opción de respuesta       |
 
 ### 10.3 Lógica de carga
 
@@ -987,16 +987,20 @@ Endpoint confirmado y funcionando:
 // POST a:
 // /lib/ajax/service.php?sesskey=X&info=core_message_send_instant_messages
 
-[{
-  "index": 0,
-  "methodname": "core_message_send_instant_messages",
-  "args": {
-    "messages": [{
-      "touserid": "ID_DEL_ALUMNO",
-      "text": "Mensaje aquí"
-    }]
-  }
-}]
+[
+  {
+    index: 0,
+    methodname: "core_message_send_instant_messages",
+    args: {
+      messages: [
+        {
+          touserid: "ID_DEL_ALUMNO",
+          text: "Mensaje aquí",
+        },
+      ],
+    },
+  },
+];
 
 // Headers: Content-Type: application/json
 // Respuesta exitosa: [{"error":false,"data":[{"msgid":XXXX}]}]
@@ -1006,16 +1010,16 @@ Endpoint confirmado y funcionando:
 
 ## 12. Restricciones Técnicas de Moodle
 
-|Restricción|Detalle|
-|---|---|
-|Código embebido|Todo en un único bloque HTML con `<script>` por actividad Página|
-|Sin event handlers HTML|Prohibido `onclick`, `onchange`, etc. Todo vía `addEventListener`|
-|Sesskey obligatorio|`M.cfg.sesskey` en el body de todo POST. Sin él Moodle rechaza la solicitud|
-|Foto de perfil|Provista por Moodle en el HTML del Feedback. No requiere fetch adicional|
-|Sin dependencias externas|Cero librerías. JavaScript vanilla únicamente|
-|Acceso al dashboard|Pantalla falsa activada con clic en `accumsan`|
-|Exportación sin librerías|CSV via `Blob` + `URL.createObjectURL`. PDF via jsPDF desde CDN de cdnjs (sin CSP)|
-|DB Solicitudes|Nunca aprobar entradas manualmente. Solo aprobar programáticamente al marcar atendido|
+| Restricción               | Detalle                                                                               |
+| ------------------------- | ------------------------------------------------------------------------------------- |
+| Código embebido           | Todo en un único bloque HTML con `<script>` por actividad Página                      |
+| Sin event handlers HTML   | Prohibido `onclick`, `onchange`, etc. Todo vía `addEventListener`                     |
+| Sesskey obligatorio       | `M.cfg.sesskey` en el body de todo POST. Sin él Moodle rechaza la solicitud           |
+| Foto de perfil            | Provista por Moodle en el HTML del Feedback. No requiere fetch adicional              |
+| Sin dependencias externas | Cero librerías. JavaScript vanilla únicamente                                         |
+| Acceso al dashboard       | Pantalla falsa activada con clic en `accumsan`                                        |
+| Exportación sin librerías | CSV via `Blob` + `URL.createObjectURL`. PDF via jsPDF desde CDN de cdnjs (sin CSP)    |
+| DB Solicitudes            | Nunca aprobar entradas manualmente. Solo aprobar programáticamente al marcar atendido |
 
 ### Iconos: SVG vs Emoji
 
@@ -1055,23 +1059,23 @@ Crear en este orden:
 
 Hay dos tipos de ID por cada Base de Datos Moodle, y uno por cada Feedback. Ver sección **"Cómo obtener CMID y DATAID"** al final del documento para el procedimiento detallado.
 
-|Constante|Qué es|Cómo obtenerlo|
-|---|---|---|
-|`MOODLE_BASE_URL`|Dominio del sitio|Copiarlo de la barra del navegador|
-|`CMID_ENCUESTA_INICIAL`|ID del Feedback inicial|`?id=` en la URL al navegar al Feedback|
-|`CMID_ENCUESTA_CUATRIMESTRAL`|ID del Feedback cuatrimestral|`?id=` en la URL al navegar al Feedback|
-|`CMID_DB_SOLICITUDES`|ID de la DB Solicitudes|`?id=` en la URL al navegar a la actividad|
-|`DATAID_DB_SOLICITUDES`|ID interno de la DB Solicitudes|`?d=` en la URL al abrir "Agregar entrada"|
-|`CMID_DB_LOGS`|ID de la DB Logs|`?id=` en la URL al navegar a la actividad|
-|`DATAID_DB_LOGS`|ID interno de la DB Logs|`?d=` en la URL al abrir "Agregar entrada"|
-|`CMID_DB_CONFIG`|ID de la DB Config|`?id=` en la URL al navegar a la actividad|
-|`DATAID_DB_CONFIG`|ID interno de la DB Config|`?d=` en la URL al abrir "Agregar entrada"|
-|`CMID_DB_HISTORICO`|ID de la DB Histórico|`?id=` en la URL al navegar a la actividad|
-|`DATAID_DB_HISTORICO`|ID interno de la DB Histórico|`?d=` en la URL al abrir "Agregar entrada"|
-|`CMID_DB_1ER_ANIO`|ID de la DB 1er Año|`?id=` en la URL al navegar a la actividad|
-|`DATAID_DB_1ER_ANIO`|ID interno de la DB 1er Año|`?d=` en la URL al abrir "Agregar entrada"|
-|`CMID_DB_HIST_1ER_ANIO`|ID de la DB Histórico 1er Año|`?id=` en la URL al navegar a la actividad|
-|`DATAID_DB_HIST_1ER_ANIO`|ID interno de la DB Histórico 1er Año|`?d=` en la URL al abrir "Agregar entrada"|
+| Constante                     | Qué es                                | Cómo obtenerlo                             |
+| ----------------------------- | ------------------------------------- | ------------------------------------------ |
+| `MOODLE_BASE_URL`             | Dominio del sitio                     | Copiarlo de la barra del navegador         |
+| `CMID_ENCUESTA_INICIAL`       | ID del Feedback inicial               | `?id=` en la URL al navegar al Feedback    |
+| `CMID_ENCUESTA_CUATRIMESTRAL` | ID del Feedback cuatrimestral         | `?id=` en la URL al navegar al Feedback    |
+| `CMID_DB_SOLICITUDES`         | ID de la DB Solicitudes               | `?id=` en la URL al navegar a la actividad |
+| `DATAID_DB_SOLICITUDES`       | ID interno de la DB Solicitudes       | `?d=` en la URL al abrir "Agregar entrada" |
+| `CMID_DB_LOGS`                | ID de la DB Logs                      | `?id=` en la URL al navegar a la actividad |
+| `DATAID_DB_LOGS`              | ID interno de la DB Logs              | `?d=` en la URL al abrir "Agregar entrada" |
+| `CMID_DB_CONFIG`              | ID de la DB Config                    | `?id=` en la URL al navegar a la actividad |
+| `DATAID_DB_CONFIG`            | ID interno de la DB Config            | `?d=` en la URL al abrir "Agregar entrada" |
+| `CMID_DB_HISTORICO`           | ID de la DB Histórico                 | `?id=` en la URL al navegar a la actividad |
+| `DATAID_DB_HISTORICO`         | ID interno de la DB Histórico         | `?d=` en la URL al abrir "Agregar entrada" |
+| `CMID_DB_1ER_ANIO`            | ID de la DB 1er Año                   | `?id=` en la URL al navegar a la actividad |
+| `DATAID_DB_1ER_ANIO`          | ID interno de la DB 1er Año           | `?d=` en la URL al abrir "Agregar entrada" |
+| `CMID_DB_HIST_1ER_ANIO`       | ID de la DB Histórico 1er Año         | `?id=` en la URL al navegar a la actividad |
+| `DATAID_DB_HIST_1ER_ANIO`     | ID interno de la DB Histórico 1er Año | `?d=` en la URL al abrir "Agregar entrada" |
 
 ---
 
@@ -1103,20 +1107,20 @@ Asegurarse de que haya al menos una respuesta cargada. Luego:
 
 Una vez que se tiene el HTML del Feedback, por cada pregunta de ambas encuestas definir:
 
-|Campo|Descripción|
-|---|---|
-|`id`|Selector HTML que identifica esa pregunta en el HTML del Feedback (se extrae del HTML del paso anterior)|
-|`textoPregunta`|Texto visible de la pregunta|
-|`beta`|Peso asignado (ver escala en sección 5.2)|
-|`maxValue`|Valor numérico máximo posible entre las opciones de respuesta|
-|`respuestas`|Objeto `{ "texto exacto de Moodle": valorNumérico }` — el texto debe coincidir carácter a carácter con lo que muestra Moodle|
+| Campo           | Descripción                                                                                                                  |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `id`            | Selector HTML que identifica esa pregunta en el HTML del Feedback (se extrae del HTML del paso anterior)                     |
+| `textoPregunta` | Texto visible de la pregunta                                                                                                 |
+| `beta`          | Peso asignado (ver escala en sección 5.2)                                                                                    |
+| `maxValue`      | Valor numérico máximo posible entre las opciones de respuesta                                                                |
+| `respuestas`    | Objeto `{ "texto exacto de Moodle": valorNumérico }` — el texto debe coincidir carácter a carácter con lo que muestra Moodle |
 
 Las tres preguntas con rol especial en la lógica deben identificarse también con estas constantes:
 
 ```javascript
-const ID_PREGUNTA_PERCEPCION_RIESGO = "id_html_de_esa_pregunta"  // ¿Te percibís en riesgo?
-const ID_PREGUNTA_EGRESO            = "id_html_de_esa_pregunta"  // ¿Estás egresado?
-const ID_PREGUNTA_ANIO_INGRESO      = "id_html_de_esa_pregunta"  // ¿En qué año ingresaste?
+const ID_PREGUNTA_PERCEPCION_RIESGO = "id_html_de_esa_pregunta"; // ¿Te percibís en riesgo?
+const ID_PREGUNTA_EGRESO = "id_html_de_esa_pregunta"; // ¿Estás egresado?
+const ID_PREGUNTA_ANIO_INGRESO = "id_html_de_esa_pregunta"; // ¿En qué año ingresaste?
 ```
 
 ---
@@ -1125,13 +1129,13 @@ const ID_PREGUNTA_ANIO_INGRESO      = "id_html_de_esa_pregunta"  // ¿En qué a�
 
 Este es el único endpoint que todavía no está confirmado. Ver tabla de estado:
 
-|Acción|Estado|Cómo obtenerlo|
-|---|---|---|
-|Aprobar entrada en DB Solicitudes|**Pendiente**|DevTools → Network → aprobar una entrada manualmente en la DB y capturar el request|
-|Mensajería interna Moodle|✅ Confirmado|`/lib/ajax/service.php` con `core_message_send_instant_messages`|
-|POST a DB (crear entrada)|✅ Confirmado|`/mod/data/edit.php?d=X`|
-|Leer DB (scraping)|✅ Confirmado|`/mod/data/view.php?id=X`|
-|Leer Feedback (scraping)|✅ Confirmado|`/mod/feedback/show_entries.php?id=X`|
+| Acción                            | Estado        | Cómo obtenerlo                                                                      |
+| --------------------------------- | ------------- | ----------------------------------------------------------------------------------- |
+| Aprobar entrada en DB Solicitudes | **Pendiente** | DevTools → Network → aprobar una entrada manualmente en la DB y capturar el request |
+| Mensajería interna Moodle         | ✅ Confirmado | `/lib/ajax/service.php` con `core_message_send_instant_messages`                    |
+| POST a DB (crear entrada)         | ✅ Confirmado | `/mod/data/edit.php?d=X`                                                            |
+| Leer DB (scraping)                | ✅ Confirmado | `/mod/data/view.php?id=X`                                                           |
+| Leer Feedback (scraping)          | ✅ Confirmado | `/mod/feedback/show_entries.php?id=X`                                               |
 
 ---
 
@@ -1142,15 +1146,15 @@ Datos reales:
 ```javascript
 // Materias acumuladas que el alumno debería tener aprobadas al finalizar cada año
 const PLAN_DE_ESTUDIOS = {
-  anio1:  7,
+  anio1: 7,
   anio2: 18,
   anio3: 30,
   anio4: 41,
   anio5: 51,
-}
+};
 
-const MATERIAS_ESPERADAS_1ER_ANIO = 7   // usado en el Panel 1er Año (alargamiento)
-const TOTAL_MATERIAS_CARRERA      = 51  // igual a anio5, pero explícito para no asumir cuál es el último año
+const MATERIAS_ESPERADAS_1ER_ANIO = 7; // usado en el Panel 1er Año (alargamiento)
+const TOTAL_MATERIAS_CARRERA = 51; // igual a anio5, pero explícito para no asumir cuál es el último año
 ```
 
 **Cómo determinar en qué año está un alumno** (necesario para elegir el denominador correcto en la ralentización):
@@ -1179,15 +1183,15 @@ function materiasEsperadas(anioIngreso):
 Datos reales:
 (Si falta algo el agente debe notificar)
 
-|Constante|Valor sugerido|Descripción|
-|---|---|---|
-|`THRESHOLD_IRD`|40|IRD mínimo para mostrar botón "Asistir"|
-|`ACTUALIZAR_COOLDOWN_SEG`|30|Segundos entre clicks en "Actualizar"|
-|`QUARTERLY_WARNING_DAYS`|90|Días sin encuesta cuatrimestral antes de advertencia|
-|`CUATRIMESTRES_DESERCION`|2|Cuatrimestres sin encuesta para considerar desertor|
-|`HISTORICO_DELAY_MS`|500|Delay entre escrituras al guardar histórico|
-|`RESULTS_PER_PAGE_MOODLE`|Verificar|Resultados por página en Feedback (inspeccionar Moodle)|
-|`PAGE_SIZE_PANELS`|30|Resultados por página en paneles del dashboard|
+| Constante                 | Valor sugerido | Descripción                                             |
+| ------------------------- | -------------- | ------------------------------------------------------- |
+| `THRESHOLD_IRD`           | 40             | IRD mínimo para mostrar botón "Asistir"                 |
+| `ACTUALIZAR_COOLDOWN_SEG` | 30             | Segundos entre clicks en "Actualizar"                   |
+| `QUARTERLY_WARNING_DAYS`  | 90             | Días sin encuesta cuatrimestral antes de advertencia    |
+| `CUATRIMESTRES_DESERCION` | 2              | Cuatrimestres sin encuesta para considerar desertor     |
+| `HISTORICO_DELAY_MS`      | 500            | Delay entre escrituras al guardar histórico             |
+| `RESULTS_PER_PAGE_MOODLE` | Verificar      | Resultados por página en Feedback (inspeccionar Moodle) |
+| `PAGE_SIZE_PANELS`        | 30             | Resultados por página en paneles del dashboard          |
 
 ---
 
@@ -1223,7 +1227,7 @@ Los nombres de los campos (`id_alumno`, `alumno`, `anio_ingreso`, etc.) no cambi
 son definidos por el administrador al crear la actividad y son el punto de anclaje
 confiable para el mapeo.
 
-***
+---
 
 # Codigo Referencia Funcional 1: Crear Registro en base de datos
 
@@ -1236,9 +1240,9 @@ confiable para el mapeo.
     if (document.currentScript?.parentElement?.tagName === "P") {
       document.currentScript.parentElement.style.margin = "0";
     }
-    
+
     // Pequeño Script para ocultar el titulo default de la actividad pagina lo mas rapido posible
-    (function() {
+    (function () {
       var style = document.createElement("style");
       style.textContent = `
          h2:first-of-type {
@@ -1255,66 +1259,110 @@ confiable para el mapeo.
 </p>
 <!-- BLOQUE MOODLE: Crear entrada en Base de Datos -->
 <div id="pantalla-falsa">
-  <p style="font-size: 15px; color: #444; line-height: 1.8;"
-    data-darkreader-inline-color=""><strong>Página de pruebaa Moodle</strong>
+  <p
+    style="font-size: 15px; color: #444; line-height: 1.8;"
+    data-darkreader-inline-color=""
+  >
+    <strong>Página de pruebaa Moodle</strong>
   </p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8;"
-    data-darkreader-inline-color="">Lorem ipsum dolor sit amet, consectetur
-    adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna
-    aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-    nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-    reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-    pariatur.</p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8;"
-    data-darkreader-inline-color="">Pellentesque habitant morbi tristique
-    senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor
-    quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero
-    sit amet quam egestas semper. Aenean ultricies mi vitae est, et nunc <span
-      id="btn-oculto" style="cursor: text;">accumsan</span> vehicula nisi.
+  <p
+    style="font-size: 14px; color: #555; line-height: 1.8;"
+    data-darkreader-inline-color=""
+  >
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur.
+  </p>
+  <p
+    style="font-size: 14px; color: #555; line-height: 1.8;"
+    data-darkreader-inline-color=""
+  >
+    Pellentesque habitant morbi tristique senectus et netus et malesuada fames
+    ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget,
+    tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean
+    ultricies mi vitae est, et nunc
+    <span id="btn-oculto" style="cursor: text;">accumsan</span> vehicula nisi.
     Mauris placerat eleifend leo, quisque sit amet est et sapien ullamcorper
-    pharetra.</p>
-  <p style="font-size: 14px; color: #555; line-height: 1.8;"
-    data-darkreader-inline-color="">Curabitur pretium tincidunt lacus. Nulla
-    gravida orci a odio. Nullam varius, turpis molestie dictum semper, quam quam
-    congue erat, vitae sodales nisi metus a nunc. Aliquam erat volutpat. Nam dui
-    ligula, fringilla a, euismod sodales, sollicitudin vel, wisi.</p>
+    pharetra.
+  </p>
+  <p
+    style="font-size: 14px; color: #555; line-height: 1.8;"
+    data-darkreader-inline-color=""
+  >
+    Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius,
+    turpis molestie dictum semper, quam quam congue erat, vitae sodales nisi
+    metus a nunc. Aliquam erat volutpat. Nam dui ligula, fringilla a, euismod
+    sodales, sollicitudin vel, wisi.
+  </p>
 </div>
 <div id="tablero" style="display: none; max-width: 400px;">
-  <p style="font-size: 15px; font-weight: 600; color: #333; margin-bottom: 16px;"
-    data-darkreader-inline-color="">Nueva entrada</p>
-  <div style="margin-bottom: 12px;"><label
+  <p
+    style="font-size: 15px; font-weight: 600; color: #333; margin-bottom: 16px;"
+    data-darkreader-inline-color=""
+  >
+    Nueva entrada
+  </p>
+  <div style="margin-bottom: 12px;">
+    <label
       style="display: block; font-size: 13px; color: #555; margin-bottom: 4px;"
-      for="input-materia" data-darkreader-inline-color="">Materia</label> <input
+      for="input-materia"
+      data-darkreader-inline-color=""
+      >Materia</label
+    >
+    <input
       id="input-materia"
       style="width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box;"
-      type="text" value="Fisica 1" placeholder="Ej: Física 1"
+      type="text"
+      value="Fisica 1"
+      placeholder="Ej: Física 1"
       data-darkreader-inline-border-top=""
       data-darkreader-inline-border-right=""
       data-darkreader-inline-border-bottom=""
-      data-darkreader-inline-border-left=""></div>
-  <div style="margin-bottom: 16px;"><label
+      data-darkreader-inline-border-left=""
+    />
+  </div>
+  <div style="margin-bottom: 16px;">
+    <label
       style="display: block; font-size: 13px; color: #555; margin-bottom: 4px;"
-      for="input-nota" data-darkreader-inline-color="">Nota</label> <input
+      for="input-nota"
+      data-darkreader-inline-color=""
+      >Nota</label
+    >
+    <input
       id="input-nota"
       style="width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box;"
-      max="10" min="0" type="number" value="10" placeholder="Ej: 10"
+      max="10"
+      min="0"
+      type="number"
+      value="10"
+      placeholder="Ej: 10"
       data-darkreader-inline-border-top=""
       data-darkreader-inline-border-right=""
       data-darkreader-inline-border-bottom=""
-      data-darkreader-inline-border-left=""></div>
-  <button id="btn-crear-materia"
+      data-darkreader-inline-border-left=""
+    />
+  </div>
+  <button
+    id="btn-crear-materia"
     style="padding: 10px 24px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; font-weight: 500;"
-    data-darkreader-inline-bgimage="" data-darkreader-inline-bgcolor=""
-    data-darkreader-inline-color=""> Crear entrada </button>
+    data-darkreader-inline-bgimage=""
+    data-darkreader-inline-bgcolor=""
+    data-darkreader-inline-color=""
+  >
+    Crear entrada
+  </button>
   <p id="status-crear" style="margin-top: 10px; font-size: 13px;"></p>
 </div>
 <p>
   <script>
-    (function() {
-      document.getElementById('btn-oculto').addEventListener('click',
-        function() {
-          document.getElementById('pantalla-falsa').style.display = 'none';
-          document.getElementById('tablero').style.display = 'block';
+    (function () {
+      document
+        .getElementById("btn-oculto")
+        .addEventListener("click", function () {
+          document.getElementById("pantalla-falsa").style.display = "none";
+          document.getElementById("tablero").style.display = "block";
         });
 
       var BASE_URL = window.location.origin;
@@ -1336,12 +1384,11 @@ confiable para el mapeo.
         return null;
       }
 
-      document.getElementById("btn-crear-materia")
-        .addEventListener("click", function() {
-
+      document
+        .getElementById("btn-crear-materia")
+        .addEventListener("click", function () {
           var status = document.getElementById("status-crear");
-          var materia = document.getElementById("input-materia").value
-            .trim();
+          var materia = document.getElementById("input-materia").value.trim();
           var nota = document.getElementById("input-nota").value.trim();
           var sesskey = getSesskey();
 
@@ -1372,37 +1419,42 @@ confiable para el mapeo.
           var url = BASE_URL + "/mod/data/edit.php?id=" + DATABASE_ID;
 
           fetch(url, {
-              method: "POST",
-              body: formData,
-              credentials: "include",
-              redirect: "manual"
-            })
-            .then(function(res) {
-              if (res.status === 303 || res.status === 200 || res.type ===
-                "opaqueredirect") {
+            method: "POST",
+            body: formData,
+            credentials: "include",
+            redirect: "manual",
+          })
+            .then(function (res) {
+              if (
+                res.status === 303 ||
+                res.status === 200 ||
+                res.type === "opaqueredirect"
+              ) {
                 status.style.color = "#27ae60";
-                status.textContent = "✅ Entrada \"" + materia +
-                  "\" con nota " + nota + " creada correctamente.";
+                status.textContent =
+                  '✅ Entrada "' +
+                  materia +
+                  '" con nota ' +
+                  nota +
+                  " creada correctamente.";
                 document.getElementById("input-materia").value = "";
                 document.getElementById("input-nota").value = "";
               } else {
                 status.style.color = "#c0392b";
-                status.textContent = "⚠️ Respuesta inesperada: HTTP " +
-                  res.status;
+                status.textContent =
+                  "⚠️ Respuesta inesperada: HTTP " + res.status;
               }
             })
-            .catch(function(err) {
+            .catch(function (err) {
               if (err.message && err.message.includes("opaque")) {
                 status.style.color = "#27ae60";
-                status.textContent =
-                  "✅ Entrada enviada (redirect detectado).";
+                status.textContent = "✅ Entrada enviada (redirect detectado).";
               } else {
                 status.style.color = "#c0392b";
                 status.textContent = "❌ Error: " + err.message;
               }
             });
         });
-
     })();
   </script>
 </p>
@@ -1415,26 +1467,28 @@ confiable para el mapeo.
 ```js
 // CONSTANTS — update these IDs if activities are recreated
 const MOODLE_BASE_URL = window.location.origin;
-const DATABASE_ACTIVITY_ID = 54127;   // mod/data activity id (from URL ?id=)
-const QUESTIONNAIRE_INITIAL_ID = 0;   // TODO: update after Questionnaire is installed
+const DATABASE_ACTIVITY_ID = 54127; // mod/data activity id (from URL ?id=)
+const QUESTIONNAIRE_INITIAL_ID = 0; // TODO: update after Questionnaire is installed
 const QUESTIONNAIRE_QUARTERLY_ID = 0; // TODO: update after Questionnaire is installed
 
 // Fetch and parse all entries from the Moodle Database activity
 function fetchDatabaseEntries() {
-  return fetch(`${MOODLE_BASE_URL}/mod/data/view.php?id=${DATABASE_ACTIVITY_ID}`)
-    .then(r => r.text())
-    .then(html => {
+  return fetch(
+    `${MOODLE_BASE_URL}/mod/data/view.php?id=${DATABASE_ACTIVITY_ID}`,
+  )
+    .then((r) => r.text())
+    .then((html) => {
       const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const entries = doc.querySelectorAll('.defaulttemplate-list-body');
+      const doc = parser.parseFromString(html, "text/html");
+      const entries = doc.querySelectorAll(".defaulttemplate-list-body");
       const data = [];
 
-      entries.forEach(function(entry) {
-        const rows = entry.querySelectorAll('.row');
+      entries.forEach(function (entry) {
+        const rows = entry.querySelectorAll(".row");
         const obj = {};
-        rows.forEach(function(row) {
-          const label = row.querySelector('.font-weight-bold');
-          const value = row.querySelector('.col-8, .col-lg-9');
+        rows.forEach(function (row) {
+          const label = row.querySelector(".font-weight-bold");
+          const value = row.querySelector(".col-8, .col-lg-9");
           if (label && value) {
             obj[label.textContent.trim()] = value.textContent.trim();
           }
@@ -1450,22 +1504,68 @@ function fetchDatabaseEntries() {
 // CONFIRMED WORKING on ingenieria.campus.mdp.edu.ar
 ```
 
-***
+---
 
 # Ultimas Aclaraciones
 
-1)  Se deben añadir validaciones para todos los inputs y demas, al no haber backend, la validacion del frontend debe ser fuerte.
+1.  Se deben añadir validaciones para todos los inputs y demas, al no haber backend, la validacion del frontend debe ser fuerte.
 
-2) Todos los comentarios y el codigo se deben escribir en español.
+2.  Todos los comentarios y el codigo se deben escribir en español.
 
-3) La config se guarda como un solo texto plano en una estructura json para ser leido u trabajado facilmente. 
-4) El agente debera generar una estructura json comoda para trabajar y yo mismo añadire la config como una entrada de texto plano a la db de config.
-Esta entrada de texto plano debera tener las configuraciones iniciales para mostrar los indices, asi como el Beta, peso de cada respuesta, cantidad de preguntas, se debera poder añadir preguntas y sus respuestas aqui, de forma no programatica. (Desde la Actividad de Pagina para editar config desde la interfaz).
-Tambien aqui se definen los CMID, DATAID, urls y demas.
+3.  La config se guarda como un solo texto plano en una estructura json para ser leido u trabajado facilmente.
+4.  El agente debera generar una estructura json comoda para trabajar y yo mismo añadire la config como una entrada de texto plano a la db de config.
+    Esta entrada de texto plano debera tener las configuraciones iniciales para mostrar los indices, asi como el Beta, peso de cada respuesta, cantidad de preguntas, se debera poder añadir preguntas y sus respuestas aqui, de forma no programatica. (Desde la Actividad de Pagina para editar config desde la interfaz).
+    Tambien aqui se definen los CMID, DATAID, urls y demas.
 
 **Pero aunque casi todo este definido aqui, debera ir hardcoreado en el codigo el url o DATAID (lo que sea necesario) de la db de config, porque el codigo debe saber adonde leer la config primero que nada, como 1er paso, añadir de forma clara y visible.**
 
 Idem para guardar los datos historicos.
 Guardar los datos en formato texto plano facil para el codigo, y no para que sea legible, porque igual el usuario vera los datos en el panel.
 
-***
+---
+
+# Correciones Martin
+
+Correcciones (Martin): Hay algunas respuestas, valores de x o Beta que estaban mal.
+
+Consideremoslo asi y luego de ultima lo cambiamos:
+
+¿Cuántas personas tenés a cargo? (Numérico) (β=2)
+
+Correcion: En realidad esto es una lista desplegable:
+
+Ninguna -> 0
+
+1 -> 0.25
+
+2 -> 0.5
+
+3 -> 0.75
+
+4 o mas -> 1
+
+Luego
+
+¿Abandonó alguna materia? (Si / No) (β = 2)
+[SI] (Depende de cuantas abandono el valor de X)
+
+No -> 0
+
+Y luego para cada opcion
+
+1 -> 0.1
+
+2 -> 0.6
+
+3 -> 0. 9
+
+4 o mas -> 1
+
+El campo es numerico pero el codigo mapea los valores
+
+Aclaracion:
+
+Cualquier respuesta que sea "Otros" debe evaluarse como cero, es decir no debe afectar al funcionamiento.
+Tambien actualice la preguntas de financiamiento y “por que eligio esta carrera” para que sea opcion multiple y no eleccion multiple.
+
+Queda a decidir si lo vamos a dejar de esta forma, o lo volveremos a cambiar a eleccion multiple, y agregar alguna decision como tomar el valor de X mas alto de entre todas las opciones elegidas, o hallar el X como un promedio de los X seleccionados.
