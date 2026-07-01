@@ -615,6 +615,12 @@
             margin: 2px;
             font-size: 12px;
           }
+
+          .chip-materia.reprobada {
+            background: #fadbd8;
+            border-color: #f1948a;
+            color: #78281f;
+          }
           
           /* Paginación */
           .pagination-row {
@@ -669,7 +675,7 @@
       const MOODLE_BASE_URL = window.location.origin;
       const DATAID_DB_1ER_ANIO = 19; // DB 1er Año
       const DATAID_DB_HIST_1ER_ANIO = 20; // DB Histórico 1er Año
-      const MATERIAS_ESPERADAS_1ER_ANIO = 7;
+      const MATERIAS_ESPERADAS_POR_CUAT = { 1: 3, 2: 7 };
 
       // Constante para pruebas de guardado histórico (ej. "2025-1" o "2025-2"). Si es null, se calcula automáticamente.
       const TEST_PERIODO_OVERRIDE = null;
@@ -1536,11 +1542,22 @@
               materiasArray,
             );
 
-            // Recalcular aprobadas (nota >= 5) y alargamiento
+            // Recalcular aprobadas (nota >= 5) y alargamiento cuatrimestral
             const aprobadas = materiasArray.filter((m) => m.nota >= 5).length;
+            const anioIngreso = parseInt(
+              getRecordValueByKeyword(alumnoDB, ["anio_ingreso", "ano_ingreso", "año_ingreso", "anio", "año"]) ||
+              new Date().getFullYear()
+            );
+            const cuatIngreso = parseInt(
+              getRecordValueByKeyword(alumnoDB, ["cuatrimestre_ingreso", "cuatrimestre"]) || 1
+            );
+            const anioActual = new Date().getFullYear();
+            const cuatActual = new Date().getMonth() <= 6 ? 1 : 2;
+            const cuatEnCarrera = Math.min(Math.max((anioActual - anioIngreso) * 2 + cuatActual - (cuatIngreso - 1), 1), 2);
+            const esperadas = MATERIAS_ESPERADAS_POR_CUAT[cuatEnCarrera];
             const alargamiento = Math.max(
               0,
-              Math.round((1 - aprobadas / MATERIAS_ESPERADAS_1ER_ANIO) * 100),
+              Math.round((1 - aprobadas / esperadas) * 100),
             );
 
             console.log(
@@ -2108,7 +2125,7 @@
           if (filterExclude2ndYear) {
             const aprobadasVal = getRecordValueByKeyword(al, ["aprobadas", "materias_aprobadas"]) || "0";
             const aprobadas = parseInt(aprobadasVal);
-            if (aprobadas >= MATERIAS_ESPERADAS_1ER_ANIO) return false;
+            if (aprobadas >= MATERIAS_ESPERADAS_POR_CUAT[2]) return false;
           }
 
           return true;
@@ -2210,7 +2227,7 @@
             materiasHTML = materias
               .map(
                 (m) =>
-                  `<span class="chip-materia">${m.materia}: <strong>${m.nota}</strong></span>`,
+                  `<span class="chip-materia${parseFloat(m.nota) < 5 ? ' reprobada' : ''}">${m.materia}: <strong>${m.nota}</strong></span>`,
               )
               .join(" ");
           }
